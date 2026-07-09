@@ -14,6 +14,7 @@ dotenv.config({
     path: './env'
 })
 
+//! second approach
 connectDB()
 
 //! first approach
