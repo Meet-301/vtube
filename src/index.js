@@ -1,7 +1,7 @@
 import connectDB from "./db/db.js";
 import dotenv from "dotenv";
 import dns from "dns";
-import app from "./app.js";
+import { app } from "./app.js";
 
 //! Set DNS servers before any database connection
 //! (force node.js to use trusted DNS resolution providers)
