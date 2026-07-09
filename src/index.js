@@ -1,6 +1,7 @@
 import connectDB from "./db/db.js";
 import dotenv from "dotenv";
 import dns from "dns";
+import app from "./app.js";
 
 //! Set DNS servers before any database connection
 //! (force node.js to use trusted DNS resolution providers)
@@ -12,5 +13,10 @@ dotenv.config({
 })
 
 connectDB()
-.then()
+.then(() => {
+    app.listen(process.env.PORT || 5000, () => {
+        console.log(`Server is running at port ${process.env.PORT}`);
+        
+    })
+})
 .catch((error) => console.log(`DB Connection Error: ${error}`))
