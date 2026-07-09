@@ -8,7 +8,7 @@ import dns from "dns";
 //! (e.g. cloudflare or google)
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
-const app = express()
+const app = express() //! new server instance of express application
 
 dotenv.config({
     path: './env'
