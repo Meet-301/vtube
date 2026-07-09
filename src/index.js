@@ -12,3 +12,5 @@ dotenv.config({
 })
 
 connectDB()
+.then()
+.catch((error) => console.log(`DB Connection Error: ${error}`))
