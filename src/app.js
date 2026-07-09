@@ -5,7 +5,7 @@ import cors from "cors"
 const app = express() //! new server instance of express application
 
 app.use(cors({
-    origin: process.env
+    origin: process.env.CORS_ORIGIN
 }))
 
 export default app
