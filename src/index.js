@@ -4,7 +4,11 @@ import express from "express";
 
 const app = express()
 
+dotenv.config({
+    path: './env'
+})
 
+connectDB()
 
 //! first approach
 // ( () => {
