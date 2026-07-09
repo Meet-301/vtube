@@ -14,4 +14,5 @@ app.use(express.urlencoded({limit: "16kb"})) //! for data that comes from URL(it
 app.use(express.static("public")) //! for assets that will be available publicly via folder named "public"
 app.use(cookieParser()) //! to set and get cookies in user browser
 
-export { app }
+
+export default app
