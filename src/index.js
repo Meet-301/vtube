@@ -4,17 +4,18 @@ import express from "express";
 
 const app = express()
 
-( () => {
-    try {
-        mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
-        app.on("error", (error) => {
-            console.log("Error: ", error);
-        })
+//! first approach
+// ( () => {
+//     try {
+//         await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
+//         app.on("error", (error) => {
+//             console.log("Error: ", error);
+//         })
 
-        app.listen(process.env.PORT, () => {
-            console.log(`app is listening on port ${process.env.PORT}`);
-        })
-    } catch (error) {
-        console.error("Error: ", error)
-    }
-} )()
+//         app.listen(process.env.PORT, () => {
+//             console.log(`app is listening on port ${process.env.PORT}`);
+//         })
+//     } catch (error) {
+//         console.error("Error: ", error)
+//     }
+// } )()
