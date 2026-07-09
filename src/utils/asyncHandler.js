@@ -1,1 +1,3 @@
-const asyncHandler = (fn) => async (req, res, next) => {}
+const asyncHandler = (fn) => async (req, res, next) => {
+    
+}
