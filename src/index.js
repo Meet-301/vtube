@@ -1,3 +1,4 @@
+//! base file from which the server(or backend app) will be started
 import connectDB from "./db/db.js";
 import dotenv from "dotenv";
 import dns from "dns";
