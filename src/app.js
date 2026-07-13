@@ -10,7 +10,7 @@ app.use(cors({
     credentials: true
 }))
 
-app.use(express.json({ limit: "16kb" })) //! for data that comes from json(it'll accept 16kb)
+app.use(express.json()) //! for data that comes from json(it'll accept 16kb)
 app.use(express.urlencoded({ limit: "16kb", extended: true })) 
 //! for data that comes from HTML form
 app.use(express.static("public")) //! for assets that will be available publicly via folder named "public"
