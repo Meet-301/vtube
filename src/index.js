@@ -10,18 +10,17 @@ import app from "./app.js";
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 dotenv.config({
-    path: './.env'
-})
+   path: "./.env",
+});
 
-connectDB()
-    .then(() => {
-        app.on("error", (error) => {
-            console.log(`Application failed: ${error}`)
-        })
+connectDB().then(() => {
+   app.on("error", (error) => {
+      console.log(`Application failed: ${error}`);
+   });
 
-        const port = process.env.PORT || 5000
+   const port = process.env.PORT || 5000;
 
-        app.listen(port, () => {
-            console.log(`Server is running at port ${port}`)
-        })
-    })
+   app.listen(port, () => {
+      console.log(`Server is running at port ${port}`);
+   });
+});
