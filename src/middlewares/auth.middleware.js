@@ -10,7 +10,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
       req.header("Authorization")?.replace("Bearer ", "");
 
    if (!token) {
-      throw new ApiError(401, "Unthorized request");
+      throw new ApiError(401, "Unauthorized request");
    }
 
    //! verify whether the token is correct or not
