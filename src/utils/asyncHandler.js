@@ -1,5 +1,9 @@
 //! wrapper class to wrap the functions
 
+/**
+ * @param {import('express').RequestHandler} fn //!this tells vs code that request handler comes from express
+ */
+
 //todo first approach
 // const asyncHandler = (requestHandler) => {
 //     return (req, res, next) => {
