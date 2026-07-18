@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import { extractPublicId } from "cloudinary-build-url";
 
 cloudinary.config({
    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -17,7 +18,7 @@ const uploadOnCloudinary = async (localFilePath) => {
       });
 
       //! after successful file upload
-      fs.unlinkSync(localFilePath)
+      fs.unlinkSync(localFilePath);
       return response;
    } catch (error) {
       fs.unlinkSync(localFilePath); //! remove the file from local server as the upload operation failure
@@ -25,4 +26,18 @@ const uploadOnCloudinary = async (localFilePath) => {
    }
 };
 
-export default uploadOnCloudinary;
+const deleteFromCloudinary = async (cloudinaryUrl) => {
+   try {
+      if (!cloudinaryUrl) return null;
+
+      const publicId = extractPublicId(cloudinaryUrl);
+
+      const response = await cloudinary.uploader.destroy(publicId);
+
+      return response;
+   } catch (error) {
+      console.log(error?.message);
+   }
+};
+
+export { uploadOnCloudinary, deleteFromCloudinary };
