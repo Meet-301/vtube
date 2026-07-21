@@ -470,12 +470,6 @@ const getWatchHistory = asyncHandler(async (req, res) => {
          },
       },
       {
-         $project: {
-            password: 0,
-            refreshToken: 0
-         }
-      },
-      {
          $lookup: {
             from: "videos",
             localField: "watchHistory",
