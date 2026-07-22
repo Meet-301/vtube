@@ -37,7 +37,7 @@ userRouter.route("/login").post(loginUser);
 //! secure routes
 userRouter.route("/logout").post(verifyJWT, logoutUser);
 userRouter.route("/refresh-token").post(refreshAccessToken);
-userRouter.route("/update-password").post(verifyJWT, updateCurrentPassword);
+userRouter.route("/update-password").patch(verifyJWT, updateCurrentPassword);
 userRouter.route("/current-user").get(verifyJWT, getCurrentUser);
 userRouter.route("/update-account").patch(verifyJWT, updateAccountDetails);
 
@@ -48,6 +48,7 @@ userRouter
    .route("/update-cover")
    .patch(verifyJWT, multerUpload.single("coverImage"), updateCoverImage);
 
+//! :username is used for query params
 userRouter.route("/channel/:username").get(verifyJWT, getUserChannelProfile);
 userRouter.route("/watch-history").get(verifyJWT, getWatchHistory);
 
