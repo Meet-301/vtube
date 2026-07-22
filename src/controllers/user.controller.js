@@ -38,6 +38,14 @@ const registerUser = asyncHandler(async (req, res) => {
    const { fullName, email, username, password } = req.body;
 
    //! validation
+   if (
+      [fullName, email, username, password].some(
+         (field) => field?.trim() === ""
+      )
+   ) {
+      throw new ApiError(400, "All fields are required");
+   }
+
    const isValidEmail = (email) => {
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       return emailRegex.test(email);
@@ -49,13 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
       return passwordRegex.test(password);
    };
 
-   if (
-      [fullName, email, username, password].some(
-         (field) => field?.trim() === ""
-      )
-   ) {
-      throw new ApiError(400, "All fields are required");
-   } else if (!isValidEmail(email)) {
+   if (!isValidEmail(email)) {
       throw new ApiError(400, "Invalid email format");
    } else if (!isValidPassword(password)) {
       throw new ApiError(400, "Invalid password format");
@@ -233,28 +235,39 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
+
+   //! check whether both fields are empty or not
+   if(!req.body) {
+      throw new ApiError(
+         400,
+         "At least one field is required for account updation"
+      );
+   }
+
    //! extract data from request
    const { fullName, username } = req.body;
 
    //! match the current username for uniqueness purpose
-   const currentUsername = await User.findOne({ username });
-
-   if (currentUsername) {
-      throw new ApiError(409, "User already exists with this username");
+   if(username) {
+      const currentUsername = await User.findOne({ username });
+   
+      if (currentUsername) {
+         throw new ApiError(409, "User already exists with this username");
+      }
    }
 
    //! empty object for keeping data
    const updateFields = {};
 
-   if (fullName) updateFields.fullName = fullName;
-   else updateFields.username = username.toLowerCase();
-
-   //! check whether both fields are empty or not
-   if (Object.keys(updateFields).length === 0) {
-      throw new ApiError(
-         400,
-         "At least one field is required for account updation"
-      );
+   if(fullName && !username) {
+      updateFields.fullName = fullName
+   }
+   else if(!fullName && username) {
+      updateFields.username = username
+   }
+   else {
+      updateFields.fullName = fullName
+      updateFields.username = username
    }
 
    //! update the data
