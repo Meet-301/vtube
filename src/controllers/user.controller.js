@@ -235,9 +235,8 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-
    //! check whether both fields are empty or not
-   if(!req.body) {
+   if (!req.body) {
       throw new ApiError(
          400,
          "At least one field is required for account updation"
@@ -248,9 +247,9 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
    const { fullName, username } = req.body;
 
    //! match the current username for uniqueness purpose
-   if(username) {
+   if (username) {
       const currentUsername = await User.findOne({ username });
-   
+
       if (currentUsername) {
          throw new ApiError(409, "User already exists with this username");
       }
@@ -259,15 +258,13 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
    //! empty object for keeping data
    const updateFields = {};
 
-   if(fullName && !username) {
-      updateFields.fullName = fullName
-   }
-   else if(!fullName && username) {
-      updateFields.username = username
-   }
-   else {
-      updateFields.fullName = fullName
-      updateFields.username = username
+   if (fullName && !username) {
+      updateFields.fullName = fullName;
+   } else if (!fullName && username) {
+      updateFields.username = username;
+   } else {
+      updateFields.fullName = fullName;
+      updateFields.username = username;
    }
 
    //! update the data
@@ -325,9 +322,9 @@ const updateAvatar = asyncHandler(async (req, res) => {
    }
 
    //! upload new avatar on cloudinary
-   const avatar = await uploadOnCloudinary(avatarLocalPath);
+   const newAvatar = await uploadOnCloudinary(avatarLocalPath);
 
-   if (!avatar?.url) {
+   if (!newAvatar?.url) {
       throw new ApiError(400, "Error while uploading avatar on cloudinary");
    }
 
@@ -335,7 +332,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
    await User.findByIdAndUpdate(
       currentUser?._id,
       {
-         $set: { avatar: avatar.url },
+         $set: { avatar: newAvatar.url },
       },
       {
          returnDocument: "after",
@@ -349,7 +346,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
 
    return res
       .status(200)
-      .json(new ApiResponse(200, avatar.url, "Avatar updated successfully"));
+      .json(new ApiResponse(200, newAvatar.url, "Avatar updated successfully"));
 });
 
 const updateCoverImage = asyncHandler(async (req, res) => {
@@ -360,9 +357,9 @@ const updateCoverImage = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Cover image file is required");
    }
 
-   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+   const newCoverImage = await uploadOnCloudinary(coverImageLocalPath);
 
-   if (!coverImage?.url) {
+   if (!newCoverImage?.url) {
       throw new ApiError(
          400,
          "Error while uploading cover image on cloudinary"
@@ -372,12 +369,12 @@ const updateCoverImage = asyncHandler(async (req, res) => {
    await User.findByIdAndUpdate(
       currentUser?._id,
       {
-         $set: { coverImage: coverImage.url },
+         $set: { coverImage: newCoverImage.url },
       },
       {
          returnDocument: "after",
       }
-   ).select("-password");
+   );
 
    const oldCoverImageUrl = currentUser?.coverImage;
 
@@ -390,7 +387,7 @@ const updateCoverImage = asyncHandler(async (req, res) => {
       .json(
          new ApiResponse(
             200,
-            coverImage.url,
+            newCoverImage.url,
             "Cover image updated successfully"
          )
       );
@@ -409,16 +406,17 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
       {
          $match: {
             //! $match - same as WHERE clause in SQL
+            //! match the username
             username: username,
          },
       },
       {
+         //! $lookup - left outer join operation(its output will be in array format)
          $lookup: {
-            //! $lookup - join operation
-            from: "subscriptions",
-            localField: "_id",
-            foreignField: "channel",
-            as: "subscribers",
+            from: "subscriptions", //! right side collection - subscriptions
+            localField: "_id", //! connect from user collection's _id field
+            foreignField: "channel", //! connect to subscriptions collection's channel field
+            as: "subscribers", //! output will be provided here as subscribers field
          },
       },
       {
