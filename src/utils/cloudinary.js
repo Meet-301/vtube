@@ -33,8 +33,6 @@ const deleteFromCloudinary = async (cloudinaryUrl) => {
       const publicId = extractPublicId(cloudinaryUrl);
 
       const response = await cloudinary.uploader.destroy(publicId);
-
-      return response;
    } catch (error) {
       console.log(error?.message);
    }
