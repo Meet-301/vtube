@@ -9,9 +9,16 @@ import ApiResponse from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
-const options = {
+const accessOptions = {
    httpOnly: true, //! hides the cookie from malicious client side scripts
    secure: true, //! ensures it is never sent in plaintext and can only be accessbile in https(not in http)
+   maxAge: 24 * 60 * 60 * 1000 //! cookie expiry time(1 day)
+};
+
+const refreshOptions = {
+   httpOnly: true,
+   secure: true,
+   maxAge: 10 * (24 * 60 * 60 * 1000) //! (10 days)
 };
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -152,8 +159,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
    return res
       .status(200)
-      .cookie("accessToken", accessToken, options)
-      .cookie("refreshToken", refreshToken, options)
+      .cookie("accessToken", accessToken, accessOptions)
+      .cookie("refreshToken", refreshToken, refreshOptions)
       .json(
          new ApiResponse(
             200,
@@ -180,8 +187,8 @@ const logoutUser = asyncHandler(async (req, res, next) => {
 
    return res
       .status(200)
-      .clearCookie("accessToken", options)
-      .clearCookie("refreshToken", options)
+      .clearCookie("accessToken", accessOptions)
+      .clearCookie("refreshToken", refreshOptions)
       .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 
