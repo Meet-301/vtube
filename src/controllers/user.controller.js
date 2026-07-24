@@ -98,10 +98,10 @@ const registerUser = asyncHandler(async (req, res) => {
 
    //! create user object - create entry in DB
    const user = await User.create({
-      email,
-      password,
+      email: email.trim(),
+      password: password.trim(),
       username: username.toLowerCase(),
-      fullName,
+      fullName: fullName.trim(),
       avatar: avatar.url,
       coverImage: coverImage?.url || "",
    });
@@ -403,7 +403,7 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 const getUserChannelProfile = asyncHandler(async (req, res) => {
    const { username } = req.params;
 
-   if (!username?.trim()) {
+   if (!username) {
       throw new ApiError(400, "Username is missing");
    }
 
