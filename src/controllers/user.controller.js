@@ -12,13 +12,13 @@ import mongoose from "mongoose";
 const accessOptions = {
    httpOnly: true, //! hides the cookie from malicious client side scripts
    secure: true, //! ensures it is never sent in plaintext and can only be accessbile in https(not in http)
-   maxAge: 24 * 60 * 60 * 1000 //! cookie expiry time(1 day)
+   maxAge: 24 * 60 * 60 * 1000, //! cookie expiry time(1 day)
 };
 
 const refreshOptions = {
    httpOnly: true,
    secure: true,
-   maxAge: 10 * (24 * 60 * 60 * 1000) //! (10 days)
+   maxAge: 10 * (24 * 60 * 60 * 1000), //! (10 days)
 };
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -81,7 +81,7 @@ const registerUser = asyncHandler(async (req, res) => {
    }
 
    //! check for images and avatar
-   const avatarLocalPath = req.files?.avatar?.[0]?.path;
+   const avatarLocalPath = req.files.avatar?.[0]?.path;
    const coverImageLocalPath = req.files.coverImage?.[0].path;
 
    if (!avatarLocalPath) {
@@ -93,7 +93,10 @@ const registerUser = asyncHandler(async (req, res) => {
    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
    if (!avatar) {
-      throw new ApiError(400, "Avatar file is required");
+      throw new ApiError(
+         400,
+         "Something went wrong while uploading avatar on cloudinary"
+      );
    }
 
    //! create user object - create entry in DB
@@ -193,6 +196,10 @@ const logoutUser = asyncHandler(async (req, res, next) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res, next) => {
+   if (!req?.body || !req.cookies) {
+      throw new ApiError(400, "Request data is missing");
+   }
+
    //! get refresh token from request's cookies
    const incomingRefreshToken =
       req.cookies.refreshToken || req.body.refreshToken;
@@ -217,6 +224,9 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
          throw new ApiError(401, "Invalid user");
       }
 
+      console.log(incomingRefreshToken);
+      console.log(user?.refreshToken);
+
       //! if refresh token is invalid
       if (incomingRefreshToken !== user?.refreshToken) {
          throw new ApiError(401, "Invalid refresh token");
@@ -227,8 +237,8 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
 
       return res
          .status(200)
-         .cookie("accessToken", accessToken, options)
-         .cookie("refreshToken", refreshToken, options)
+         .cookie("accessToken", accessToken, accessOptions)
+         .cookie("refreshToken", refreshToken, refreshOptions)
          .json(
             new ApiResponse(
                200,
@@ -265,11 +275,13 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
    //! empty object for keeping data
    const updateFields = {};
 
-   if (fullName && !username) {
+   if (fullName) {
       updateFields.fullName = fullName;
-   } else if (!fullName && username) {
+   }
+   if (username) {
       updateFields.username = username;
-   } else {
+   }
+   if (fullName && username) {
       updateFields.fullName = fullName;
       updateFields.username = username;
    }
@@ -325,7 +337,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
 
    //! check whether avatar file is provided or not
    if (!avatarLocalPath) {
-      throw new ApiError(400, "Avatar file is required");
+      throw new ApiError(400, "Avatar file is required while updation");
    }
 
    //! upload new avatar on cloudinary
