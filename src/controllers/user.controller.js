@@ -131,9 +131,9 @@ const loginUser = asyncHandler(async (req, res) => {
    //! request body -> data
    const { email, password } = req.body;
 
-   //! check whether email is provided or not
-   if (!email) {
-      throw new ApiError(400, "Email is required");
+   //! check whether email, password is provided or not
+   if (!email || !password) {
+      throw new ApiError(400, "Email and password is required");
    }
 
    //! find the user
