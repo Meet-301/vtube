@@ -7,10 +7,6 @@ const commentSchema = new Schema(
          required: true,
          trim: true,
       },
-      likes: {
-         type: Number,
-         default: 0,
-      },
       video: {
          type: Schema.Types.ObjectId,
          ref: "Video",
