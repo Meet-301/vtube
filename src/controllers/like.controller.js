@@ -9,10 +9,6 @@ import { Like } from "../models/like.model.js";
 const toggleLikes = asyncHandler(async (req, res) => {
    const { videoId } = req.params;
 
-   if (!videoId) {
-      throw new ApiError(400, "Video id is required");
-   }
-
    if (!mongoose.Types.ObjectId.isValid(videoId)) {
       throw new ApiError(400, "Invalid video id");
    }
@@ -128,4 +124,23 @@ const getLikedVideos = asyncHandler(async (req, res) => {
       );
 });
 
-export { toggleLikes, getLikedVideos };
+const isLiked = asyncHandler(async (req, res) => {
+   const { videoId } = req.params;
+
+   const isVideoLiked = await Like.exists({
+      video: videoId,
+      likedBy: req.user._id,
+   });
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(
+            200,
+            isVideoLiked ? true : false,
+            "Like status fetched successfully"
+         )
+      );
+});
+
+export { toggleLikes, getLikedVideos, isLiked };
