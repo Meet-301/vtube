@@ -127,6 +127,10 @@ const getLikedVideos = asyncHandler(async (req, res) => {
 const isLiked = asyncHandler(async (req, res) => {
    const { videoId } = req.params;
 
+   if (!mongoose.Types.ObjectId.isValid(videoId)) {
+      throw new ApiError(400, "Invalid video id");
+   }
+
    const isVideoLiked = await Like.exists({
       video: videoId,
       likedBy: req.user._id,
