@@ -75,10 +75,6 @@ const createVideo = asyncHandler(async (req, res) => {
 const watchVideo = asyncHandler(async (req, res) => {
    const { videoId } = req.params;
 
-   if (!videoId) {
-      throw new ApiError(400, "Video id is required");
-   }
-
    if (!mongoose.Types.ObjectId.isValid(videoId)) {
       throw new ApiError(400, "Invalid video id");
    }
@@ -157,10 +153,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
 const getVideosByUsername = asyncHandler(async (req, res) => {
    const { username } = req.params;
 
-   if (!username) {
-      throw new ApiError(400, "Username is required");
-   }
-
    const user = await User.findOne({ username: username });
 
    if (!user) {
@@ -194,10 +186,6 @@ const updateVideoDetails = asyncHandler(async (req, res) => {
 
    const { title, description, isPublished } = req.body;
    const { videoId } = req.params;
-
-   if (!videoId) {
-      throw new ApiError(400, "Video ID is required");
-   }
 
    if (!mongoose.Types.ObjectId.isValid(videoId)) {
       throw new ApiError(410, "Invalid video id");
@@ -254,10 +242,6 @@ const updateThumbnail = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Thumbnail is required");
    }
 
-   if (!videoId) {
-      throw new ApiError(400, "Video ID is required");
-   }
-
    if (!mongoose.Types.ObjectId.isValid(videoId)) {
       throw new ApiError(410, "Invalid video id");
    }
@@ -301,10 +285,6 @@ const updateThumbnail = asyncHandler(async (req, res) => {
 const deleteVideoById = asyncHandler(async (req, res) => {
    const { videoId } = req.params;
 
-   if (!videoId) {
-      throw new ApiError(400, "Video ID is required");
-   }
-
    if (!mongoose.Types.ObjectId.isValid(videoId)) {
       throw new ApiError(410, "Invalid video id");
    }
@@ -336,10 +316,6 @@ const deleteVideoById = asyncHandler(async (req, res) => {
 
 const deleteVideosByUsername = asyncHandler(async (req, res) => {
    const { username } = req.params;
-
-   if (!username) {
-      throw new ApiError(400, "Username is required");
-   }
 
    const user = await User.findOne({
       username: username,
