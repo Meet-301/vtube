@@ -7,6 +7,7 @@ import {
    deleteVideosByUsername,
    getAllVideos,
    getVideosByUsername,
+   toggleLikes,
    updateThumbnail,
    updateVideoDetails,
    watchVideo,
@@ -39,6 +40,7 @@ videoRouter
 videoRouter
    .route("/update-thumbnail/:videoId")
    .patch(verifyJWT, multerUpload.single("thumbnail"), updateThumbnail);
+videoRouter.route("/toggle-likes/:videoId").patch(verifyJWT, toggleLikes)
 
 videoRouter.route("/videoid/:videoId").delete(verifyJWT, deleteVideoById);
 videoRouter

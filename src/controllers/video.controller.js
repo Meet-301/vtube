@@ -10,6 +10,7 @@ import fs from "fs";
 import ApiResponse from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
+import { Like } from "../models/like.model.js";
 
 const createVideo = asyncHandler(async (req, res) => {
    if (!req?.body) {
@@ -154,10 +155,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
 });
 
 const getVideosByUsername = asyncHandler(async (req, res) => {
-   if (!req.params) {
-      throw new ApiError(400, "Request body is empty");
-   }
-
    const { username } = req.params;
 
    if (!username) {
@@ -188,6 +185,65 @@ const getVideosByUsername = asyncHandler(async (req, res) => {
    return res
       .status(200)
       .json(new ApiResponse(200, videos, "Videos fetched successfully"));
+});
+
+const toggleLikes = asyncHandler(async (req, res) => {
+   const { videoId } = req.params;
+
+   if (!videoId) {
+      throw new ApiError(400, "Video id is required");
+   }
+
+   if (!mongoose.Types.ObjectId.isValid(videoId)) {
+      throw new ApiError(400, "Invalid video id");
+   }
+
+   const video = await Video.findById(videoId);
+
+   if (!video) {
+      throw new ApiError(404, "Video not found");
+   }
+
+   const existingLike = await Like.findOne({
+      video: videoId,
+      likedBy: req.user._id,
+   });
+
+   let videoRes, likeRes, isLiked;
+
+   if (!existingLike) {
+      likeRes = await Like.create({ video: videoId, likedBy: req.user._id });
+      videoRes = await Video.findByIdAndUpdate(
+         videoId,
+         { $inc: { likes: 1 } },
+         { returnDocument: "after" }
+      );
+      isLiked = true;
+   } else {
+      likeRes = await Like.deleteOne({ video: videoId, likedBy: req.user._id });
+      videoRes = await Video.findByIdAndUpdate(
+         videoId,
+         { $inc: { likes: -1 } },
+         { returnDocument: "after" }
+      );
+      isLiked = false;
+   }
+
+   const resObj = {
+      videoResponse: videoRes,
+      likeResponse: likeRes,
+      isLiked: isLiked,
+   };
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(
+            200,
+            resObj,
+            isLiked ? "Video liked successfully" : "Video unliked successfully"
+         )
+      );
 });
 
 const updateVideoDetails = asyncHandler(async (req, res) => {
@@ -373,6 +429,7 @@ export {
    getAllVideos,
    getVideosByUsername,
    watchVideo,
+   toggleLikes,
    updateVideoDetails,
    updateThumbnail,
    deleteVideoById,
