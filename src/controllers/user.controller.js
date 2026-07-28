@@ -133,7 +133,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
    //! check whether email, password is provided or not
    if (!email || !password) {
-      throw new ApiError(400, "Email and password is required");
+      throw new ApiError(400, "Both email and password are required");
    }
 
    //! find the user
@@ -305,6 +305,10 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 const updateCurrentPassword = asyncHandler(async (req, res) => {
    const { oldPassword, newPassword } = req.body;
 
+   if (!oldPassword || !newPassword) {
+      throw new ApiError(400, "Both old and new password are required");
+   }
+
    const user = await User.findById(req.user?._id);
 
    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
@@ -417,6 +421,12 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 
    if (!username) {
       throw new ApiError(400, "Username is missing");
+   }
+
+   const currentUser = await User.findOne({ username });
+
+   if (!currentUser) {
+      throw new ApiError(404, "User not found");
    }
 
    //! aggregate method returns array of documents as an output
