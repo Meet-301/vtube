@@ -21,9 +21,11 @@ app.use(cookieParser()); //! to set and get cookies in user browser
 //! routes import
 import userRouter from "./routes/user.route.js";
 import videoRouter from "./routes/video.route.js";
+import likeRouter from "./routes/like.route.js";
 
 //! routes declaration
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/videos", videoRouter)
+app.use("/api/v1/likes", likeRouter)
 
 export default app;
