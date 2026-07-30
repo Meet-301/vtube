@@ -163,17 +163,16 @@ const getPlaylist = asyncHandler(async (req, res) => {
                         {
                            $project: {
                               fullName: 1,
-                              owner: 1,
-                           },
-                        },
-                        {
-                           $addFields: {
-                              owner: {
-                                 $first: "$owner",
-                              },
                            },
                         },
                      ],
+                  },
+               },
+               {
+                  $addFields: {
+                     owner: {
+                        $first: "$owner",
+                     },
                   },
                },
             ],
@@ -183,7 +182,7 @@ const getPlaylist = asyncHandler(async (req, res) => {
 
    return res
       .status(200)
-      .json(new ApiResponse(200, playlist, "Playlist fetched successfully"));
+      .json(new ApiResponse(200, playlist[0], "Playlist fetched successfully"));
 });
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
