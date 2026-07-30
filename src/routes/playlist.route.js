@@ -20,7 +20,7 @@ playlistRouter
    .post(verifyJWT, addVideoToPlaylist);
 
 playlistRouter.route("/:playlistId").get(verifyJWT, getPlaylist);
-playlistRouter.route("/user-playlists").get(verifyJWT, getUserPlaylists);
+playlistRouter.route("/playlists").get(verifyJWT, getUserPlaylists);
 
 playlistRouter
    .route("/:playlistId")
