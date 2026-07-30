@@ -13,7 +13,7 @@ import mongoose from "mongoose";
 import { Like } from "../models/like.model.js";
 
 const createVideo = asyncHandler(async (req, res) => {
-   if (!req?.body) {
+   if (!req.body) {
       throw new ApiError(400, "Data is missing");
    }
 
@@ -180,7 +180,7 @@ const getVideosByUsername = asyncHandler(async (req, res) => {
 });
 
 const updateVideoDetails = asyncHandler(async (req, res) => {
-   if (!req?.body) {
+   if (!req.body) {
       throw new ApiError(400, "Request body is empty");
    }
 

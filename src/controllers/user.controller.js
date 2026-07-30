@@ -196,7 +196,7 @@ const logoutUser = asyncHandler(async (req, res, next) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res, next) => {
-   if (!req?.body || !req.cookies) {
+   if (!req.body || !req.cookies) {
       throw new ApiError(400, "Request data is missing");
    }
 
