@@ -5,6 +5,10 @@ import { Comment } from "../models/comment.model.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 const addComment = asyncHandler(async (req, res) => {
+   if(!req?.body) {
+      throw new ApiError(400, "Request data is missing")
+   }
+ 
    const { videoId } = req.params;
    const { content } = req.body;
 
@@ -12,7 +16,7 @@ const addComment = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Invalid video id");
    }
 
-   if (!content) {
+   if (content === "") {
       throw new ApiError(400, "Content is required");
    }
 
