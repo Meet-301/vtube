@@ -224,9 +224,6 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
          throw new ApiError(401, "Invalid user");
       }
 
-      console.log(incomingRefreshToken);
-      console.log(user?.refreshToken);
-
       //! if refresh token is invalid
       if (incomingRefreshToken !== user?.refreshToken) {
          throw new ApiError(401, "Invalid refresh token");
