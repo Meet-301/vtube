@@ -100,6 +100,9 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 const getPlaylist = asyncHandler(async (req, res) => {
    const { playlistId } = req.params;
 
+   const page = Number(req.query.page) || 1;
+   const limit = Number(req.query.limit) || 10;
+
    if (!mongoose.Types.ObjectId.isValid(playlistId)) {
       throw new ApiError(400, "Invalid playlist id");
    }
@@ -179,6 +182,12 @@ const getPlaylist = asyncHandler(async (req, res) => {
                   $sort: {
                      createdAt: -1
                   }
+               },
+               {
+                  $skip: (page - 1) * limit
+               },
+               {
+                  $limit: limit
                }
             ],
          },
