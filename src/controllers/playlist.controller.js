@@ -175,6 +175,11 @@ const getPlaylist = asyncHandler(async (req, res) => {
                      },
                   },
                },
+               {
+                  $sort: {
+                     createdAt: -1
+                  }
+               }
             ],
          },
       },
