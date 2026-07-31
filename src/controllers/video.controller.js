@@ -150,6 +150,80 @@ const getAllVideos = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, videos, "Videos fetched successfully"));
 });
 
+const getVideoById = asyncHandler(async (req, res) => {
+   const { videoId } = req.params
+
+   if(!mongoose.Types.ObjectId.isValid(videoId)) {
+      throw new ApiError(400, "Invalid video id")
+   }
+
+   const videoDetails = await Video.aggregate([
+      {
+         $match: {
+            _id: new mongoose.Types.ObjectId(videoId)
+         }
+      },
+      {
+         $lookup: {
+            from: "users",
+            localField: "owner",
+            foreignField: "_id",
+            as: "owner",
+            pipeline: [
+               {
+                  $project: {
+                     fullName: 1,
+                     avatar: 1
+                  }
+               },
+            ]
+         }
+      },
+      {
+         $addFields: {
+            owner: {
+               $first: "$owner"
+            },
+         }
+      },
+      {
+         $lookup: {
+            from: "subscriptions",
+            localField: "owner._id",
+            foreignField: "channel",
+            as: "subscribers"
+         }
+      },
+      {
+         $addFields: {
+            subscribersCount: {
+               $size: "$subscribers"
+            },
+            isSubscribed: {
+               $cond: {
+                  if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+                  then: true,
+                  else: false
+               }
+            }
+         }
+      },
+      {
+         $project: {
+            subscribers: 0
+         }
+      }
+   ])
+
+   if(!videoDetails.length) {
+      throw new ApiError(404, "Video not found")
+   }
+
+   return res
+   .status(200)
+   .json(new ApiResponse(200, videoDetails, "Video fetched successfully"))
+})
+
 const getVideosByUsername = asyncHandler(async (req, res) => {
    const { username } = req.params;
 
@@ -344,6 +418,7 @@ const deleteVideosByUsername = asyncHandler(async (req, res) => {
 export {
    createVideo,
    getAllVideos,
+   getVideoById,
    getVideosByUsername,
    watchVideo,
    updateVideoDetails,
