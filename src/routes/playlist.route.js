@@ -8,6 +8,7 @@ import {
    editPlaylist,
    getPlaylist,
    getUserPlaylists,
+   removeVideoFromPlaylist,
 } from "../controllers/playlist.controller.js";
 
 const playlistRouter = Router();
@@ -26,6 +27,7 @@ playlistRouter
    .route("/:playlistId")
    .patch(verifyJWT, multerUpload.single("playlistCover"), editPlaylist);
 
-playlistRouter.route("/:playlistId").delete(verifyJWT, deletePlaylist);
+playlistRouter.route("/remove-playlist/:playlistId").delete(verifyJWT, deletePlaylist);
+playlistRouter.route("/remove-video/:playlistId/:videoId").delete(verifyJWT, removeVideoFromPlaylist);
 
 export default playlistRouter;
