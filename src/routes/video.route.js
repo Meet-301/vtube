@@ -6,6 +6,7 @@ import {
    deleteVideoById,
    deleteVideosByUsername,
    getAllVideos,
+   getSubscriptionFeed,
    getVideoById,
    getVideosByUsername,
    updateThumbnail,
@@ -34,6 +35,7 @@ videoRouter.route("/watch/:videoId").get(verifyJWT, watchVideo);
 videoRouter.route("/all").get(verifyJWT, getAllVideos);
 videoRouter.route("/username/:username").get(verifyJWT, getVideosByUsername);
 videoRouter.route("/id/:videoId").get(verifyJWT, getVideoById);
+videoRouter.route("/feed/subscription").get(verifyJWT, getSubscriptionFeed)
 
 videoRouter
    .route("/update-details/:videoId")
