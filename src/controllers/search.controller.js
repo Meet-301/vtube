@@ -375,15 +375,19 @@ const getSearchHistory = asyncHandler(async (req, res) => {
    return res
       .status(200)
       .json(
-         new ApiResponse(200, history[0]?.recentSearches, "Search history fetched successfully")
+         new ApiResponse(
+            200,
+            history[0]?.recentSearches,
+            "Search history fetched successfully"
+         )
       );
 });
 
 const removeFromHistory = asyncHandler(async (req, res) => {
    const { query } = req.query;
 
-   if(!query) {
-      throw new ApiError(400, "Search query is required")
+   if (!query) {
+      throw new ApiError(400, "Search query is required");
    }
 
    const isRecordExists = await Search.exists({
