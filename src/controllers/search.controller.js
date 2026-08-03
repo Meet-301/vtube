@@ -1,4 +1,5 @@
 import { Playlist } from "../models/playlist.model.js";
+import { Search } from "../models/search.model.js";
 import { User } from "../models/user.model.js";
 import { Video } from "../models/video.model.js";
 import ApiError from "../utils/ApiError.js";
@@ -29,6 +30,7 @@ const search = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Search query is empty");
    }
 
+   //! sortBy object logic
    if (sortBy === "latest") {
       sort = {
          createdAt: -1,
@@ -47,6 +49,7 @@ const search = asyncHandler(async (req, res) => {
       };
    }
 
+   //! split words by spaces
    const words = query.split(/\s+/);
 
    const videoSearchConditions = words.flatMap((word) => {
@@ -98,13 +101,42 @@ const search = asyncHandler(async (req, res) => {
             },
          },
          {
-            userrname: {
+            username: {
                $regex: word,
                $options: "i",
             },
          },
       ];
    });
+
+   async function addToSearchHistory() {
+      const searchExists = await Search.exists({
+         user: req.user._id,
+      });
+
+      if (searchExists) {
+         await Search.findByIdAndUpdate(searchExists._id, {
+            $pull: {
+               recentSearches: query,
+            },
+         });
+
+         await Search.findByIdAndUpdate(searchExists._id, {
+            $push: {
+               recentSearches: {
+                  $each: [query],
+                  $position: 0,
+                  $slice: 20,
+               },
+            },
+         });
+      } else {
+         await Search.create({
+            user: req.user._id,
+            recentSearches: [query],
+         });
+      }
+   }
 
    if (type === "video") {
       //! search by video
@@ -171,6 +203,8 @@ const search = asyncHandler(async (req, res) => {
          currentPage: page,
          totalPages: totalPages ?? 0,
       };
+
+      addToSearchHistory();
 
       return res
          .status(200)
@@ -247,6 +281,8 @@ const search = asyncHandler(async (req, res) => {
          totalPages: totalPages ?? 0,
       };
 
+      addToSearchHistory();
+
       return res
          .status(200)
          .json(
@@ -294,6 +330,7 @@ const search = asyncHandler(async (req, res) => {
             $project: {
                avatar: 1,
                username: 1,
+               fullName: 1,
                isSubscribed: 1,
                subscribersCount: 1,
             },
@@ -320,6 +357,8 @@ const search = asyncHandler(async (req, res) => {
          totalPages: totalPages ?? 0,
       };
 
+      addToSearchHistory();
+
       return res
          .status(200)
          .json(new ApiResponse(200, response, "Channels fetched successfully"));
@@ -328,4 +367,47 @@ const search = asyncHandler(async (req, res) => {
    }
 });
 
-export { search };
+const getSearchHistory = asyncHandler(async (req, res) => {
+   const history = await Search.find({
+      user: req.user._id,
+   });
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(200, history[0]?.recentSearches, "Search history fetched successfully")
+      );
+});
+
+const removeFromHistory = asyncHandler(async (req, res) => {
+   const { query } = req.query;
+
+   if(!query) {
+      throw new ApiError(400, "Search query is required")
+   }
+
+   const isRecordExists = await Search.exists({
+      user: req.user._id,
+      recentSearches: query,
+   });
+
+   if (isRecordExists) {
+      await Search.findByIdAndUpdate(isRecordExists._id, {
+         $pull: {
+            recentSearches: query,
+         },
+      });
+   }
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(
+            200,
+            {},
+            "Search query removed from history successfully"
+         )
+      );
+});
+
+export { search, getSearchHistory, removeFromHistory };
