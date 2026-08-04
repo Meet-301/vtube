@@ -154,6 +154,11 @@ const getPlaylist = asyncHandler(async (req, res) => {
             as: "videos",
             pipeline: [
                {
+                  $match: {
+                     isPublished: true
+                  }
+               },
+               {
                   $project: {
                      title: 1,
                      thumbnail: 1,
