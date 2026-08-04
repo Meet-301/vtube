@@ -496,18 +496,26 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 
 //! getting watch history of current logged in user
 const getWatchHistory = asyncHandler(async (req, res) => {
-   const user = await User.aggregate([
+   const watchHistory = await User.aggregate([
       {
          $match: {
             _id: new mongoose.Types.ObjectId(req.user._id),
          },
       },
       {
+         $unwind: "$watchHistory",
+      },
+      {
+         $sort: {
+            "watchHistory.watchedAt": -1,
+         },
+      },
+      {
          $lookup: {
             from: "videos",
-            localField: "watchHistory",
+            localField: "watchHistory.video",
             foreignField: "_id",
-            as: "watchHistory",
+            as: "video",
             pipeline: [
                {
                   $lookup: {
@@ -536,18 +544,30 @@ const getWatchHistory = asyncHandler(async (req, res) => {
             ],
          },
       },
+      {
+         $addFields: {
+            video: {
+               $first: "$video",
+            },
+         },
+      },
+      {
+         $replaceRoot: {
+            newRoot: "$video",
+         },
+      },
    ]);
 
-   return res
-      .status(200)
-      .json(
-         new ApiResponse(
-            200,
-            user[0].watchHistory,
-            "User's watch history fetched successfully"
-         )
-      );
+   return res.status(200).json(
+      new ApiResponse(
+         200,
+         watchHistory,
+         "User's watch history fetched successfully"
+      )
+   );
 });
+
+const removeFromWatchHistory = asyncHandler(async (req, res) => {});
 
 export {
    registerUser,
