@@ -68,8 +68,11 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
       throw new ApiError(404, "Playlist not found");
    }
 
-   if(playlist.owner.toString() !== req.user._id.toString()) {
-      throw new ApiError(403, "You are not authorized to add videos into this playlist")
+   if (playlist.owner.toString() !== req.user._id.toString()) {
+      throw new ApiError(
+         403,
+         "You are not authorized to add videos into this playlist"
+      );
    }
 
    const updatedPlaylist = await Playlist.findByIdAndUpdate(
@@ -152,18 +155,21 @@ const getPlaylist = asyncHandler(async (req, res) => {
             localField: "videos",
             foreignField: "_id",
             as: "videos",
+            let: {
+               originalOrder: "$videos",
+            },
             pipeline: [
                {
                   $match: {
-                     isPublished: true
-                  }
+                     isPublished: true,
+                  },
                },
                {
                   $project: {
                      title: 1,
                      thumbnail: 1,
                      owner: 1,
-                     createdAt: 1
+                     createdAt: 1,
                   },
                },
                {
@@ -186,14 +192,27 @@ const getPlaylist = asyncHandler(async (req, res) => {
                      owner: {
                         $first: "$owner",
                      },
+                     sortOrder: {
+                        $indexOfArray: ["$$originalOrder", "$_id"],
+                     },
                   },
                },
                {
-                  $skip: (page - 1) * limit
+                  $sort: {
+                     sortOrder: 1,
+                  },
                },
                {
-                  $limit: limit
-               }
+                  $project: {
+                     sortOrder: 0,
+                  },
+               },
+               {
+                  $skip: (page - 1) * limit,
+               },
+               {
+                  $limit: limit,
+               },
             ],
          },
       },
@@ -316,14 +335,14 @@ const editPlaylist = asyncHandler(async (req, res) => {
 });
 
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
-   const { playlistId, videoId } = req.params
+   const { playlistId, videoId } = req.params;
 
-   if(!mongoose.Types.ObjectId.isValid(playlistId)) {
-      throw new ApiError(400, "Invalid playlist id")
+   if (!mongoose.Types.ObjectId.isValid(playlistId)) {
+      throw new ApiError(400, "Invalid playlist id");
    }
 
-   if(!mongoose.Types.ObjectId.isValid(videoId)) {
-      throw new ApiError(400, "Invalid video id")
+   if (!mongoose.Types.ObjectId.isValid(videoId)) {
+      throw new ApiError(400, "Invalid video id");
    }
 
    const playlist = await Playlist.findById(playlistId);
@@ -333,28 +352,33 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
    }
 
    if (playlist.owner.toString() !== req.user._id.toString()) {
-      throw new ApiError(403, "You are not authorized to remove videos from playlist");
+      throw new ApiError(
+         403,
+         "You are not authorized to remove videos from playlist"
+      );
    }
 
    const updatedPlaylist = await Playlist.findByIdAndUpdate(
       playlistId,
       {
          $pull: {
-            videos: videoId
+            videos: videoId,
          },
          $inc: {
             videoCount: -1,
          },
       },
       {
-         returnDocument: "after"
+         returnDocument: "after",
       }
-   )
+   );
 
    return res
-   .status(200)
-   .json(new ApiResponse(200, updatedPlaylist, "Video removed successfully"))
-})
+      .status(200)
+      .json(
+         new ApiResponse(200, updatedPlaylist, "Video removed successfully")
+      );
+});
 
 const deletePlaylist = asyncHandler(async (req, res) => {
    const { playlistId } = req.params;
@@ -400,5 +424,5 @@ export {
    getUserPlaylists,
    editPlaylist,
    deletePlaylist,
-   removeVideoFromPlaylist
+   removeVideoFromPlaylist,
 };
