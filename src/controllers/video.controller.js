@@ -97,7 +97,6 @@ const watchVideo = asyncHandler(async (req, res) => {
       },
    });
 
-   //! add that video again at top(with the help of $each and $position: 0)
    await User.findByIdAndUpdate(req.user._id, {
       $push: {
          watchHistory: {
@@ -142,10 +141,36 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
    const skip = (pageNumber - 1) * limitNumber;
 
-   const videos = await Video.find({ isPublished: true })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limitNumber);
+   const videos = await Video.aggregate([
+      {
+         $match: {
+            isPublished: true,
+         },
+      },
+      {
+         $lookup: {
+            from: "users",
+            localField: "owner",
+            foreignField: "_id",
+            as: "owner",
+            pipeline: [
+               {
+                  $project: {
+                     fullName: 1,
+                     avatar: 1,
+                  },
+               },
+            ],
+         },
+      },
+      {
+         $addFields: {
+            owner: {
+               $first: "$owner",
+            },
+         },
+      },
+   ]);
 
    return res
       .status(200)
