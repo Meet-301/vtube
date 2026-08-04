@@ -496,27 +496,27 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 
 //! getting watch history of current logged in user
 const getWatchHistory = asyncHandler(async (req, res) => {
-   const watchHistory = await User.aggregate([
+   const videos = await User.aggregate([
       {
          $match: {
             _id: new mongoose.Types.ObjectId(req.user._id),
          },
       },
       {
-         $unwind: "$watchHistory",
-      },
-      {
-         $sort: {
-            "watchHistory.watchedAt": -1,
-         },
-      },
-      {
          $lookup: {
             from: "videos",
-            localField: "watchHistory.video",
+            localField: "watchHistory",
             foreignField: "_id",
-            as: "video",
+            as: "watchHistory",
+            let: {
+               originalOrder: "$watchHistory",
+            },
             pipeline: [
+               {
+                  $match: {
+                     isPublished: true,
+                  },
+               },
                {
                   $lookup: {
                      from: "users",
@@ -539,35 +539,74 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                      owner: {
                         $first: "$owner",
                      },
+                     sortOrder: {
+                        $indexOfArray: ["$$originalOrder", "$_id"],
+                     },
+                  },
+               },
+               {
+                  $sort: {
+                     sortOrder: 1,
+                  },
+               },
+               {
+                  $project: {
+                     thumbnail: 1,
+                     duration: 1,
+                     views: 1,
+                     owner: 1,
+                     title: 1,
                   },
                },
             ],
          },
       },
-      {
-         $addFields: {
-            video: {
-               $first: "$video",
-            },
-         },
-      },
-      {
-         $replaceRoot: {
-            newRoot: "$video",
-         },
-      },
    ]);
 
-   return res.status(200).json(
-      new ApiResponse(
-         200,
-         watchHistory,
-         "User's watch history fetched successfully"
-      )
-   );
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(
+            200,
+            videos[0].watchHistory,
+            "User's watch history fetched successfully"
+         )
+      );
 });
 
-const removeFromWatchHistory = asyncHandler(async (req, res) => {});
+const removeFromWatchHistory = asyncHandler(async (req, res) => {
+   const { videoId } = req.query;
+
+   if (!videoId) {
+      throw new ApiError(400, "Video id is required");
+   }
+
+   if(!mongoose.Types.ObjectId.isValid(videoId)) {
+      throw new ApiError(400, "Invalid video id")
+   }
+
+   const updatedWatchHistory = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+         $pull: {
+            watchHistory: videoId,
+         },
+      },
+      {
+         returnDocument: "after",
+      }
+   );
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(
+            200,
+            updatedWatchHistory.watchHistory,
+            "Video removed successfully from watch history"
+         )
+      );
+});
 
 export {
    registerUser,
@@ -581,4 +620,5 @@ export {
    updateAvatar,
    getUserChannelProfile,
    getWatchHistory,
+   removeFromWatchHistory,
 };

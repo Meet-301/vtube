@@ -11,6 +11,7 @@ import {
    updateCoverImage,
    getUserChannelProfile,
    getWatchHistory,
+   removeFromWatchHistory,
 } from "../controllers/user.controller.js";
 import { multerUpload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -48,8 +49,12 @@ userRouter
    .route("/update-cover")
    .patch(verifyJWT, multerUpload.single("coverImage"), updateCoverImage);
 
-//! :username is used for query params
+//! :username is used for params(dynamic binbding)
 userRouter.route("/channel/:username").get(verifyJWT, getUserChannelProfile);
 userRouter.route("/watch-history").get(verifyJWT, getWatchHistory);
+
+userRouter
+   .route("/watch-history/remove")
+   .delete(verifyJWT, removeFromWatchHistory);
 
 export default userRouter;
