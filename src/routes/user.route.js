@@ -12,6 +12,10 @@ import {
    getUserChannelProfile,
    getWatchHistory,
    removeFromWatchHistory,
+   verifyEmail,
+   resendVerificationEmail,
+   forgotPassword,
+   resetPassword,
 } from "../controllers/user.controller.js";
 import { multerUpload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -32,16 +36,16 @@ userRouter.route("/register").post(
    ]),
    registerUser
 );
-
 userRouter.route("/login").post(loginUser);
-
-//! secure routes
+userRouter.route("/verify-email").post(verifyEmail);
+userRouter.route("/resend-email").post(resendVerificationEmail);
+userRouter.route("/forgot-password").post(forgotPassword);
 userRouter.route("/logout").post(verifyJWT, logoutUser);
 userRouter.route("/refresh-token").post(refreshAccessToken);
-userRouter.route("/update-password").patch(verifyJWT, updateCurrentPassword);
-userRouter.route("/current-user").get(verifyJWT, getCurrentUser);
-userRouter.route("/update-account").patch(verifyJWT, updateAccountDetails);
 
+userRouter.route("/reset-password").patch(resetPassword);
+userRouter.route("/update-password").patch(verifyJWT, updateCurrentPassword);
+userRouter.route("/update-account").patch(verifyJWT, updateAccountDetails);
 userRouter
    .route("/update-avatar")
    .patch(verifyJWT, multerUpload.single("avatar"), updateAvatar);
@@ -50,6 +54,7 @@ userRouter
    .patch(verifyJWT, multerUpload.single("coverImage"), updateCoverImage);
 
 //! :username is used for params(dynamic binbding)
+userRouter.route("/current-user").get(verifyJWT, getCurrentUser);
 userRouter.route("/channel/:username").get(verifyJWT, getUserChannelProfile);
 userRouter.route("/watch-history").get(verifyJWT, getWatchHistory);
 
