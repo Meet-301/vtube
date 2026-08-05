@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 
 const sendEmail = async ({ to, subject, html }) => {
    const info = await transporter.sendMail({
-      from: process.env.SMTP_MAIL,
+      from: `Vtube Team ${process.env.SMTP_MAIL}`,
       to,
       subject,
       html,
