@@ -121,7 +121,7 @@ const registerUser = asyncHandler(async (req, res) => {
    //! select method selects all fields by default but for removal of any field,
    //! you need to follow below syntax(-fieldName)
    const createdUser = await User.findById(user._id).select(
-      "-password -refreshToken -emailVerificationToken -emailVerificationExpiry"
+      "-password -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordResetExpiry"
    );
 
    try {
@@ -195,6 +195,15 @@ const resendVerificationEmail = asyncHandler(async (req, res) => {
 
    if (!email) {
       throw new ApiError(400, "Email is required");
+   }
+
+   const isValidEmail = (email) => {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      return emailRegex.test(email);
+   };
+
+   if (!isValidEmail(email)) {
+      throw new ApiError(400, "Invalid email format");
    }
 
    const user = await User.findOne({ email });
@@ -315,15 +324,19 @@ const resetPassword = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Password reset token is expired");
    }
 
-   user.password = newPassword
+   user.password = newPassword;
 
-   user.passwordResetToken = undefined
-   user.passwordResetExpiry = undefined
+   user.passwordResetToken = undefined;
+   user.passwordResetExpiry = undefined;
+   user.accessToken = undefined;
+   user.refreshToken = undefined;
 
-   await user.save()
+   await user.save();
 
    return res
       .status(200)
+      .clearCookie("accessToken", accessOptions)
+      .clearCookie("refreshToken", refreshOptions)
       .json(new ApiResponse(200, {}, "Password reset successfully"));
 });
 
@@ -361,7 +374,7 @@ const loginUser = asyncHandler(async (req, res) => {
    );
 
    const loggedInUser = await User.findById(user._id).select(
-      "-password -refreshToken"
+      "-password -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordVerificationExpiry"
    );
 
    return res
@@ -386,15 +399,15 @@ const logoutUser = asyncHandler(async (req, res, next) => {
       req.user._id,
       {
          $unset: {
-            refreshToken: 1
-         }
+            refreshToken: 1,
+         },
       },
       {
          returnDocument: "after", //! it'll return new updated document with updated values
       }
    );
 
-   console.log(user);   
+   console.log(user);
 
    return res
       .status(200)
@@ -404,10 +417,6 @@ const logoutUser = asyncHandler(async (req, res, next) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res, next) => {
-   if (!req.body || !req.cookies) {
-      throw new ApiError(400, "Request data is missing");
-   }
-
    //! get refresh token from request's cookies
    const incomingRefreshToken =
       req.cookies.refreshToken || req.body.refreshToken;
@@ -457,14 +466,6 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-   //! check whether both fields are empty or not
-   if (!req.body) {
-      throw new ApiError(
-         400,
-         "At least one field is required for account updation"
-      );
-   }
-
    //! extract data from request
    const { fullName, username } = req.body;
 
@@ -491,6 +492,11 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
       updateFields.username = username;
    }
 
+   //! check whether both fields are empty or not
+   if(Object.keys(updateFields).length === 0) {
+      throw new ApiError(400, "Please enter all data")
+   }
+
    //! update the data
    const user = await User.findByIdAndUpdate(
       req.user._id,
@@ -500,7 +506,9 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
       {
          returnDocument: "after",
       }
-   ).select("-password -refreshToken");
+   ).select(
+      "-password -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordResetExpiry"
+   );
 
    return res
       .status(200)
@@ -523,11 +531,15 @@ const updateCurrentPassword = asyncHandler(async (req, res) => {
    }
 
    user.password = newPassword;
+   user.accessToken = undefined;
+   user.refreshToken = undefined;
 
    await user.save({ validateBeforeSave: false });
 
    return res
       .status(200)
+      .clearCookie("accessToken", accessOptions)
+      .clearCookie("refreshToken", refreshOptions)
       .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
@@ -565,7 +577,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
       {
          returnDocument: "after",
       }
-   ).select("-password");
+   );
 
    //! remove old avatar from cloudinary
    const oldAvatarUrl = currentUser.avatar;
@@ -819,6 +831,9 @@ const removeFromWatchHistory = asyncHandler(async (req, res) => {
 export {
    registerUser,
    verifyEmail,
+   resendVerificationEmail,
+   forgotPassword,
+   resetPassword,
    loginUser,
    logoutUser,
    refreshAccessToken,
