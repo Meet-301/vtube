@@ -8,6 +8,8 @@ import {
 import ApiResponse from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import crypto from "crypto";
+import sendEmail from "../utils/mailer.js";
 
 const accessOptions = {
    httpOnly: true, //! hides the cookie from malicious client side scripts
@@ -99,6 +101,10 @@ const registerUser = asyncHandler(async (req, res) => {
       );
    }
 
+   const emailVerificationToken = crypto.randomBytes(32).toString("hex");
+
+   const emailVerificationExpiry = new Date(Date.now() + 15 * 60 * 1000);
+
    //! create user object - create entry in DB
    const user = await User.create({
       email: email.trim(),
@@ -107,14 +113,34 @@ const registerUser = asyncHandler(async (req, res) => {
       fullName: fullName.trim(),
       avatar: avatar.url,
       coverImage: coverImage?.url || "",
+      isVerified: false,
+      emailVerificationToken,
+      emailVerificationExpiry,
    });
 
-   //! remove password and refresh token fields from response
    //! select method selects all fields by default but for removal of any field,
-   //! you need to follow below syntax
+   //! you need to follow below syntax(-fieldName)
    const createdUser = await User.findById(user._id).select(
-      "-password -refreshToken"
+      "-password -refreshToken -emailVerificationToken -emailVerificationExpiry"
    );
+
+   try {
+      await sendEmail({
+         to: createdUser.email,
+         subject: "Welcome to Vtube - Verify your email",
+         html: `
+            <h2>Welcome, ${createdUser.fullName}</h2>
+
+            <p>Your verification code is:</p>
+
+            <h1>${emailVerificationToken}</h1>
+
+            <p>This code is valid for 15 minutes</p>
+         `,
+      });
+   } catch (error) {
+      console.error("Email sending failed: ", error);
+   }
 
    //! check for user creation
    if (!createdUser) {
@@ -125,6 +151,180 @@ const registerUser = asyncHandler(async (req, res) => {
    return res
       .status(201)
       .json(new ApiResponse(200, createdUser, "User Registered Successfully"));
+});
+
+const verifyEmail = asyncHandler(async (req, res) => {
+   const { email, token } = req.body;
+
+   if (!email || !token) {
+      throw new ApiError(400, "Email and token are required");
+   }
+
+   const user = await User.findOne({ email });
+
+   if (!user) {
+      throw new ApiError(400, "User not found");
+   }
+
+   if (user.isVerified) {
+      throw new ApiError(400, "Email is verified already");
+   }
+
+   if (user.emailVerificationToken !== token) {
+      throw new ApiError(400, "Invalid verification token");
+   }
+
+   if (user.emailVerificationExpiry < new Date()) {
+      throw new ApiError(400, "Verification token expired");
+   }
+
+   user.isVerified = true;
+
+   user.emailVerificationToken = undefined;
+   user.emailVerificationExpiry = undefined;
+
+   await user.save({ validateBeforeSave: false });
+
+   return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Email verified successfully"));
+});
+
+const resendVerificationEmail = asyncHandler(async (req, res) => {
+   const { email } = req.body;
+
+   if (!email) {
+      throw new ApiError(400, "Email is required");
+   }
+
+   const user = await User.findOne({ email });
+
+   if (!user) {
+      throw new ApiError(400, "User not found");
+   }
+
+   if (user.isVerified) {
+      throw new ApiError(400, "Email is verified already");
+   }
+
+   const resendEmailToken = crypto.randomBytes(32).toString("hex");
+   const resendEmailTokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
+
+   user.emailVerificationToken = resendEmailToken;
+   user.emailVerificationExpiry = resendEmailTokenExpiry;
+
+   await user.save({ validateBeforeSave: false });
+
+   try {
+      await sendEmail({
+         to: user.email,
+         subject: "Vtube - Verify your email again",
+         html: `
+            <h2>Hi, ${user.fullName}</h2>
+
+            <p>Your verification code is:</p>
+
+            <h1>${resendEmailToken}</h1>
+
+            <p>This code is valid for 15 minutes</p>
+         `,
+      });
+   } catch (error) {
+      console.error("Email sending failed: ", error);
+   }
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(200, {}, "Verification email re-sent successfully")
+      );
+});
+
+const forgotPassword = asyncHandler(async (req, res) => {
+   const { email } = req.body;
+
+   if (!email) {
+      throw new ApiError(400, "Email is required");
+   }
+
+   const user = await User.findOne({ email });
+
+   if (!user) {
+      throw new ApiError(400, "User not found");
+   }
+
+   const forgotPasswordToken = crypto.randomBytes(32).toString("hex");
+   const forgotPasswordTokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
+
+   user.passwordResetToken = forgotPasswordToken;
+   user.passwordResetExpiry = forgotPasswordTokenExpiry;
+
+   await user.save({ validateBeforeSave: false });
+
+   try {
+      await sendEmail({
+         to: email,
+         subject: "Vtube - Reset password link",
+         html: `
+         <h2>Hi, ${user.fullName}</h2>
+
+         <p>Your code for password reset is:</p>
+
+         <h1>${forgotPasswordToken}</h1>
+         `,
+      });
+   } catch (error) {
+      console.error(`Error while processing forgot password: ${error}`);
+   }
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(
+            200,
+            {},
+            "Email sent successfully for resetting the password"
+         )
+      );
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+   const { token, newPassword } = req.body;
+
+   if (!token || !newPassword) {
+      throw new ApiError(400, "Token and new password both are required");
+   }
+
+   const isValidPassword = (password) => {
+      const passwordRegex =
+         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      return passwordRegex.test(password);
+   };
+
+   if (!isValidPassword(newPassword)) {
+      throw new ApiError(400, "Invalid password format");
+   }
+
+   const user = await User.findOne({ passwordResetToken: token });
+
+   if (!user) {
+      throw new ApiError(400, "Invalid password reset token");
+   }
+
+   if (user.passwordResetExpiry < new Date()) {
+      throw new ApiError(400, "Password reset token is expired");
+   }
+
+   user.password = newPassword
+
+   user.passwordResetToken = undefined
+   user.passwordResetExpiry = undefined
+
+   await user.save()
+
+   return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Password reset successfully"));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -149,6 +349,10 @@ const loginUser = asyncHandler(async (req, res) => {
 
    if (!isPasswordValid) {
       throw new ApiError(401, "Password is incorrect");
+   }
+
+   if (!user.isVerified) {
+      throw new ApiError(403, "Please verify your email before login");
    }
 
    //! generate access and refresh tokens
@@ -178,15 +382,19 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res, next) => {
-   await User.findByIdAndUpdate(
+   const user = await User.findByIdAndUpdate(
       req.user._id,
       {
-         refreshToken: undefined,
+         $unset: {
+            refreshToken: 1
+         }
       },
       {
          returnDocument: "after", //! it'll return new updated document with updated values
       }
    );
+
+   console.log(user);   
 
    return res
       .status(200)
@@ -581,8 +789,8 @@ const removeFromWatchHistory = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Video id is required");
    }
 
-   if(!mongoose.Types.ObjectId.isValid(videoId)) {
-      throw new ApiError(400, "Invalid video id")
+   if (!mongoose.Types.ObjectId.isValid(videoId)) {
+      throw new ApiError(400, "Invalid video id");
    }
 
    const updatedWatchHistory = await User.findByIdAndUpdate(
@@ -610,6 +818,7 @@ const removeFromWatchHistory = asyncHandler(async (req, res) => {
 
 export {
    registerUser,
+   verifyEmail,
    loginUser,
    logoutUser,
    refreshAccessToken,
