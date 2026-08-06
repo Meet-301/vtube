@@ -340,6 +340,63 @@ const resetPassword = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, {}, "Password reset successfully"));
 });
 
+const googleLogin = asyncHandler(async (req, res) => {
+   const profile = req.user;
+
+   const fullName = profile.displayName;
+   const email = profile.emails[0].value;
+   const avatar = profile.photos[0].value;
+   const googleId = profile.id;
+   const username = email.split("@")[0];
+
+   const existingUser = await User.findOne({ email });
+
+   if (existingUser) {
+      const { accessToken, refreshToken } =
+         await generateAccessAndRefreshTokens(req.user._id);
+
+      return res.status(200).json(
+         new ApiResponse(
+            200,
+            {
+               user: existingUser,
+               accessToken,
+               refreshToken,
+            },
+            "Google login successful"
+         )
+      );
+   } else {
+      const user = await User.create({
+         fullName,
+         email,
+         avatar,
+         googleId,
+         username,
+         isVerified: true,
+      });
+
+      const { accessToken, refreshToken } =
+         await generateAccessAndRefreshTokens(user._id);
+
+      return res.status(200).json(
+         new ApiResponse(
+            200,
+            {
+               user,
+               accessToken,
+               refreshToken,
+            },
+            "Google login successful"
+         )
+      );
+   }
+
+   return res
+      .status(200)
+      .json(new ApiResponse(200, profile, "Google login successful"));
+});
+
 const loginUser = asyncHandler(async (req, res) => {
    //! request body -> data
    const { email, password } = req.body;
@@ -355,6 +412,13 @@ const loginUser = asyncHandler(async (req, res) => {
    //! if user not found
    if (!user) {
       throw new ApiError(404, "User not found");
+   }
+
+   if (!user.password) {
+      throw new ApiError(
+         400,
+         "This account is created with google. Please login with google or set a password using forgot password"
+      );
    }
 
    //! check whether password is correct or not
@@ -493,8 +557,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
    }
 
    //! check whether both fields are empty or not
-   if(Object.keys(updateFields).length === 0) {
-      throw new ApiError(400, "Please enter all data")
+   if (Object.keys(updateFields).length === 0) {
+      throw new ApiError(400, "Please enter all data");
    }
 
    //! update the data
@@ -834,6 +898,7 @@ export {
    resendVerificationEmail,
    forgotPassword,
    resetPassword,
+   googleLogin,
    loginUser,
    logoutUser,
    refreshAccessToken,

@@ -7,9 +7,12 @@ const userSchema = new Schema(
       username: {
          type: String,
          required: true,
-         lowercase: true,
          index: true,
          unique: true,
+      },
+      googleId: {
+        type: String,
+        default: null 
       },
       email: {
          type: String,
@@ -38,7 +41,6 @@ const userSchema = new Schema(
       ],
       password: {
          type: String,
-         required: [true, "Password is required"],
       },
       refreshToken: {
          type: String,

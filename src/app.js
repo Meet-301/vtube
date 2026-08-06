@@ -2,6 +2,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import passport from "./config/passport.js";
 
 const app = express(); //! new server instance of express application
 
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 //! for data that comes from HTML form
 app.use(express.static("public")); //! for assets that will be available publicly via folder named "public"
 app.use(cookieParser()); //! to set and get cookies in user browser
+app.use(passport.initialize())
 
 //! routes import
 import userRouter from "./routes/user.route.js";

@@ -16,9 +16,11 @@ import {
    resendVerificationEmail,
    forgotPassword,
    resetPassword,
+   googleLogin,
 } from "../controllers/user.controller.js";
 import { multerUpload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import passport from "passport";
 
 const userRouter = Router();
 
@@ -57,6 +59,17 @@ userRouter
 userRouter.route("/current-user").get(verifyJWT, getCurrentUser);
 userRouter.route("/channel/:username").get(verifyJWT, getUserChannelProfile);
 userRouter.route("/watch-history").get(verifyJWT, getWatchHistory);
+userRouter.route("/auth/google").get(
+   passport.authenticate("google", {
+      scope: ["profile", "email"]
+   })
+)
+userRouter.route("/auth/google/callback").get(
+   passport.authenticate("google", {
+      session: false
+   }),
+   googleLogin
+)
 
 userRouter
    .route("/watch-history/remove")
