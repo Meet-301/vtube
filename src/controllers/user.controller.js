@@ -355,17 +355,21 @@ const googleLogin = asyncHandler(async (req, res) => {
       const { accessToken, refreshToken } =
          await generateAccessAndRefreshTokens(req.user._id);
 
-      return res.status(200).json(
-         new ApiResponse(
-            200,
-            {
-               user: existingUser,
-               accessToken,
-               refreshToken,
-            },
-            "Google login successful"
-         )
-      );
+      return res
+         .status(200)
+         .cookie("accessToken", accessToken, accessOptions)
+         .cookie("refreshToken", refreshToken, refreshOptions)
+         .json(
+            new ApiResponse(
+               200,
+               {
+                  user: existingUser,
+                  accessToken,
+                  refreshToken,
+               },
+               "Google login successful"
+            )
+         );
    } else {
       const user = await User.create({
          fullName,
@@ -395,10 +399,6 @@ const googleLogin = asyncHandler(async (req, res) => {
             )
          );
    }
-
-   return res
-      .status(200)
-      .json(new ApiResponse(200, profile, "Google login successful"));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
