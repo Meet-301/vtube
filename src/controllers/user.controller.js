@@ -379,7 +379,10 @@ const googleLogin = asyncHandler(async (req, res) => {
       const { accessToken, refreshToken } =
          await generateAccessAndRefreshTokens(user._id);
 
-      return res.status(200).json(
+      return res.status(200)
+      .cookie("accessToken", accessToken, accessOptions)
+      .cookie("refreshToken", refreshToken, refreshOptions)
+      .json(
          new ApiResponse(
             200,
             {
