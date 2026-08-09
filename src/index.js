@@ -33,12 +33,6 @@ connectDB().then(() => {
       console.log(`Application failed: ${error}`);
    });
 
-   app.get("/", (req, res) => {
-      res.json(new ApiResponse(200, {
-         message: "hello"
-      }, "Hello from server"))
-   })
-
    const port = process.env.PORT || 5000;
 
    server.listen(port, () => {
