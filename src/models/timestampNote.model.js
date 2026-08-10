@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const timestampNoteSchema = new Schema(
    {
-      userId: {
+      owner: {
          type: Schema.Types.ObjectId,
          ref: "User",
       },
