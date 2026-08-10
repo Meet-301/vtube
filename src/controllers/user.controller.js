@@ -121,7 +121,7 @@ const registerUser = asyncHandler(async (req, res) => {
    //! select method selects all fields by default but for removal of any field,
    //! you need to follow below syntax(-fieldName)
    const createdUser = await User.findById(user._id).select(
-      "-password -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordResetExpiry"
+      "-password -googleId -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordResetExpiry"
    );
 
    try {
@@ -442,7 +442,7 @@ const loginUser = asyncHandler(async (req, res) => {
    );
 
    const loggedInUser = await User.findById(user._id).select(
-      "-password -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordVerificationExpiry"
+      "-password -googleId -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordVerificationExpiry"
    );
 
    return res
@@ -575,7 +575,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
          returnDocument: "after",
       }
    ).select(
-      "-password -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordResetExpiry"
+      "-password -googleId -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordResetExpiry"
    );
 
    return res
@@ -612,10 +612,14 @@ const updateCurrentPassword = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
+   const currentUser = await User.findById(req.user._id).select(
+      "-password -googleId -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordResetExpiry"
+   );
+
    return res
       .status(200)
       .json(
-         new ApiResponse(200, req.user, "Current user fetched successfully")
+         new ApiResponse(200, currentUser, "Current user fetched successfully")
       );
 });
 
