@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const timestampNoteSchema = new Schema(
+const videoNoteSchema = new Schema(
    {
       owner: {
          type: Schema.Types.ObjectId,
@@ -26,7 +26,7 @@ const timestampNoteSchema = new Schema(
    { timestamps: true }
 );
 
-export const TimestampNote = mongoose.model(
-   "TimestampNote",
-   timestampNoteSchema
+export const VideoNote = mongoose.model(
+   "VideoNote",
+   videoNoteSchema
 );
