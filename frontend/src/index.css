@@ -72,3 +72,23 @@ video {
   display: block;
   max-width: 100%;
 }
+
+@theme {
+  --color-primary: #0074d9;
+  --color-primary-hover: #2196f3;
+
+  --color-background: #0f1115;
+  --color-surface: #151922;
+  --color-surface-elevated: #1b202b;
+
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #a7b0c0;
+  --color-text-muted: #70798a;
+
+  --color-border: #252b36;
+
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #2196f3;
+}
