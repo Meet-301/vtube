@@ -1,1 +1,74 @@
 @import "tailwindcss";
+
+/* ================================
+   VTube Design System
+================================ */
+
+:root {
+  /* Brand */
+  --color-primary: #0074d9;
+  --color-primary-hover: #2196f3;
+
+  /* Backgrounds */
+  --color-background: #0f1115;
+  --color-surface: #151922;
+  --color-surface-elevated: #1b202b;
+
+  /* Text */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #a7b0c0;
+  --color-text-muted: #70798a;
+
+  /* Borders */
+  --color-border: #252b36;
+
+  /* Status */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #2196f3;
+}
+
+/* ================================
+   Base
+================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+}
