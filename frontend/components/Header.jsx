@@ -236,7 +236,7 @@ function Header() {
                         />
                     </button>
 
-                    {/* Profile picture */}
+                    {/* Profile menu */}
                     <ProfileMenu/>
 
                 </div>
