@@ -1,13 +1,19 @@
-
+import { Header, Sidebar } from "../components";
 
 function App() {
-  
-
   return (
-    <>
-      <h1 className="bg-blue-500 text-white">Hello</h1>
-    </>
-  )
+    <div className="min-h-screen bg-background text-text-primary">
+      <Header />
+
+      <div className="flex">
+        <Sidebar />
+
+        <main className="flex-1">
+          {/* Page content will come here */}
+        </main>
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
