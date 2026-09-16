@@ -7,6 +7,7 @@ import ProfileMenu from "./ProfileMenu.jsx";
 import NotificationMenu from "./NotificationMenu.jsx";
 import NotificationItem from "./NotificationItem.jsx";
 import UploadButton from "./UploadButton.jsx";
+import VideoCard from "./VideoCard.jsx";
 
 export {
    Header,
@@ -17,5 +18,6 @@ export {
    ProfileMenu,
    NotificationMenu,
    NotificationItem,
-   UploadButton
+   UploadButton,
+   VideoCard
 };

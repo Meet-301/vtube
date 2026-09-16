@@ -1,6 +1,6 @@
 import { BellIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
-import { NotificationItem } from "../components";
+import { NotificationItem } from ".";
 
 function NotificationMenu() {
     const [isOpen, setIsOpen] = useState(false);

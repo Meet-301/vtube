@@ -3,7 +3,7 @@ import {
     MagnifyingGlassIcon
 } from "@phosphor-icons/react";
 
-import { HeaderSearchButton, NotificationMenu, ProfileMenu, UploadButton } from "../components";
+import { HeaderSearchButton, NotificationMenu, ProfileMenu, UploadButton } from ".";
 import { useState } from "react";
 import SidebarDrawer from "./SidebarDrawer";
 
