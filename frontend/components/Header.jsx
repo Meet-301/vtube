@@ -1,15 +1,20 @@
 import {
     ListIcon,
-    MagnifyingGlassIcon,
-    UploadSimpleIcon,
-    BellIcon
+    MagnifyingGlassIcon
 } from "@phosphor-icons/react";
 
-import { HeaderSearchButton, NotificationMenu, ProfileMenu } from "../components";
+import { HeaderSearchButton, NotificationMenu, ProfileMenu, UploadButton } from "../components";
+import { useState } from "react";
+import SidebarDrawer from "./SidebarDrawer";
 
 function Header() {
+
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
     return (
         <header className="sticky top-0 z-50 h-12 w-full md:h-16">
+
+            <SidebarDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
 
             <div className="flex h-full w-full items-center px-2 sm:px-3 md:px-4">
 
@@ -21,6 +26,7 @@ function Header() {
                         type="button"
                         aria-label="Open menu"
                         title="More"
+                        onClick={() => setIsDrawerOpen(true)}
                         className="
                             group relative
                             flex lg:hidden
@@ -28,6 +34,7 @@ function Header() {
                             items-center justify-center
                             rounded-full
                             text-text-primary
+                            active:bg-surface
                             active:scale-95
                         "
                     >
@@ -58,6 +65,7 @@ function Header() {
                             flex items-center
                             rounded-lg
                         "
+                        title="VTube Home"
                     >
                         <img
                             src="/Vtube logo.png"
@@ -104,11 +112,11 @@ function Header() {
                             type="text"
                             placeholder="Search"
                             className="
-                                h-12 w-md
+                                h-12 w-96
                                 rounded-full
                                 border border-border
                                 bg-surface
-                                px-5 pr-14 mt-1 ml-2
+                                px-5 pr-14 mt-1
                                 text-sm
                                 text-text-primary
                                 outline-none
@@ -164,12 +172,7 @@ function Header() {
                     </div>
 
                     {/* Upload */}
-                    <button
-                        type="button"
-                        aria-label="Upload"
-                        title="Upload"
-                        className="
-                            flex
+                    <UploadButton size={25} classes="hidden lg:flex
                             h-10 w-10
                             shrink-0 mt-1
                             items-center justify-center
@@ -178,20 +181,23 @@ function Header() {
                             text-text-primary
                             transition-all duration-200
                             hover:bg-surface
-                            active:scale-95
-                        "
-                    >
-                        <UploadSimpleIcon
-                            size={25}
-                            weight="regular"
-                        />
-                    </button>
-
+                            active:bg-surface
+                            active:scale-95" />
                 </div>
-
 
                 {/* ================= RIGHT SECTION ================= */}
                 <div className="ml-auto flex shrink-0 items-center gap-3">
+
+                    <UploadButton size={32} classes="lg:hidden flex
+                            h-10 w-10
+                            shrink-0 mt-1
+                            items-center justify-center
+                            rounded-full
+                            text-text-primary
+                            transition-all duration-200
+                            hover:bg-surface
+                            active:bg-surface
+                            active:scale-95" />
 
                     {/* Mobile Search */}
                     <button
@@ -205,6 +211,7 @@ function Header() {
                             text-text-primary
                             transition-all duration-200
                             hover:bg-surface-elevated
+                            active:bg-surface-elevated
                             active:scale-95
                         "
                     >
@@ -215,11 +222,10 @@ function Header() {
                     </button>
 
                     {/* Notifications */}
-                    <NotificationMenu/>
+                    <NotificationMenu />
 
                     {/* Profile menu */}
-                    <ProfileMenu/>
-
+                    <ProfileMenu />
                 </div>
 
             </div>

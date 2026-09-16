@@ -6,6 +6,7 @@ import YouSection from "./YouSection.jsx";
 import ProfileMenu from "./ProfileMenu.jsx";
 import NotificationMenu from "./NotificationMenu.jsx";
 import NotificationItem from "./NotificationItem.jsx";
+import UploadButton from "./UploadButton.jsx";
 
 export {
    Header,
@@ -15,5 +16,6 @@ export {
    YouSection,
    ProfileMenu,
    NotificationMenu,
-   NotificationItem
+   NotificationItem,
+   UploadButton
 };

@@ -1,0 +1,133 @@
+import {
+    HouseIcon,
+    UserIcon,
+    UserCirclePlusIcon,
+    QueueIcon,
+    ClockCounterClockwiseIcon,
+    PlaylistIcon,
+    ThumbsUpIcon,
+    XIcon,
+} from "@phosphor-icons/react";
+
+function DrawerItem({ icon: Icon, label, active = false }) {
+    return (
+        <a
+            href="#"
+            className={`
+                flex items-center gap-4
+                rounded-lg
+                px-4 py-3
+                text-base
+                transition-colors duration-200
+                ${active
+                    ? "bg-surface-elevated text-text-primary"
+                    : "text-text-secondary hover:bg-surface-elevated active:bg-surface-elevated hover:text-text-primary"
+                }
+            `}
+        >
+            <Icon
+                size={24}
+                weight={active ? "fill" : "regular"}
+            />
+
+            <span>{label}</span>
+        </a>
+    );
+}
+
+function SidebarDrawer({ isOpen, onClose }) {
+    if (!isOpen) return null;
+
+    return (
+        <>
+            {/* Overlay */}
+            <div
+                onClick={onClose}
+                className="
+                    fixed inset-0 z-50
+                    bg-black/50
+                "
+            />
+
+            {/* Drawer */}
+            <aside
+                className="
+                    fixed left-0 top-0 z-50
+                    h-full w-72
+                    bg-surface
+                    shadow-2xl
+                "
+            >
+                {/* Header */}
+                <div className="flex h-16 items-center justify-between px-4">
+                    <div className="flex items-center">
+                        <img
+                            src="/Vtube logo.png"
+                            alt="VTube"
+                            className="h-11 w-11 object-contain"
+                        />
+
+                        <span className="brand-font -ml-2 text-2xl text-text-primary">
+                            VTUBE
+                        </span>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        aria-label="Close menu"
+                        className="
+                            flex h-10 w-10
+                            items-center justify-center
+                            rounded-full
+                            text-text-primary
+                            hover:bg-surface-elevated
+                            active:bg-surface-elevated
+                            active:scale-95
+                        "
+                    >
+                        <XIcon size={26} />
+                    </button>
+                </div>
+
+                {/* Navigation */}
+                <nav className="px-3 py-4">
+                    <DrawerItem
+                        icon={HouseIcon}
+                        label="Home"
+                        active
+                    />
+
+                    <DrawerItem
+                        icon={UserCirclePlusIcon}
+                        label="Subscriptions"
+                    />
+
+                    <div className="my-3 border-t border-border" />
+
+                    <DrawerItem
+                        icon={UserIcon}
+                        label="Your channel"
+                    />
+
+                    <DrawerItem
+                        icon={ClockCounterClockwiseIcon}
+                        label="History"
+                    />
+
+                    <DrawerItem
+                        icon={QueueIcon}
+                        label="Playlists"
+                    />
+
+                    <DrawerItem
+                        icon={ThumbsUpIcon}
+                        label="Liked videos"
+                    />
+                </nav>
+            </aside>
+        </>
+    );
+}
+
+export default SidebarDrawer;

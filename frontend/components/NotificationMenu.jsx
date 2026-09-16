@@ -1,6 +1,6 @@
 import { BellIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
-import {NotificationItem} from "../components";
+import { NotificationItem } from "../components";
 
 function NotificationMenu() {
     const [isOpen, setIsOpen] = useState(false);
@@ -32,7 +32,8 @@ function NotificationMenu() {
                 aria-label="Notifications"
                 title="Notifications"
                 className="
-                    flex h-10 w-10 items-center justify-center
+                    hidden lg:flex
+                    h-10 w-10 items-center justify-center
                     rounded-full
                     text-text-primary
                     transition-all duration-200
@@ -45,15 +46,23 @@ function NotificationMenu() {
 
             {/* Notification popup */}
             {isOpen && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-96">
+                <div
+                    className="
+                    absolute right-0 top-full z-50 mt-2
+                    w-[calc(100vw-1rem)]
+                    max-w-96
+                    sm:w-96
+                    "
+                >
                     <div className="rounded-2xl bg-surface-elevated p-2 shadow-2xl">
+
                         <h2 className="px-4 py-3 text-xl font-semibold">
                             Notifications
                         </h2>
 
                         <div className="border-t border-border" />
 
-                        <div className="space-y-1">
+                        <div className="max-h-[70vh] overflow-y-auto space-y-1">
                             <NotificationItem
                                 avatar="https://i.pravatar.cc/150?img=12"
                                 message="Someone liked your video"
@@ -74,6 +83,7 @@ function NotificationMenu() {
                                 unread
                             />
                         </div>
+
                     </div>
                 </div>
             )}

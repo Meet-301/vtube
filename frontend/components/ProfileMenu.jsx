@@ -79,7 +79,7 @@ function ProfileMenu() {
                         {/* Edit profile */}
                         <button
                             type="button"
-                            className="flex w-full items-center gap-4 rounded-lg px-3 py-3 text-text-secondary hover:bg-surface hover:text-text-primary"
+                            className="flex w-full items-center gap-4 rounded-lg px-3 py-3 text-text-secondary hover:bg-surface active:bg-surface hover:text-text-primary"
                         >
                             <UserGearIcon size={22} />
                             <span className="text-sm">
@@ -90,7 +90,7 @@ function ProfileMenu() {
                         {/* Logout */}
                         <button
                             type="button"
-                            className="flex w-full items-center gap-4 rounded-lg px-3 py-3 text-red-700 hover:bg-surface hover:text-red-500"
+                            className="flex w-full items-center gap-4 rounded-lg px-3 py-3 text-red-700 hover:bg-surface active:bg-surface hover:text-red-500"
                         >
                             <SignOutIcon size={22} />
                             <span className="text-sm">
