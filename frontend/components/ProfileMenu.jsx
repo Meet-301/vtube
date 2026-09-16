@@ -67,7 +67,7 @@ function ProfileMenu() {
                     {/* Logout */}
                     <button
                         type="button"
-                        className="flex w-full items-center gap-4 rounded-lg px-3 py-3 text-red-500 hover:bg-surface hover:text-red-600"
+                        className="flex w-full items-center gap-4 rounded-lg px-3 py-3 text-red-700 hover:bg-surface hover:text-red-500"
                     >
                         <SignOutIcon size={22} />
                         <span className="text-sm">
