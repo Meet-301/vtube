@@ -1,4 +1,4 @@
-import { Header, Sidebar } from "./components";
+import { Header, Sidebar, Home} from "./components";
 
 function App() {
   return (
@@ -10,6 +10,7 @@ function App() {
 
         <main className="flex-1">
           {/* Page content will come here */}
+          <Home/>
         </main>
       </div>
     </div>

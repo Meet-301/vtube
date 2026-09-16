@@ -8,6 +8,7 @@ import NotificationMenu from "./NotificationMenu.jsx";
 import NotificationItem from "./NotificationItem.jsx";
 import UploadButton from "./UploadButton.jsx";
 import VideoCard from "./VideoCard.jsx";
+import Home from "./Home.jsx";
 
 export {
    Header,
@@ -19,5 +20,6 @@ export {
    NotificationMenu,
    NotificationItem,
    UploadButton,
-   VideoCard
+   VideoCard,
+   Home
 };
