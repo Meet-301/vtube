@@ -14,16 +14,16 @@ function Header() {
             <div className="flex h-full w-full items-center px-2 sm:px-3 md:px-4">
 
                 {/* ================= LEFT SECTION ================= */}
-                <div className="flex shrink-0 items-center lg:ml-3 gap-3">
+                <div className="flex shrink-0 items-center lg:ml-1.5 gap-3">
 
-                    {/* Menu - Tablet & Desktop */}
+                    {/* Menu - Mobile & Tablet */}
                     <button
                         type="button"
                         aria-label="Open menu"
                         title="More"
                         className="
                             group relative
-                            hidden lg:flex
+                            flex lg:hidden
                             h-10 w-10
                             items-center justify-center
                             rounded-full
@@ -104,11 +104,11 @@ function Header() {
                             type="text"
                             placeholder="Search"
                             className="
-                                h-12 w-full
+                                h-12 w-md
                                 rounded-full
                                 border border-border
                                 bg-surface
-                                px-5 pr-14 mt-1
+                                px-5 pr-14 mt-1 ml-2
                                 text-sm
                                 text-text-primary
                                 outline-none
@@ -220,7 +220,7 @@ function Header() {
                         aria-label="Notifications"
                         title="Notifications"
                         className="
-                            flex
+                            hidden lg:flex
                             h-10 w-10 mt-1
                             items-center justify-center
                             rounded-full
