@@ -5,7 +5,7 @@ import {
     BellIcon
 } from "@phosphor-icons/react";
 
-import { HeaderSearchButton, ProfileMenu } from "../components";
+import { HeaderSearchButton, NotificationMenu, ProfileMenu } from "../components";
 
 function Header() {
     return (
@@ -215,26 +215,7 @@ function Header() {
                     </button>
 
                     {/* Notifications */}
-                    <button
-                        type="button"
-                        aria-label="Notifications"
-                        title="Notifications"
-                        className="
-                            hidden lg:flex
-                            h-10 w-10 mt-1
-                            items-center justify-center
-                            rounded-full
-                            transition-all duration-200
-                            hover:bg-surface-elevated
-                            text-text-primary
-                            active:scale-95
-                        "
-                    >
-                        <BellIcon
-                            size={32}
-                            weight="regular"
-                        />
-                    </button>
+                    <NotificationMenu/>
 
                     {/* Profile menu */}
                     <ProfileMenu/>
