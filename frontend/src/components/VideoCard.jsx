@@ -21,6 +21,7 @@ function VideoCard({
     const menuRef = useRef(null);
     const buttonRef = useRef(null);
 
+    //! code to implement the outside click effect of more menu button of the video card
     useEffect(() => {
         function handleClickOutside(event) {
             if (
@@ -41,6 +42,7 @@ function VideoCard({
         };
     }, []);
 
+    //! Handling code of more button's pop-up
     function handleToggleMenu() {
         if (!isMenuOpen && buttonRef.current) {
             const rect = buttonRef.current.getBoundingClientRect();

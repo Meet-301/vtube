@@ -1,5 +1,9 @@
-import { Header, Sidebar, CategoryBar, SidebarDrawer } from "./components";
-import { Home } from "./pages";
+import { Outlet } from "react-router-dom";
+import { 
+  Header, 
+  Sidebar,
+  SidebarDrawer
+} from "./components";
 import { useState, useEffect } from "react";
 
 function App() {
@@ -34,17 +38,9 @@ function App() {
         `}
       >
         <Header onMenuClick={() => setIsDrawerOpen(true)} />
-
-        <div className="flex min-w-0">
-          <div className="hidden lg:block w-24 lg:w-48 xl:w-60 shrink-0" />
-
-          <div className="min-w-0 flex-1">
-            <CategoryBar />
-          </div>
-        </div>
       </div>
 
-      {/* Mobile/Tablet drawer — OUTSIDE glass wrapper */}
+      {/* Mobile/Tablet drawer */}
       <SidebarDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
@@ -52,11 +48,10 @@ function App() {
 
       {/* Main */}
       <div className="flex min-w-0">
-        <Sidebar />
 
         <main className="min-w-0 flex-1">
           {/* pages */}
-          <Home />
+          <Outlet />
         </main>
       </div>
 

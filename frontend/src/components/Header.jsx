@@ -28,7 +28,7 @@ function Header({ onMenuClick }) {
                         onClick={onMenuClick}
                         className="
                             group relative
-                            flex lg:hidden
+                            flex
                             h-10 w-10
                             items-center justify-center
                             rounded-full

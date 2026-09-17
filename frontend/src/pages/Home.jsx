@@ -1,5 +1,7 @@
 import {
-    VideoCard
+    VideoCard,
+    CategoryBar,
+    Sidebar
 } from "../components";
 
 function Home() {
@@ -79,15 +81,36 @@ function Home() {
     ];
 
     return (
-        <main className="p-4">
-            <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-                {videos.map((video, index) => (
-                    <VideoCard
-                        key={index}
-                        {...video}
-                    />
-                ))}
+        <main className="flex min-w-0">
+
+            <Sidebar />
+
+            <div className="min-w-0 flex-1 p-4">
+
+                <div
+                    className="
+                sticky
+                top-12
+                md:top-16
+                z-40
+                bg-background/75
+                backdrop-blur-xl
+            "
+                >
+                    <CategoryBar />
+                </div>
+
+                <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+                    {videos.map((video, index) => (
+                        <VideoCard
+                            key={index}
+                            {...video}
+                        />
+                    ))}
+                </div>
+
             </div>
+
         </main>
     );
 }
