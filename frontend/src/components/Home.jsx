@@ -60,7 +60,7 @@ function Home() {
         },
         {
             thumbnail: "https://picsum.photos/seed/vtube5/640/360",
-            title: "JavaScript Async Await Finally",
+            title: "JavaScript Async Await Finally Explained",
             avatar: "https://i.pravatar.cc/150?img=68",
             channelName: "JS Simplified",
             views: "17K views",

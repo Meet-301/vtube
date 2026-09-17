@@ -3,10 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import {
     BookmarkSimpleIcon,
     DotsThreeVerticalIcon,
-    FlagIcon,
     PlayIcon,
     ShareNetworkIcon,
-    ThumbsDownIcon,
 } from "@phosphor-icons/react";
 
 function VideoCard({
