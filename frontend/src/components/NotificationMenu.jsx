@@ -41,7 +41,7 @@ function NotificationMenu() {
                     active:scale-95
                 "
             >
-                <BellIcon size={28} weight="regular" />
+                <BellIcon size={32} weight="regular" />
             </button>
 
             {/* Notification popup */}
