@@ -8,7 +8,8 @@ import NotificationMenu from "./NotificationMenu.jsx";
 import NotificationItem from "./NotificationItem.jsx";
 import UploadButton from "./UploadButton.jsx";
 import VideoCard from "./VideoCard.jsx";
-import Home from "./Home.jsx";
+import CategoryBar from "./CategoryBar.jsx";
+import SidebarDrawer from "./SidebarDrawer.jsx";
 
 export {
    Header,
@@ -21,5 +22,6 @@ export {
    NotificationItem,
    UploadButton,
    VideoCard,
-   Home
+   CategoryBar,
+   SidebarDrawer
 };

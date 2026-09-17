@@ -4,7 +4,6 @@ import {
     UserCirclePlusIcon,
     QueueIcon,
     ClockCounterClockwiseIcon,
-    PlaylistIcon,
     ThumbsUpIcon,
     XIcon,
 } from "@phosphor-icons/react";

@@ -3,18 +3,17 @@ import {
     MagnifyingGlassIcon
 } from "@phosphor-icons/react";
 
-import { HeaderSearchButton, NotificationMenu, ProfileMenu, UploadButton } from ".";
-import { useState } from "react";
-import SidebarDrawer from "./SidebarDrawer";
+import {
+    HeaderSearchButton,
+    NotificationMenu,
+    ProfileMenu,
+    UploadButton
+} from "../components";
 
-function Header() {
-
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+function Header({ onMenuClick }) {
 
     return (
-        <header className="sticky top-0 z-50 h-12 w-full md:h-16">
-
-            <SidebarDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+        <header className="h-12 w-full md:h-16">
 
             <div className="flex h-full w-full items-center px-2 sm:px-3 md:px-4">
 
@@ -26,7 +25,7 @@ function Header() {
                         type="button"
                         aria-label="Open menu"
                         title="More"
-                        onClick={() => setIsDrawerOpen(true)}
+                        onClick={onMenuClick}
                         className="
                             group relative
                             flex lg:hidden
@@ -114,7 +113,7 @@ function Header() {
                             className="
                                 h-12 w-96
                                 rounded-full
-                                border border-border
+                                border border-primary/10
                                 bg-surface
                                 px-5 pr-14 mt-1
                                 text-sm
@@ -153,7 +152,7 @@ function Header() {
                             className="
                                 h-14 w-full
                                 rounded-full
-                                border border-border
+                                border border-primary/10
                                 bg-surface
                                 px-5 pr-14 mt-2
                                 text-base

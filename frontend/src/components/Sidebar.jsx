@@ -1,5 +1,5 @@
 import { SidebarItem, YouSection } from "./index.js";
-import { HouseIcon, ClockCounterClockwiseIcon, UserCircleIcon } from "@phosphor-icons/react";
+import { HouseIcon, ClockCounterClockwiseIcon } from "@phosphor-icons/react";
 
 function Sidebar() {
   return (

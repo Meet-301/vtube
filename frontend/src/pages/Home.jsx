@@ -1,4 +1,6 @@
-import VideoCard from "../components/VideoCard";
+import {
+    VideoCard
+} from "../components";
 
 function Home() {
     const videos = [
