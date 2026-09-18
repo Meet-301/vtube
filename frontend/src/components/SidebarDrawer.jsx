@@ -7,6 +7,7 @@ import {
     ThumbsUpIcon,
     XIcon,
 } from "@phosphor-icons/react";
+import { Link } from "react-router-dom";
 
 function DrawerItem({ icon: Icon, label, active = false }) {
     return (
@@ -59,17 +60,19 @@ function SidebarDrawer({ isOpen, onClose }) {
             >
                 {/* Header */}
                 <div className="flex h-16 items-center justify-between px-4">
-                    <div className="flex items-center">
-                        <img
-                            src="/Vtube logo.png"
-                            alt="VTube"
-                            className="h-11 w-11 object-contain"
-                        />
+                    <Link to="/" title="VTube Home">
+                        <div className="flex items-center">
+                            <img
+                                src="/Vtube logo.png"
+                                alt="VTube"
+                                className="h-11 w-11 object-contain"
+                            />
 
-                        <span className="brand-font -ml-2 text-2xl text-text-primary">
-                            VTUBE
-                        </span>
-                    </div>
+                            <span className="brand-font -ml-2 text-2xl text-text-primary">
+                                VTUBE
+                            </span>
+                        </div>
+                    </Link>
 
                     <button
                         type="button"

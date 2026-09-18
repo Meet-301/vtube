@@ -10,6 +10,8 @@ import {
     UploadButton
 } from "../components";
 
+import {Link} from "react-router-dom";
+
 function Header({ onMenuClick }) {
 
     return (
@@ -58,12 +60,9 @@ function Header({ onMenuClick }) {
                     </button>
 
                     {/* Brand */}
-                    <a
-                        href="/"
-                        className="
-                            flex items-center
-                            rounded-lg
-                        "
+                    <Link
+                        to="/"
+                        className="flex items-center rounded-lg"
                         title="VTube Home"
                     >
                         <img
@@ -90,7 +89,7 @@ function Header({ onMenuClick }) {
                         >
                             VTUBE
                         </span>
-                    </a>
+                    </Link>
 
                 </div>
 

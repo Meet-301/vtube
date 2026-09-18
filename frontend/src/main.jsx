@@ -8,12 +8,13 @@ import {
   Route,
   RouterProvider
 } from 'react-router-dom'
-import {Home} from './pages'
+import {Home, Watch} from './pages'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<App />} path='/'>
       <Route element={<Home/>} path='' />
+      <Route element={<Watch/>} path='watch' />
     </Route>
   )
 )

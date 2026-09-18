@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { 
-  Header, 
-  Sidebar,
+  Header,
   SidebarDrawer
 } from "./components";
 import { useState, useEffect } from "react";
@@ -32,7 +31,7 @@ function App() {
             sticky top-0 z-50
             transition-all duration-300
             ${isScrolled
-            ? "bg-background/75 backdrop-blur-xl"
+            ? "bg-surface/70 backdrop-blur-xl"
             : "bg-transparent"
           }
         `}
