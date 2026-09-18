@@ -111,6 +111,7 @@ const registerUser = asyncHandler(async (req, res) => {
       password: password.trim(),
       username: username.toLowerCase(),
       fullName: fullName.trim(),
+      description: description.trim(),
       avatar: avatar.url,
       coverImage: coverImage?.url || "",
       isVerified: false,
@@ -535,7 +536,7 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
    //! extract data from request
-   const { fullName, username } = req.body;
+   const { fullName, username, description } = req.body;
 
    //! match the current username for uniqueness purpose
    if (username) {
@@ -555,9 +556,13 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
    if (username) {
       updateFields.username = username;
    }
-   if (fullName && username) {
+   if(description) {
+      updateFields.description = description;
+   }
+   if (fullName && username && description) {
       updateFields.fullName = fullName;
       updateFields.username = username;
+      updateFields.description = description;
    }
 
    //! check whether both fields are empty or not

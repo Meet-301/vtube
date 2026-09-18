@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { type } from "node:os";
 
 const userSchema = new Schema(
    {
@@ -32,6 +33,10 @@ const userSchema = new Schema(
       },
       coverImage: {
          type: String,
+      },
+      channelDescription: {
+         type: String,
+         default: ""
       },
       watchHistory: [
          {
