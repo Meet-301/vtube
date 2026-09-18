@@ -38,6 +38,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
       description,
       playlistCover: playlistCover ? playlistCoverPath.url : "",
       owner: req.user._id,
+      videoCount: 0
    });
 
    return res

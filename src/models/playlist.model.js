@@ -13,6 +13,7 @@ const playlistSchema = new Schema(
       },
       videoCount: {
          type: Number,
+         default: 0
       },
       playlistCover: {
          type: String,
