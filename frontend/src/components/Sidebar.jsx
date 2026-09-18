@@ -9,11 +9,13 @@ function Sidebar() {
         <SidebarItem
           label="Home"
           icon={HouseIcon}
+          url="/"
           active
         />
 
         <SidebarItem
           label="History"
+          url="/history"
           icon={ClockCounterClockwiseIcon}
         />
 
