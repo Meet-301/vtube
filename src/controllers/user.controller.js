@@ -742,6 +742,29 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
          },
       },
       {
+         $lookup: {
+            from: "videos",
+            localField: "_id",
+            foreignField: "owner",
+            as: "videos",
+            pipeline: [
+               {
+                  $match: {
+                     isPublished: true
+                  }
+               }
+            ]
+         }
+      },
+      {
+         $lookup: {
+            from: "playlists",
+            localField: "_id",
+            foreignField: "owner.id",
+            as: "playlists",
+         }
+      },
+      {
          $addFields: {
             //! $ adds the new fields in DB
             subscribersCount: {
@@ -771,6 +794,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
             subscribersCount: 1,
             subscribedToCount: 1,
             isSubscribed: 1,
+            videos: 1,
+            playlists: 1
          },
       },
    ]);
