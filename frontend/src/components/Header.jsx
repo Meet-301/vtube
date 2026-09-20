@@ -4,7 +4,7 @@ import {
 } from "@phosphor-icons/react";
 
 import {
-    HeaderSearchButton,
+    SearchButton,
     NotificationMenu,
     ProfileMenu,
     UploadButton
@@ -126,7 +126,7 @@ function Header({ onMenuClick }) {
                             "
                         />
 
-                        <HeaderSearchButton />
+                        <SearchButton />
 
                     </div>
                 </div>
@@ -165,7 +165,7 @@ function Header({ onMenuClick }) {
                             "
                         />
 
-                        <HeaderSearchButton />
+                        <SearchButton classes="mt-1" />
 
                     </div>
 

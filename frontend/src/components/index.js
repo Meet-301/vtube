@@ -1,7 +1,4 @@
 import Header from "./Header.jsx";
-import Sidebar from "./Sidebar.jsx";
-import HeaderSearchButton from "./HeaderSearchButton.jsx";
-import SidebarItem from "./SidebarItem.jsx";
 import YouSection from "./YouSection.jsx";
 import ProfileMenu from "./ProfileMenu.jsx";
 import NotificationMenu from "./NotificationMenu.jsx";
@@ -10,12 +7,14 @@ import UploadButton from "./UploadButton.jsx";
 import VideoCard from "./VideoCard.jsx";
 import CategoryBar from "./CategoryBar.jsx";
 import SidebarDrawer from "./SidebarDrawer.jsx";
+import Sidebar from "./Sidebar.jsx";
+import SidebarItem from "./SidebarItem.jsx";
+import SearchButton from "./SearchButton.jsx";
+import ChannelPageButton from "./ChannelPageButton.jsx";
+import VideoCardButton from "./VideoCardButton.jsx";
 
 export {
    Header,
-   Sidebar,
-   HeaderSearchButton,
-   SidebarItem,
    YouSection,
    ProfileMenu,
    NotificationMenu,
@@ -23,5 +22,10 @@ export {
    UploadButton,
    VideoCard,
    CategoryBar,
-   SidebarDrawer
+   SidebarDrawer,
+   Sidebar,
+   SidebarItem,
+   SearchButton,
+   ChannelPageButton,
+   VideoCardButton
 };

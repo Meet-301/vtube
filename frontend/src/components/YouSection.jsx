@@ -6,12 +6,13 @@ import {
     UserCirclePlusIcon
 } from "@phosphor-icons/react";
 
-import SidebarItem from "./SidebarItem";
+import {SidebarItem} from "./index.js";
+import {Link} from "react-router-dom";
 
-function YouMenuItem({ icon: Icon, label }) {
+function YouMenuItem({ icon: Icon, label, url }) {
     return (
-        <a
-            href="#"
+        <Link
+            to={url}
             className="
                 flex items-center gap-4
                 rounded-lg
@@ -26,7 +27,7 @@ function YouMenuItem({ icon: Icon, label }) {
             <span className="text-base font-medium">
                 {label}
             </span>
-        </a>
+        </Link>
     );
 }
 
@@ -60,21 +61,25 @@ function YouSection() {
 
                 <YouMenuItem
                     icon={UserIcon}
+                    url="/channel"
                     label="Your channel"
                 />
 
                 <YouMenuItem
                     icon={UserCirclePlusIcon}
+                    url="#"
                     label="Subscriptions"
                 />
 
                 <YouMenuItem
                     icon={QueueIcon}
+                    url="#"
                     label="Playlists"
                 />
 
                 <YouMenuItem
                     icon={ThumbsUpIcon}
+                    url="#"
                     label="Liked videos"
                 />
             </div>

@@ -3,9 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import {
     BookmarkSimpleIcon,
     DotsThreeVerticalIcon,
+    PencilSimpleIcon,
     PlayIcon,
     ShareNetworkIcon,
+    TrashIcon
 } from "@phosphor-icons/react";
+
+import { VideoCardButton } from "./index.js";
 
 function VideoCard({
     thumbnail,
@@ -14,6 +18,8 @@ function VideoCard({
     channelName,
     views,
     uploadedAt,
+    duration,
+    isEditable = false
 }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [openUpward, setOpenUpward] = useState(false);
@@ -21,7 +27,7 @@ function VideoCard({
     const menuRef = useRef(null);
     const buttonRef = useRef(null);
 
-    //! code to implement the outside click effect of more menu button of the video card
+    //! Handle click outside of more menu
     useEffect(() => {
         function handleClickOutside(event) {
             if (
@@ -42,23 +48,39 @@ function VideoCard({
         };
     }, []);
 
-    //! Handling code of more button's pop-up
+    //! Handle more button
     function handleToggleMenu() {
         if (!isMenuOpen && buttonRef.current) {
-            const rect = buttonRef.current.getBoundingClientRect();
-            const spaceBelow = window.innerHeight - rect.bottom;
-            const estimatedMenuHeight = 100; //! approx height of 4 items
+            const rect =
+                buttonRef.current.getBoundingClientRect();
 
-            setOpenUpward(spaceBelow < estimatedMenuHeight);
+            const spaceBelow =
+                window.innerHeight - rect.bottom;
+
+            const estimatedMenuHeight = 120;
+
+            setOpenUpward(
+                spaceBelow < estimatedMenuHeight
+            );
         }
 
         setIsMenuOpen((prev) => !prev);
     }
 
     return (
-        <article className="relative w-full">
+        <article
+            className="
+                group
+                relative
+                w-full
+                transition-transform
+                duration-150
+                has-[button:active]:scale-[0.99]
+            "
+        >
 
-            {/* Main video card */}
+            {/* ================= THUMBNAIL ================= */}
+
             <button
                 type="button"
                 className="
@@ -66,11 +88,8 @@ function VideoCard({
                     block
                     w-full
                     text-left
-                    active:scale-[0.99]
-                    transition-transform duration-150
                 "
             >
-                {/* Thumbnail */}
                 <div
                     className="
                         relative
@@ -80,6 +99,8 @@ function VideoCard({
                         bg-surface
                     "
                 >
+                    {/* Thumbnail */}
+
                     <img
                         src={thumbnail}
                         alt={title}
@@ -87,182 +108,265 @@ function VideoCard({
                             h-full
                             w-full
                             object-cover
-                            transition-transform duration-200
+                            transition-transform
+                            duration-200
                             group-hover:scale-[1.02]
                         "
                     />
 
-                    {/* Play */}
+                    {/* Dark overlay */}
+
+                    <div
+                        className="
+                            absolute
+                            inset-0
+                            bg-black/0
+                            transition-colors
+                            duration-200
+                            group-hover:bg-black/10
+                            group-active:bg-black/10
+                        "
+                    />
+
+                    {/* Blue Play Button */}
+
                     <span
                         className="
                             absolute
                             left-1/2
                             top-1/2
                             flex
-                            h-16
-                            w-16
+                            h-14
+                            w-14
                             -translate-x-1/2
                             -translate-y-1/2
+                            scale-90
                             items-center
                             justify-center
                             rounded-full
                             bg-primary
                             text-white
                             opacity-0
-                            scale-90
                             shadow-xl
-                            transition-all duration-200
-                            group-hover:opacity-100
+                            transition-all
+                            duration-200
                             group-hover:scale-100
-                            group-active:opacity-100
+                            group-hover:opacity-100
                             group-active:scale-95
+                            group-active:opacity-100
                         "
                     >
                         <PlayIcon
-                            size={32}
+                            size={30}
                             weight="fill"
                         />
                     </span>
-                </div>
+                    {/* Duration */}
 
-                {/* Video information */}
-                <div className="mt-4 flex gap-4 px-1">
+                    {duration && (
+                        <span
+                            className="
+                                absolute
+                                bottom-2
+                                right-2
+                                rounded-md
+                                bg-black/80
+                                px-1.5
+                                py-0.5
+                                text-xs
+                                font-medium
+                                text-white
+                            "
+                        >
+                            {duration}
+                        </span>
+                    )}
+                </div>
+            </button>
+
+
+            {/* ================= VIDEO INFORMATION ================= */}
+
+            <div
+                className="
+                    relative
+                    mt-3
+                    min-w-0
+                "
+            >
+
+                {/* Main information */}
+
+                <button
+                    type="button"
+                    className="
+                        group
+                        flex
+                        w-full
+                        min-w-0
+                        gap-3
+                        pr-11
+                        text-left
+                        transition-colors
+                        duration-150
+                    "
+                >
 
                     {/* Avatar */}
-                    <img
-                        src={avatar}
-                        alt={channelName}
-                        className="
-                            h-11
-                            w-11
-                            shrink-0
-                            rounded-full
-                            object-cover
-                        "
-                    />
 
-                    {/* Information */}
-                    <div className="min-w-0 flex-1 pr-8">
+                    {avatar && (
+                        <img
+                            src={avatar}
+                            alt={channelName || ""}
+                            className="
+                                h-11
+                                w-11
+                                shrink-0
+                                rounded-full
+                                object-cover
+                            "
+                        />
+                    )}
+
+
+                    {/* Text information */}
+
+                    <div className="min-w-0 flex-1">
 
                         {/* Title */}
+
                         <h3
                             className="
                                 line-clamp-2
-                                text-xl
+                                text-lg
                                 font-semibold
-                                leading-7
+                                leading-6
                                 text-text-primary
+                                transition-colors
+                                duration-150
+                                group-hover:text-primary-hover
+                                group-active:text-primary-hover
+                                sm:text-xl
+                                sm:leading-7
                             "
                         >
                             {title}
                         </h3>
 
+
                         {/* Channel */}
-                        <p
-                            className="
-                                mt-1
-                                text-base
-                                leading-6
-                                text-text-secondary
-                            "
-                        >
-                            {channelName}
-                        </p>
+
+                        {channelName && (
+                            <p
+                                className="
+                                    mt-1
+                                    text-sm
+                                    leading-5
+                                    text-text-secondary
+                                    sm:text-base
+                                    sm:leading-6
+                                "
+                            >
+                                {channelName}
+                            </p>
+                        )}
+
 
                         {/* Metadata */}
+
                         <p
                             className="
-                                text-base
-                                leading-6
+                                text-sm
+                                leading-5
                                 text-text-muted
+                                sm:text-base
+                                sm:leading-6
                             "
                         >
                             {views} • {uploadedAt}
                         </p>
-                    </div>
-                </div>
-            </button>
 
-            {/* More button */}
-            <div
-                ref={menuRef}
-                className="
-                    absolute
-                    right-0
-                    top-[calc(100%-105px)]
-                    z-20
-                "
-            >
-                <button
-                    ref={buttonRef}
-                    type="button"
-                    aria-label="More options"
-                    title="More"
-                    onClick={handleToggleMenu}
-                    className="
-                        flex
-                        h-10
-                        w-10
-                        items-center
-                        justify-center
-                        rounded-full
-                        text-text-secondary
-                        transition-colors duration-200
-                        hover:bg-surface-elevated
-                        active:bg-surface-elevated
-                        hover:text-text-primary
-                        active:scale-95
-                    "
-                >
-                    <DotsThreeVerticalIcon
-                        size={28}
-                        weight="bold"
-                    />
+                    </div>
+
                 </button>
 
-                {/* More menu */}
-                {isMenuOpen && (
-                    <div
-                        className={`
-                            absolute right-0
-                            w-56
-                            rounded-2xl
-                            bg-surface-elevated
-                            p-2
-                            shadow-2xl
-                            ${openUpward ? "bottom-full mb-2" : "top-full mt-2"}
-                        `}
-                    >
-                        <button
-                            type="button"
-                            className="
-                                flex w-full items-center gap-4
-                                rounded-xl px-4 py-3
-                                text-base text-text-primary
-                                hover:bg-surface
-                                active:bg-surface
-                            "
-                        >
-                            <ShareNetworkIcon size={22} />
-                            <span>Share</span>
-                        </button>
 
-                        <button
-                            type="button"
-                            className="
-                                flex w-full items-center gap-4
-                                rounded-xl px-4 py-3
-                                text-base text-text-primary
-                                hover:bg-surface
-                                active:bg-surface
-                            "
+                {/* ================= MORE BUTTON ================= */}
+
+                <div
+                    ref={menuRef}
+                    className="
+                        absolute
+                        right-0
+                        top-0
+                        z-20
+                    "
+                >
+
+                    <button
+                        ref={buttonRef}
+                        type="button"
+                        aria-label="More options"
+                        title="More"
+                        onClick={handleToggleMenu}
+                        className="
+                            flex
+                            h-10
+                            w-10
+                            items-center
+                            justify-center
+                            rounded-full
+                            text-text-secondary
+                            transition-colors
+                            duration-200
+                            hover:bg-surface-elevated
+                            active:bg-surface-elevated
+                            hover:text-text-primary
+                            active:scale-95
+                        "
+                    >
+                        <DotsThreeVerticalIcon
+                            size={27}
+                            weight="bold"
+                        />
+                    </button>
+
+                    {/* ================= MORE MENU ================= */}
+
+                    {isMenuOpen && (
+                        <div
+                            className={`
+                                absolute
+                                right-0
+                                w-56
+                                rounded-2xl
+                                bg-surface-elevated
+                                p-2
+                                shadow-2xl
+                                ${openUpward
+                                    ? "bottom-full mb-2"
+                                    : "top-full mt-2"
+                                }
+                            `}
                         >
-                            <BookmarkSimpleIcon size={22} />
-                            <span>Save</span>
-                        </button>
-                    </div>
-                )}
+
+                            {/* Share */}
+                            <VideoCardButton icon={ShareNetworkIcon} text="Share" />
+
+                            {/* Save */}
+                            <VideoCardButton icon={BookmarkSimpleIcon} text="Save" />
+
+                            {isEditable ? <VideoCardButton icon={PencilSimpleIcon} text="Edit" /> : null}
+
+                            {isEditable ? <VideoCardButton icon={TrashIcon} text="Delete" /> : null}
+
+                        </div>
+                    )}
+
+                </div>
+
             </div>
+
         </article>
     );
 }

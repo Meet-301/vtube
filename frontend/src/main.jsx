@@ -8,13 +8,15 @@ import {
   Route,
   RouterProvider
 } from 'react-router-dom'
-import {Home, Watch} from './pages'
+import {Channel, History, Home, Watch} from './pages'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<App />} path='/'>
       <Route element={<Home/>} path='' />
       <Route element={<Watch/>} path='watch' />
+      <Route element={<History/>} path='history' />
+      <Route element={<Channel/>} path='channel' />
     </Route>
   )
 )

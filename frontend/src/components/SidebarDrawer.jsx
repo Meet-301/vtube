@@ -9,10 +9,10 @@ import {
 } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 
-function DrawerItem({ icon: Icon, label, active = false }) {
+function DrawerItem({ icon: Icon, label, active = false, url }) {
     return (
-        <a
-            href="#"
+        <Link
+            to={url}
             className={`
                 flex items-center gap-4
                 rounded-lg
@@ -31,7 +31,7 @@ function DrawerItem({ icon: Icon, label, active = false }) {
             />
 
             <span>{label}</span>
-        </a>
+        </Link>
     );
 }
 
@@ -97,6 +97,7 @@ function SidebarDrawer({ isOpen, onClose }) {
                     <DrawerItem
                         icon={HouseIcon}
                         label="Home"
+                        url="/"
                         active
                     />
 
@@ -114,6 +115,7 @@ function SidebarDrawer({ isOpen, onClose }) {
 
                     <DrawerItem
                         icon={ClockCounterClockwiseIcon}
+                        url="/history"
                         label="History"
                     />
 
