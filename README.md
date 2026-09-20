@@ -9,7 +9,7 @@ A video platform built from scratch with **Node.js, Express and MongoDB**. It sh
 ![Socket.IO](https://img.shields.io/badge/Socket.IO-010101?logo=socketdotio&logoColor=white)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?logo=cloudinary&logoColor=white)
 
-**🔗 Live API:** http://vtube-mvnn.onrender.com &nbsp;|&nbsp; **📮 Postman collection:** [`docs/vtube.postman_collection.json`](./docs/vtube.postman_collection.json)
+**🔗 Live API:** http://vtube-mvnn.onrender.com &nbsp;|&nbsp;
 
 <!-- Add a screenshot or GIF here once the frontend is ready:
 ![Vtube demo](./docs/demo.gif)
@@ -37,7 +37,6 @@ A video platform built from scratch with **Node.js, Express and MongoDB**. It sh
 - **Search:** search by query and type (e.g. channel), with saved search history
 - **Video notes:** timestamped notes on any video (create, list, edit, delete)
 - **Efficient data access:** MongoDB aggregation pipelines with pagination
-- **Real-time:** Socket.IO — [WHAT_IT_DOES, e.g. live notifications]
 
 ## 🛠️ Tech Stack
 
