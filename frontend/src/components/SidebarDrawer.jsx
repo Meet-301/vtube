@@ -111,6 +111,7 @@ function SidebarDrawer({ isOpen, onClose }) {
                     <DrawerItem
                         icon={UserIcon}
                         label="Your channel"
+                        url="/channel"
                     />
 
                     <DrawerItem

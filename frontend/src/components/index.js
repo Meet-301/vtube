@@ -12,6 +12,7 @@ import SidebarItem from "./SidebarItem.jsx";
 import SearchButton from "./SearchButton.jsx";
 import ChannelPageButton from "./ChannelPageButton.jsx";
 import VideoCardButton from "./VideoCardButton.jsx";
+import MoreButton from "./MoreButton.jsx";
 
 export {
    Header,
@@ -27,5 +28,6 @@ export {
    SidebarItem,
    SearchButton,
    ChannelPageButton,
-   VideoCardButton
+   VideoCardButton,
+   MoreButton
 };

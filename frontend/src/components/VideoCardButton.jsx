@@ -1,5 +1,3 @@
-
-
 function VideoCardButton({ icon: Icon, text }) {
     return (
         <button
@@ -17,10 +15,11 @@ function VideoCardButton({ icon: Icon, text }) {
                 py-3
                 text-base
                 text-text-primary
-                transition-colors
+                transition-transform
                 duration-150
                 hover:bg-surface
                 active:bg-surface
+                active:scale-95
             "
         >
             <Icon
@@ -35,4 +34,4 @@ function VideoCardButton({ icon: Icon, text }) {
     )
 }
 
-export default VideoCardButton
+export default VideoCardButton;

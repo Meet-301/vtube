@@ -1,15 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-
 import {
-    BookmarkSimpleIcon,
-    DotsThreeVerticalIcon,
-    PencilSimpleIcon,
-    PlayIcon,
-    ShareNetworkIcon,
-    TrashIcon
+    PlayIcon
 } from "@phosphor-icons/react";
 
-import { VideoCardButton } from "./index.js";
+import { MoreButton } from "./index.js";
 
 function VideoCard({
     thumbnail,
@@ -18,54 +11,8 @@ function VideoCard({
     channelName,
     views,
     uploadedAt,
-    duration,
-    isEditable = false
+    duration
 }) {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [openUpward, setOpenUpward] = useState(false);
-
-    const menuRef = useRef(null);
-    const buttonRef = useRef(null);
-
-    //! Handle click outside of more menu
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (
-                menuRef.current &&
-                !menuRef.current.contains(event.target)
-            ) {
-                setIsMenuOpen(false);
-            }
-        }
-
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener(
-                "mousedown",
-                handleClickOutside
-            );
-        };
-    }, []);
-
-    //! Handle more button
-    function handleToggleMenu() {
-        if (!isMenuOpen && buttonRef.current) {
-            const rect =
-                buttonRef.current.getBoundingClientRect();
-
-            const spaceBelow =
-                window.innerHeight - rect.bottom;
-
-            const estimatedMenuHeight = 120;
-
-            setOpenUpward(
-                spaceBelow < estimatedMenuHeight
-            );
-        }
-
-        setIsMenuOpen((prev) => !prev);
-    }
 
     return (
         <article
@@ -75,7 +22,7 @@ function VideoCard({
                 w-full
                 transition-transform
                 duration-150
-                has-[button:active]:scale-[0.99]
+                has-[button:active:not(.more-btn)]:scale-[0.99]
             "
         >
 
@@ -290,80 +237,7 @@ function VideoCard({
 
                 </button>
 
-
-                {/* ================= MORE BUTTON ================= */}
-
-                <div
-                    ref={menuRef}
-                    className="
-                        absolute
-                        right-0
-                        top-0
-                        z-20
-                    "
-                >
-
-                    <button
-                        ref={buttonRef}
-                        type="button"
-                        aria-label="More options"
-                        title="More"
-                        onClick={handleToggleMenu}
-                        className="
-                            flex
-                            h-10
-                            w-10
-                            items-center
-                            justify-center
-                            rounded-full
-                            text-text-secondary
-                            transition-colors
-                            duration-200
-                            hover:bg-surface-elevated
-                            active:bg-surface-elevated
-                            hover:text-text-primary
-                            active:scale-95
-                        "
-                    >
-                        <DotsThreeVerticalIcon
-                            size={27}
-                            weight="bold"
-                        />
-                    </button>
-
-                    {/* ================= MORE MENU ================= */}
-
-                    {isMenuOpen && (
-                        <div
-                            className={`
-                                absolute
-                                right-0
-                                w-56
-                                rounded-2xl
-                                bg-surface-elevated
-                                p-2
-                                shadow-2xl
-                                ${openUpward
-                                    ? "bottom-full mb-2"
-                                    : "top-full mt-2"
-                                }
-                            `}
-                        >
-
-                            {/* Share */}
-                            <VideoCardButton icon={ShareNetworkIcon} text="Share" />
-
-                            {/* Save */}
-                            <VideoCardButton icon={BookmarkSimpleIcon} text="Save" />
-
-                            {isEditable ? <VideoCardButton icon={PencilSimpleIcon} text="Edit" /> : null}
-
-                            {isEditable ? <VideoCardButton icon={TrashIcon} text="Delete" /> : null}
-
-                        </div>
-                    )}
-
-                </div>
+                <MoreButton isEditable={true}/>
 
             </div>
 

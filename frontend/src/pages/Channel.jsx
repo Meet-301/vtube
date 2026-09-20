@@ -7,7 +7,7 @@ import {
     UploadSimpleIcon
 } from "@phosphor-icons/react";
 
-import { ChannelPageButton, VideoCard } from "../components";
+import { ChannelPageButton, MoreButton, VideoCard } from "../components";
 
 function Channel() {
 
@@ -235,11 +235,7 @@ function Channel() {
 
                     <div
                         className="
-                        flex
-                            sticky
-                            z-50
-                            sm:top-14
-                            md:top-20
+                            flex
                             rounded-xl
                             bg-surface
                             p-1
@@ -318,9 +314,14 @@ function Channel() {
                     {activeTab === "playlists" && (
                         <section className="mt-8">
 
-                        <ChannelPageButton icon={PlusIcon} text="Add playlist" />
+                            <div className="flex items-center justify-between">
+                                <ChannelPageButton
+                                    icon={PlusIcon}
+                                    text="Add playlist"
+                                />
+                            </div>
 
-                            <div className="mt-5 space-y-5">
+                            <div className="mt-5 space-y-8">
 
                                 {playlists.map((playlist) => (
 
@@ -328,30 +329,26 @@ function Channel() {
                                         key={playlist.id}
                                         className="
                                             group
-                                            flex
+                                            relative
+                                            min-w-0
                                             cursor-pointer
-                                            gap-4
                                             rounded-2xl
-                                            p-2
-                                            transition-all
-                                            duration-200
-                                            hover:bg-surface
+                                            transition-transform
+                                            duration-150
                                             active:scale-[0.99]
                                         "
                                     >
 
-                                        {/* Playlist thumbnail */}
+                                        {/* Playlist Thumbnail */}
 
                                         <div
                                             className="
                                                 relative
                                                 aspect-video
-                                                w-40
-                                                shrink-0
+                                                w-full
                                                 overflow-hidden
-                                                rounded-xl
+                                                rounded-2xl
                                                 bg-surface
-                                                sm:w-48
                                             "
                                         >
 
@@ -364,22 +361,24 @@ function Channel() {
                                                     object-cover
                                                     transition-transform
                                                     duration-300
-                                                    group-hover:scale-105
+                                                    group-hover:scale-[1.02]
                                                 "
                                             />
+
+                                            {/* Video count */}
 
                                             <div
                                                 className="
                                                     absolute
-                                                    bottom-0
-                                                    right-0
+                                                    bottom-2
+                                                    right-2
                                                     flex
                                                     items-center
                                                     gap-1.5
-                                                    rounded-tl-lg
+                                                    rounded-md
                                                     bg-black/80
-                                                    px-2.5
-                                                    py-1.5
+                                                    px-2
+                                                    py-1
                                                     text-xs
                                                     font-medium
                                                     text-white
@@ -395,45 +394,64 @@ function Channel() {
 
                                         </div>
 
-                                        {/* Playlist information */}
 
-                                        <div className="min-w-0 py-1">
+                                        {/* Playlist Information */}
+
+                                        <div className="relative mt-4 pr-12">
 
                                             <h3
                                                 className="
                                                     line-clamp-2
-                                                    text-base
+                                                    text-xl
                                                     font-semibold
-                                                    leading-6
+                                                    leading-7
                                                     text-text-primary
                                                     transition-colors
                                                     group-hover:text-primary-hover
+                                                    group-active:text-primary-hover
                                                 "
                                             >
                                                 {playlist.name}
                                             </h3>
 
+
                                             <p
                                                 className="
                                                     mt-1
                                                     line-clamp-2
-                                                    text-sm
-                                                    leading-5
+                                                    text-base
+                                                    leading-6
                                                     text-text-secondary
                                                 "
                                             >
                                                 {playlist.description}
                                             </p>
 
+
                                             <p
                                                 className="
-                                                    mt-2
-                                                    text-xs
+                                                    mt-1
+                                                    text-base
+                                                    leading-6
                                                     text-text-muted
                                                 "
                                             >
                                                 {playlist.videoCount} videos
                                             </p>
+
+
+                                            {/* More button */}
+
+                                            <div
+                                                className="
+                                                    absolute
+                                                    right-0
+                                                    top-0
+                                                "
+                                            >
+                                                <MoreButton isEditable={true} />
+                                            </div>
+
                                         </div>
 
                                     </article>
@@ -505,17 +523,17 @@ function Channel() {
 
                         <div className="flex gap-3">
                             <h2
-                            className="
+                                className="
                                 text-xl
                                 font-semibold
                                 text-text-primary
                                 md:text-2xl
                             "
-                        >
-                            Playlists
-                        </h2>
+                            >
+                                Playlists
+                            </h2>
 
-                        <ChannelPageButton icon={PlusIcon} text="Add playlist" />
+                            <ChannelPageButton icon={PlusIcon} text="Add playlist" />
                         </div>
 
                         <div
@@ -527,7 +545,6 @@ function Channel() {
                                 xl:grid-cols-4
                             "
                         >
-
                             {playlists.map((playlist) => (
 
                                 <article
@@ -541,7 +558,6 @@ function Channel() {
                                         active:scale-[0.99]
                                     "
                                 >
-
                                     <div
                                         className="
                                             relative
@@ -564,8 +580,6 @@ function Channel() {
                                                 group-hover:scale-105
                                             "
                                         />
-
-
 
                                         <div
                                             className="
@@ -591,13 +605,11 @@ function Channel() {
 
                                             {playlist.videoCount} videos
                                         </div>
-
                                     </div>
 
-
-
-                                    <h3
-                                        className="
+                                    <div className="relative">
+                                        <h3
+                                            className="
                                             mt-3
                                             line-clamp-2
                                             text-lg
@@ -607,21 +619,26 @@ function Channel() {
                                             group-hover:text-primary-hover
                                             group-active:text-primary-hover
                                         "
-                                    >
-                                        {playlist.name}
-                                    </h3>
+                                        >
+                                            {playlist.name}
+                                        </h3>
 
-                                    <p
-                                        className="
+                                        <p
+                                            className="
                                             mt-1
                                             line-clamp-2
                                             text-sm
                                             leading-5
                                             text-text-secondary
                                         "
-                                    >
-                                        {playlist.description}
-                                    </p>
+                                        >
+                                            {playlist.description}
+                                        </p>
+
+                                        <div className="absolute top-0 right-0">
+                                            <MoreButton isEditable={true} />
+                                        </div>
+                                    </div>
 
                                 </article>
 
