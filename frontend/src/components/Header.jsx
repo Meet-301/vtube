@@ -63,7 +63,7 @@ function Header({ onMenuClick }) {
                     <Link
                         to="/"
                         className="flex items-center rounded-lg"
-                        title="VTube Home"
+                        title="Home"
                     >
                         <img
                             src="/Vtube logo.png"
