@@ -68,7 +68,7 @@ function SidebarDrawer({ isOpen, onClose }) {
             >
                 {/* Header */}
                 <div className="flex h-16 items-center justify-between px-4">
-                    <Link to="/" title="VTube Home">
+                    <Link to="/" title="Home">
                         <div className="flex items-center">
                             <img
                                 src="/Vtube logo.png"
@@ -137,6 +137,7 @@ function SidebarDrawer({ isOpen, onClose }) {
                     <DrawerItem
                         icon={ThumbsUpIcon}
                         label="Liked videos"
+                        url="/liked-videos"
                     />
                 </nav>
             </aside>

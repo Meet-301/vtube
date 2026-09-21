@@ -4,6 +4,7 @@ import History from "./History.jsx";
 import Channel from "./Channel.jsx";
 import Subscriptions from "./Subscriptions.jsx";
 import Playlists from "./Playlists.jsx";
+import LikedVideos from "./LikedVideos.jsx";
 
 export {
     Home,
@@ -11,5 +12,6 @@ export {
     History,
     Channel,
     Subscriptions,
-    Playlists
+    Playlists,
+    LikedVideos
 }

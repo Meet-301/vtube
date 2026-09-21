@@ -80,7 +80,7 @@ function YouSection() {
 
                 <YouMenuItem
                     icon={ThumbsUpIcon}
-                    url="#"
+                    url="/liked-videos"
                     label="Liked videos"
                 />
             </div>
