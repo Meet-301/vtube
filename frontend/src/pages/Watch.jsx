@@ -70,21 +70,15 @@ function Watch() {
                             </video>
                         </div>
 
-
-
                         {/* Video Title */}
                         <h1 className="mt-5 text-2xl font-semibold leading-8 text-text-primary">
                             MongoDB Aggregation Pipeline Tutorial
                         </h1>
 
-
-
                         {/* Views + Date */}
                         <p className="mt-2 text-base text-text-secondary">
                             21K views • 1 week ago
                         </p>
-
-
 
                         {/* ================= CHANNEL + ACTIONS ================= */}
                         <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
@@ -272,9 +266,11 @@ function Watch() {
                                                     text-sm
                                                     font-medium
                                                     text-text-primary
-                                                    transition-colors
+                                                    transition-transform
+                                                    duration-150
                                                     hover:bg-surface-elevated
                                                     active:bg-surface-elevated
+                                                    active:scale-95
                                                 "
                                             >
                                                 <ShareNetworkIcon
@@ -304,9 +300,11 @@ function Watch() {
                                                     text-sm
                                                     font-medium
                                                     text-text-primary
-                                                    transition-colors
+                                                    transition-transform
+                                                    duration-150
                                                     hover:bg-surface-elevated
                                                     active:bg-surface-elevated
+                                                    active:scale-95
                                                 "
                                             >
                                                 <BookmarkSimpleIcon

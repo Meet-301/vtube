@@ -10,7 +10,6 @@ import {
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-// NOTE: VideoCardButton ko uski apni file se import karo (circular import se bachne ke liye)
 import { VideoCardButton } from "./index.js";
 
 const MOBILE_QUERY = "(max-width: 639px)"; // Tailwind `sm` = 640px
@@ -41,7 +40,7 @@ function useIsMobile() {
     return isMobile;
 }
 
-function MoreButton({ isEditable = false }) {
+function MoreButton({ isEditable = false, onlyDelete = false }) {
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [coords, setCoords] = useState(null); // desktop dropdown position
@@ -49,29 +48,37 @@ function MoreButton({ isEditable = false }) {
     const isMobile = useIsMobile();
 
     const buttonRef = useRef(null);
-    const popupRef = useRef(null);    // portal root (dropdown ya sheet + backdrop)
+    const popupRef = useRef(null);    //! portal root (dropdown or sheet + backdrop)
     const dropdownRef = useRef(null);
 
     const closeMenu = () => setIsMenuOpen(false);
 
-    const actions = [
-        { key: "share", icon: ShareNetworkIcon, text: "Share" },
-        { key: "save", icon: BookmarkSimpleIcon, text: "Save" },
-        ...(isEditable
-            ? [
-                { key: "edit", icon: PencilSimpleIcon, text: "Edit" },
-                { key: "delete", icon: TrashIcon, text: "Delete" },
-            ]
-            : []),
-    ];
+    const deleteAction = { key: "delete", icon: TrashIcon, text: "Delete" };
+
+    const actions = onlyDelete
+        ? [
+            { key: "share", icon: ShareNetworkIcon, text: "Share" },
+            { key: "save", icon: BookmarkSimpleIcon, text: "Save" },
+            deleteAction
+        ]
+        : [
+            { key: "share", icon: ShareNetworkIcon, text: "Share" },
+            { key: "save", icon: BookmarkSimpleIcon, text: "Save" },
+            ...(isEditable
+                ? [
+                    { key: "edit", icon: PencilSimpleIcon, text: "Edit" },
+                    deleteAction,
+                ]
+                : []),
+        ];
 
     //! Outside click / Escape / (desktop) scroll + resize => close
     useEffect(() => {
 
         if (!isMenuOpen) return;
 
-        // CAPTURE phase: menu ke bahar ka click yahin rok dete hain,
-        // taaki wo card tak (React onClick, native listener, <a> navigation) na pahunche.
+        //! CAPTURE phase: we stop the outside click of the menu here only
+        //! therefore it'll not reach to the card(React onClick, native listener, <a> navigation).
         function handleClickCapture(event) {
 
             const target = event.target;

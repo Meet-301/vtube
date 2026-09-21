@@ -67,7 +67,7 @@ function YouSection() {
 
                 <YouMenuItem
                     icon={UserCirclePlusIcon}
-                    url="#"
+                    url="/subscriptions"
                     label="Subscriptions"
                 />
 

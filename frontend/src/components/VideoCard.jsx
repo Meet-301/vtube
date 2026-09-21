@@ -11,41 +11,59 @@ function VideoCard({
     channelName,
     views,
     uploadedAt,
-    duration
+    duration,
+    variant = "grid",
+    isEditable = false,
+    onlyDelete = false
 }) {
+
+    const isHorizontal = variant === "horizontal";
 
     return (
         <article
-            className="
+            className={`
                 group
                 relative
                 w-full
+                min-w-0
                 transition-transform
                 duration-150
                 has-[button:active:not(.more-btn)]:scale-[0.99]
-            "
+
+                ${isHorizontal
+                    ? "flex flex-col gap-3 sm:flex-row sm:gap-4"
+                    : ""
+                }
+            `}
         >
 
             {/* ================= THUMBNAIL ================= */}
 
             <button
                 type="button"
-                className="
+                className={`
                     group
                     block
-                    w-full
                     text-left
-                "
+
+                    ${isHorizontal
+                        ? "w-full shrink-0 sm:w-72 md:w-80 lg:w-84"
+                        : "w-full"
+                    }
+                `}
             >
+
                 <div
                     className="
                         relative
                         aspect-video
+                        w-full
                         overflow-hidden
                         rounded-2xl
                         bg-surface
                     "
                 >
+
                     {/* Thumbnail */}
 
                     <img
@@ -61,6 +79,7 @@ function VideoCard({
                         "
                     />
 
+
                     {/* Dark overlay */}
 
                     <div
@@ -75,7 +94,8 @@ function VideoCard({
                         "
                     />
 
-                    {/* Blue Play Button */}
+
+                    {/* Play button */}
 
                     <span
                         className="
@@ -103,11 +123,15 @@ function VideoCard({
                             group-active:opacity-100
                         "
                     >
+
                         <PlayIcon
                             size={30}
                             weight="fill"
                         />
+
                     </span>
+
+
                     {/* Duration */}
 
                     {duration && (
@@ -117,10 +141,10 @@ function VideoCard({
                                 bottom-2
                                 right-2
                                 rounded-md
-                                bg-black/80
+                                bg-black/60
                                 px-1.5
                                 py-0.5
-                                text-xs
+                                text-md
                                 font-medium
                                 text-white
                             "
@@ -128,40 +152,50 @@ function VideoCard({
                             {duration}
                         </span>
                     )}
+
                 </div>
+
             </button>
 
 
             {/* ================= VIDEO INFORMATION ================= */}
 
             <div
-                className="
+                className={`
                     relative
-                    mt-3
                     min-w-0
-                "
+
+                    ${isHorizontal
+                        ? "flex-1 sm:mt-0 sm:pr-12"
+                        : "mt-3"
+                    }
+                `}
             >
 
                 {/* Main information */}
 
                 <button
                     type="button"
-                    className="
+                    className={`
                         group
                         flex
                         w-full
                         min-w-0
                         gap-3
-                        pr-11
                         text-left
                         transition-colors
                         duration-150
-                    "
+
+                        ${isHorizontal
+                            ? "pr-10"
+                            : "pr-11"
+                        }
+                    `}
                 >
 
                     {/* Avatar */}
 
-                    {avatar && (
+                    {!isHorizontal && avatar && (
                         <img
                             src={avatar}
                             alt={channelName || ""}
@@ -230,14 +264,17 @@ function VideoCard({
                                 sm:leading-6
                             "
                         >
-                            {views} • {uploadedAt}
+                            {views} {!isHorizontal ? `• ${uploadedAt}` : ""}
                         </p>
 
                     </div>
 
                 </button>
 
-                <MoreButton isEditable={true}/>
+
+                {/* More */}
+
+                <MoreButton isEditable={isEditable} onlyDelete={onlyDelete} />
 
             </div>
 

@@ -12,6 +12,7 @@ function Home() {
             avatar: "https://i.pravatar.cc/150?img=12",
             channelName: "Code With Meet",
             views: "12K views",
+            duration: "5:07",
             uploadedAt: "2 days ago",
         },
         {
@@ -20,6 +21,7 @@ function Home() {
             avatar: "https://i.pravatar.cc/150?img=32",
             channelName: "Dev Academy",
             views: "8.4K views",
+            duration: "5:07",
             uploadedAt: "5 days ago",
         },
         {
@@ -28,6 +30,7 @@ function Home() {
             avatar: "https://i.pravatar.cc/150?img=45",
             channelName: "Backend Lab",
             views: "21K views",
+            duration: "5:07",
             uploadedAt: "1 week ago",
         },
         {
@@ -36,6 +39,7 @@ function Home() {
             avatar: "https://i.pravatar.cc/150?img=56",
             channelName: "Code Stories",
             views: "34K views",
+            duration: "5:07",
             uploadedAt: "2 weeks ago",
         },
         {
@@ -44,6 +48,7 @@ function Home() {
             avatar: "https://i.pravatar.cc/150?img=68",
             channelName: "JS Simplified",
             views: "17K views",
+            duration: "5:07",
             uploadedAt: "3 weeks ago",
         },
         {
@@ -52,6 +57,7 @@ function Home() {
             avatar: "https://i.pravatar.cc/150?img=11",
             channelName: "Web Dev Daily",
             views: "9.7K views",
+            duration: "1:35:07",
             uploadedAt: "1 month ago",
         },
         {
@@ -60,6 +66,7 @@ function Home() {
             avatar: "https://i.pravatar.cc/150?img=56",
             channelName: "Code Stories",
             views: "34K views",
+            duration: "42:14",
             uploadedAt: "2 weeks ago",
         },
         {
@@ -68,6 +75,7 @@ function Home() {
             avatar: "https://i.pravatar.cc/150?img=68",
             channelName: "JS Simplified",
             views: "17K views",
+            duration: "5:07",
             uploadedAt: "3 weeks ago",
         },
         {
@@ -76,6 +84,7 @@ function Home() {
             avatar: "https://i.pravatar.cc/150?img=11",
             channelName: "Web Dev Daily",
             views: "9.7K views",
+            duration: "5:07",
             uploadedAt: "1 month ago",
         },
     ];
@@ -89,13 +98,13 @@ function Home() {
 
                 <div
                     className="
-                sticky
-                top-12
-                md:top-16
-                z-40
-                bg-background/75
-                backdrop-blur-xl
-            "
+                        sticky
+                        top-12
+                        md:top-16
+                        z-40
+                        bg-background/75
+                        backdrop-blur-xl
+                    "
                 >
                     <CategoryBar />
                 </div>

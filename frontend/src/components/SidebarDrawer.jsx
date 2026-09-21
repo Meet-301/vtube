@@ -102,8 +102,9 @@ function SidebarDrawer({ isOpen, onClose }) {
                     />
 
                     <DrawerItem
-                        icon={UserCirclePlusIcon}
-                        label="Subscriptions"
+                        icon={ClockCounterClockwiseIcon}
+                        url="/history"
+                        label="History"
                     />
 
                     <div className="my-3 border-t border-border" />
@@ -115,9 +116,9 @@ function SidebarDrawer({ isOpen, onClose }) {
                     />
 
                     <DrawerItem
-                        icon={ClockCounterClockwiseIcon}
-                        url="/history"
-                        label="History"
+                        icon={UserCirclePlusIcon}
+                        label="Subscriptions"
+                        url="/subscriptions"
                     />
 
                     <DrawerItem
