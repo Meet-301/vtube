@@ -201,7 +201,7 @@ function Playlists() {
                                                     bg-black/80
                                                     px-3
                                                     py-1
-                                                    text-xs
+                                                    text-sm
                                                     font-medium
                                                     text-white
                                                 "
