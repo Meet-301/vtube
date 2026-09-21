@@ -1,26 +1,15 @@
 import { TrashIcon } from "@phosphor-icons/react";
 
 import {
-    CategoryBar,
     SearchButton,
     Sidebar,
     VideoCard,
 } from "../components";
 
 function History() {
-
     return (
-        <main className="flex min-w-0">
-
-            {/* ================= SIDEBAR ================= */}
-
-            <Sidebar />
-
-            {/* ================= MAIN CONTENT ================= */}
-
-            <div className="min-w-0 flex-1 p-4">
-
-                {/* ================= PAGE CONTENT ================= */}
+        <main className="min-w-0">
+            <div className="min-w-0 p-4">
 
                 <div
                     className="
@@ -31,12 +20,10 @@ function History() {
                     "
                 >
 
-                    {/* ================= PAGE HEADER ================= */}
-
+                    {/* PAGE HEADER */}
                     <div className="relative">
 
                         {/* Title */}
-
                         <h1
                             className="
                                 text-2xl
@@ -48,9 +35,7 @@ function History() {
                             Watch history
                         </h1>
 
-
-                        {/* ================= HISTORY CONTROLS ================= */}
-
+                        {/* HISTORY CONTROLS */}
                         <aside
                             className="
                                 mt-6
@@ -64,11 +49,8 @@ function History() {
                                 xl:w-72
                             "
                         >
-
                             {/* Search */}
-
                             <div className="group relative">
-
                                 <input
                                     type="text"
                                     placeholder="Search watch history"
@@ -90,12 +72,9 @@ function History() {
                                 />
 
                                 <SearchButton />
-
                             </div>
 
-
                             {/* Divider */}
-
                             <div
                                 className="
                                     my-4
@@ -104,9 +83,7 @@ function History() {
                                 "
                             />
 
-
                             {/* Clear history */}
-
                             <button
                                 type="button"
                                 className="
@@ -128,7 +105,6 @@ function History() {
                                     active:scale-[0.99]
                                 "
                             >
-
                                 <TrashIcon
                                     size={20}
                                     weight="regular"
@@ -137,15 +113,12 @@ function History() {
                                 <span>
                                     Clear watch history
                                 </span>
-
                             </button>
-
                         </aside>
 
                     </div>
 
-
-                    {/* ================= HISTORY CONTENT ================= */}
+                    {/* HISTORY CONTENT */}
                     <section
                         className="
                             mt-8
@@ -163,7 +136,7 @@ function History() {
                             Today
                         </h2>
 
-                        {/* ================= TODAY VIDEOS ================= */}
+                        {/* TODAY VIDEOS */}
                         <div
                             className="
                                 mt-5
@@ -184,12 +157,12 @@ function History() {
                                 onlyDelete={true}
                             />
                         </div>
+
                     </section>
 
                 </div>
 
             </div>
-
         </main>
     );
 }

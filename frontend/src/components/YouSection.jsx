@@ -3,7 +3,8 @@ import {
     UserIcon,
     QueueIcon,
     ThumbsUpIcon,
-    UserCirclePlusIcon
+    UserCirclePlusIcon,
+    ClockCounterClockwiseIcon
 } from "@phosphor-icons/react";
 
 import {SidebarItem} from "./index.js";
@@ -72,9 +73,9 @@ function YouSection() {
                 />
 
                 <YouMenuItem
-                    icon={QueueIcon}
-                    url="#"
-                    label="Playlists"
+                    icon={ClockCounterClockwiseIcon}
+                    url="/history"
+                    label="History"
                 />
 
                 <YouMenuItem

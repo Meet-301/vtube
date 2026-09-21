@@ -7,9 +7,17 @@ import {
     ThumbsUpIcon,
     XIcon,
 } from "@phosphor-icons/react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-function DrawerItem({ icon: Icon, label, active = false, url }) {
+function DrawerItem({ icon: Icon, label, url }) {
+
+    const location = useLocation();
+    
+        const isActive =
+        url === "/"
+            ? location.pathname === "/"
+            : location.pathname.startsWith(url);
+
     return (
         <Link
             to={url}
@@ -19,7 +27,7 @@ function DrawerItem({ icon: Icon, label, active = false, url }) {
                 px-4 py-3
                 text-base
                 transition-colors duration-200
-                ${active
+                ${isActive
                     ? "bg-surface-elevated text-text-primary"
                     : "text-text-secondary hover:bg-surface-elevated active:bg-surface-elevated hover:text-text-primary"
                 }
@@ -27,7 +35,7 @@ function DrawerItem({ icon: Icon, label, active = false, url }) {
         >
             <Icon
                 size={24}
-                weight={active ? "fill" : "regular"}
+                weight={isActive ? "fill" : "regular"}
             />
 
             <span>{label}</span>
@@ -93,18 +101,17 @@ function SidebarDrawer({ isOpen, onClose }) {
                 </div>
 
                 {/* Navigation */}
-                <nav className="px-3 py-4">
+                <nav className="px-3 py-4" onClick={onClose}>
                     <DrawerItem
                         icon={HouseIcon}
                         label="Home"
-                        url="/"
-                        active
+                        url="/" 
                     />
 
                     <DrawerItem
                         icon={ClockCounterClockwiseIcon}
-                        url="/history"
                         label="History"
+                        url="/history"
                     />
 
                     <div className="my-3 border-t border-border" />
