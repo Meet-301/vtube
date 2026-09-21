@@ -225,23 +225,20 @@ function Channel() {
 
                 <div className="my-8 border-t border-border" />
 
-                {/* ==================================================
-                    MOBILE / TABLET TABS (below lg screens)
-                ================================================== */}
-
-                <div className="lg:hidden">
-
+                <div>
                     {/* Tabs */}
 
                     <div
                         className="
+                            sticky
+                            top-16
+                            z-30
                             flex
                             rounded-xl
                             bg-surface
                             p-1
                         "
                     >
-
                         <button
                             type="button"
                             onClick={() => setActiveTab("videos")}
@@ -283,16 +280,24 @@ function Channel() {
                         >
                             Playlists
                         </button>
-
                     </div>
 
-                    {/* ================= MOBILE VIDEOS ================= */}
+                    {/* Videos */}
 
                     {activeTab === "videos" && (
                         <section className="mt-8">
-
-                            <div className="mt-5 space-y-8">
-
+                            <div
+                                className="
+                                    mt-5
+                                    grid
+                                    grid-cols-1
+                                    gap-x-4
+                                    gap-y-8
+                                    sm:grid-cols-2
+                                    lg:grid-cols-3
+                                    xl:grid-cols-4
+                                "
+                            >
                                 {videos.map((video) => (
                                     <VideoCard
                                         key={video._id}
@@ -303,13 +308,11 @@ function Channel() {
                                         isEditable={true}
                                     />
                                 ))}
-
                             </div>
-
                         </section>
                     )}
 
-                    {/* ================= MOBILE PLAYLISTS ================= */}
+                    {/* Playlists */}
 
                     {activeTab === "playlists" && (
                         <section className="mt-8">
@@ -321,37 +324,41 @@ function Channel() {
                                 />
                             </div>
 
-                            <div className="mt-5 space-y-8">
-
+                            <div
+                                className="
+                                    mt-5
+                                    grid
+                                    grid-cols-1
+                                    gap-x-5
+                                    gap-y-8
+                                    sm:grid-cols-2
+                                    lg:grid-cols-3
+                                    xl:grid-cols-4
+                                "
+                            >
                                 {playlists.map((playlist) => (
-
                                     <article
                                         key={playlist.id}
                                         className="
                                             group
-                                            relative
                                             min-w-0
                                             cursor-pointer
-                                            rounded-2xl
                                             transition-transform
                                             duration-150
                                             active:scale-[0.99]
                                         "
                                     >
-
-                                        {/* Playlist Thumbnail */}
+                                        {/* Thumbnail */}
 
                                         <div
                                             className="
                                                 relative
                                                 aspect-video
-                                                w-full
                                                 overflow-hidden
                                                 rounded-2xl
                                                 bg-surface
                                             "
                                         >
-
                                             <img
                                                 src={playlist.playlistCover}
                                                 alt={playlist.name}
@@ -359,13 +366,8 @@ function Channel() {
                                                     h-full
                                                     w-full
                                                     object-cover
-                                                    transition-transform
-                                                    duration-300
-                                                    group-hover:scale-[1.02]
                                                 "
                                             />
-
-                                            {/* Video count */}
 
                                             <div
                                                 className="
@@ -377,36 +379,33 @@ function Channel() {
                                                     gap-1.5
                                                     rounded-tl-lg
                                                     bg-black/80
-                                                    px-2
-                                                    py-1
-                                                    text-xs
+                                                    px-3
+                                                    py-2
+                                                    text-sm
                                                     font-medium
                                                     text-white
                                                 "
                                             >
                                                 <PlayCircleIcon
-                                                    size={15}
+                                                    size={16}
                                                     weight="fill"
                                                 />
 
                                                 {playlist.videoCount} videos
                                             </div>
-
                                         </div>
 
+                                        {/* Information */}
 
-                                        {/* Playlist Information */}
-
-                                        <div className="relative mt-4 pr-12">
-
+                                        <div className="relative mt-3 pr-10">
                                             <h3
                                                 className="
                                                     line-clamp-2
-                                                    text-xl
+                                                    text-lg
                                                     font-semibold
-                                                    leading-7
                                                     text-text-primary
                                                     transition-colors
+                                                    duration-150
                                                     group-hover:text-primary-hover
                                                     group-active:text-primary-hover
                                                 "
@@ -414,20 +413,17 @@ function Channel() {
                                                 {playlist.name}
                                             </h3>
 
-
                                             <p
                                                 className="
                                                     mt-1
                                                     line-clamp-2
-                                                    text-base
-                                                    leading-6
+                                                    text-sm
+                                                    leading-5
                                                     text-text-secondary
                                                 "
                                             >
                                                 {playlist.description}
                                             </p>
-
-                                            {/* More button */}
 
                                             <div
                                                 className="
@@ -438,203 +434,13 @@ function Channel() {
                                             >
                                                 <MoreButton isEditable={true} />
                                             </div>
-
                                         </div>
-
                                     </article>
-
                                 ))}
-
                             </div>
 
                         </section>
                     )}
-
-                </div>
-
-                {/* ==================================================
-                    DESKTOP lg layout
-                ================================================== */}
-
-                <div className="hidden lg:block">
-
-                    {/* ================= VIDEOS ================= */}
-
-                    <section className="mt-10">
-
-                        <div className="flex items-center justify-between">
-
-                            <h2
-                                className="
-                                    text-xl
-                                    font-semibold
-                                    text-text-primary
-                                    md:text-2xl
-                                "
-                            >
-                                Videos
-                            </h2>
-
-                        </div>
-
-                        <div
-                            className="
-                                mt-5
-                                grid
-                                grid-cols-3
-                                gap-x-4
-                                gap-y-8
-                                xl:grid-cols-4
-                            "
-                        >
-
-                            {videos.map((video) => (
-
-                                <VideoCard
-                                    key={video._id}
-                                    thumbnail={video.thumbnail}
-                                    title={video.title}
-                                    views={video.views}
-                                    uploadedAt={video.createdAt}
-                                    isEditable={true}
-                                />
-
-                            ))}
-
-                        </div>
-                    </section>
-
-                    {/* ================= PLAYLISTS ================= */}
-
-                    <section className="mt-10">
-
-                        <div className="flex gap-3">
-                            <h2
-                                className="
-                                text-xl
-                                font-semibold
-                                text-text-primary
-                                md:text-2xl
-                            "
-                            >
-                                Playlists
-                            </h2>
-
-                            <ChannelPageButton icon={PlusIcon} text="Create playlist" />
-                        </div>
-
-                        <div
-                            className="
-                                mt-5
-                                grid
-                                grid-cols-3
-                                gap-5
-                                xl:grid-cols-4
-                            "
-                        >
-                            {playlists.map((playlist) => (
-
-                                <article
-                                    key={playlist.id}
-                                    className="
-                                        group
-                                        min-w-0
-                                        cursor-pointer
-                                        transition-transform
-                                        duration-200
-                                        active:scale-[0.99]
-                                    "
-                                >
-                                    <div
-                                        className="
-                                            relative
-                                            aspect-video
-                                            overflow-hidden
-                                            rounded-xl
-                                            bg-surface
-                                        "
-                                    >
-
-                                        <img
-                                            src={playlist.playlistCover}
-                                            alt={playlist.name}
-                                            className="
-                                                h-full
-                                                w-full
-                                                object-cover
-                                                transition-transform
-                                                duration-300
-                                                group-hover:scale-105
-                                            "
-                                        />
-
-                                        <div
-                                            className="
-                                                absolute
-                                                bottom-0
-                                                right-0
-                                                flex
-                                                items-center
-                                                gap-1.5
-                                                rounded-tl-lg
-                                                bg-black/80
-                                                px-3
-                                                py-2
-                                                text-sm
-                                                font-medium
-                                                text-white
-                                            "
-                                        >
-                                            <PlayCircleIcon
-                                                size={16}
-                                                weight="fill"
-                                            />
-
-                                            {playlist.videoCount} videos
-                                        </div>
-                                    </div>
-
-                                    <div className="relative">
-                                        <h3
-                                            className="
-                                            mt-3
-                                            line-clamp-2
-                                            text-lg
-                                            font-semibold
-                                            text-text-primary
-                                            transition-colors
-                                            group-hover:text-primary-hover
-                                            group-active:text-primary-hover
-                                        "
-                                        >
-                                            {playlist.name}
-                                        </h3>
-
-                                        <p
-                                            className="
-                                            mt-1
-                                            line-clamp-2
-                                            text-sm
-                                            leading-5
-                                            text-text-secondary
-                                        "
-                                        >
-                                            {playlist.description}
-                                        </p>
-
-                                        <div className="absolute top-0 right-0">
-                                            <MoreButton isEditable={true} />
-                                        </div>
-                                    </div>
-
-                                </article>
-
-                            ))}
-
-                        </div>
-
-                    </section>
-
                 </div>
 
             </div>
