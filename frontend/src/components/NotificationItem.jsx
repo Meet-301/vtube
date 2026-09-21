@@ -11,6 +11,8 @@ function NotificationItem({
                 rounded-xl px-3 py-3
                 transition-colors duration-200
                 hover:bg-surface
+                cursor-pointer
+                active:scale-95
             "
         >
             {/* Unread indicator */}
