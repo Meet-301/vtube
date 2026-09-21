@@ -317,7 +317,7 @@ function Channel() {
                             <div className="flex items-center justify-between">
                                 <ChannelPageButton
                                     icon={PlusIcon}
-                                    text="Add playlist"
+                                    text="Create playlist"
                                 />
                             </div>
 
@@ -370,12 +370,12 @@ function Channel() {
                                             <div
                                                 className="
                                                     absolute
-                                                    bottom-2
-                                                    right-2
+                                                    bottom-0
+                                                    right-0
                                                     flex
                                                     items-center
                                                     gap-1.5
-                                                    rounded-md
+                                                    rounded-tl-lg
                                                     bg-black/80
                                                     px-2
                                                     py-1
@@ -389,7 +389,7 @@ function Channel() {
                                                     weight="fill"
                                                 />
 
-                                                {playlist.videoCount}
+                                                {playlist.videoCount} videos
                                             </div>
 
                                         </div>
@@ -426,19 +426,6 @@ function Channel() {
                                             >
                                                 {playlist.description}
                                             </p>
-
-
-                                            <p
-                                                className="
-                                                    mt-1
-                                                    text-base
-                                                    leading-6
-                                                    text-text-muted
-                                                "
-                                            >
-                                                {playlist.videoCount} videos
-                                            </p>
-
 
                                             {/* More button */}
 
@@ -533,7 +520,7 @@ function Channel() {
                                 Playlists
                             </h2>
 
-                            <ChannelPageButton icon={PlusIcon} text="Add playlist" />
+                            <ChannelPageButton icon={PlusIcon} text="Create playlist" />
                         </div>
 
                         <div
