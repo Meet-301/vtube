@@ -153,7 +153,11 @@ function Channel() {
                                 </h1>
 
                                 {isOwner && (
-                                    <ChannelPageButton icon={PencilSimpleIcon} text="Edit channel" />
+                                    <ChannelPageButton
+                                        icon={PencilSimpleIcon}
+                                        text="Edit channel"
+                                        linkTo="/edit-channel"
+                                    />
                                 )}
 
                             </div>

@@ -301,11 +301,12 @@ function MoreButton({
                                     </div>
 
                                     <div className="space-y-1">
-                                        {actions.map(({ key, icon, text }) => (
+                                        {actions.map(({ key, icon, text, onClick }) => (
                                             <VideoCardButton
                                                 key={key}
                                                 icon={icon}
                                                 text={text}
+                                                onClick={onClick}
                                             />
                                         ))}
                                     </div>

@@ -8,6 +8,7 @@ import LikedVideos from "./LikedVideos.jsx";
 import ManageAccount from "./ManageAccount.jsx";
 import UploadVideo from "./UploadVideo.jsx";
 import EditVideo from "./EditVideo.jsx";
+import EditChannel from "./EditChannel.jsx";
 
 export {
     Home,
@@ -19,5 +20,6 @@ export {
     LikedVideos,
     ManageAccount,
     UploadVideo,
-    EditVideo
+    EditVideo,
+    EditChannel
 }
