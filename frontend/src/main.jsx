@@ -8,11 +8,22 @@ import {
   Route,
   RouterProvider
 } from 'react-router-dom'
-import {ManageAccount, Channel, History, Home, LikedVideos, Playlists, Subscriptions, Watch, UploadVideo} from './pages'
+import {
+  ManageAccount, 
+  Channel, 
+  History, 
+  Home, 
+  LikedVideos, 
+  Playlists, 
+  Subscriptions, 
+  Watch, 
+  UploadVideo, 
+  EditVideo
+} from './pages'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route element={<App />} path='/'>
+    <Route element={<App/>} path='/'>
       <Route element={<Home/>} path='' />
       <Route element={<Watch/>} path='watch' />
       <Route element={<History/>} path='history' />
@@ -22,6 +33,7 @@ const router = createBrowserRouter(
       <Route element={<LikedVideos/>} path='liked-videos' />
       <Route element={<ManageAccount/>} path='manage-account' />
       <Route element={<UploadVideo/>} path='upload-video' />
+      <Route element={<EditVideo/>} path='edit-video' />
     </Route>
   )
 )

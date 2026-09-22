@@ -7,6 +7,7 @@ import Playlists from "./Playlists.jsx";
 import LikedVideos from "./LikedVideos.jsx";
 import ManageAccount from "./ManageAccount.jsx";
 import UploadVideo from "./UploadVideo.jsx";
+import EditVideo from "./EditVideo.jsx";
 
 export {
     Home,
@@ -17,5 +18,6 @@ export {
     Playlists,
     LikedVideos,
     ManageAccount,
-    UploadVideo
+    UploadVideo,
+    EditVideo
 }
