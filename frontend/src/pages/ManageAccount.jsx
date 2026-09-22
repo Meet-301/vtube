@@ -2,9 +2,12 @@ import {
     CameraIcon,
     SignOutIcon,
     EyeIcon,
-    EyeSlashIcon
+    EyeSlashIcon,
+    XIcon,
+    CheckCircleIcon
 } from "@phosphor-icons/react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function ManageAccount() {
 
@@ -154,45 +157,6 @@ function ManageAccount() {
 
                         </div>
 
-
-                        {/* Username */}
-
-                        <div>
-
-                            <label
-                                className="
-                                    mb-2
-                                    block
-                                    text-sm
-                                    font-medium
-                                    text-text-primary
-                                "
-                            >
-                                Username
-                            </label>
-
-                            <input
-                                type="text"
-                                defaultValue="vkpujara"
-                                className="
-                                    h-11
-                                    w-full
-                                    rounded-xl
-                                    border
-                                    border-border
-                                    bg-background
-                                    px-4
-                                    text-sm
-                                    text-text-primary
-                                    outline-none
-                                    transition-colors
-                                    focus:border-primary
-                                "
-                            />
-
-                        </div>
-
-
                         {/* Email */}
 
                         <div>
@@ -315,36 +279,77 @@ function ManageAccount() {
 
                     </div>
 
+                    {/* ================= ACTIONS ================= */}
 
-                    {/* ================= SAVE ================= */}
+                <div
+                    className="
+                        mt-6
+                        flex
+                        flex-col-reverse
+                        gap-3
+                        sm:flex-row
+                        sm:justify-end
+                    "
+                >
 
-                    <div
+                    <Link
+                        to="/"
                         className="
-                            mt-6
                             flex
-                            justify-end
+                            items-center
+                            justify-center
+                            gap-2
+                            rounded-full
+                            border
+                            border-border
+                            bg-surface
+                            px-6
+                            py-2.5
+                            text-sm
+                            font-semibold
+                            text-text-primary
+                            transition-all
+                            duration-200
+                            hover:bg-surface-elevated
+                            active:bg-surface-elevated
+                            active:scale-95
                         "
                     >
-                        <button
-                            type="button"
-                            className="
-                                rounded-full
-                                bg-primary
-                                px-6
-                                py-2.5
-                                text-sm
-                                font-semibold
-                                text-white
-                                transition-all
-                                duration-200
-                                hover:bg-primary-hover
-                                active:bg-primary-hover
-                                active:scale-95
-                            "
-                        >
-                            Save changes
-                        </button>
-                    </div>
+                        <XIcon size={18} />
+
+                        Cancel
+                    </Link>
+
+                    <button
+                        type="button"
+                        className="
+                            flex
+                            items-center
+                            justify-center
+                            gap-2
+                            rounded-full
+                            bg-primary
+                            px-6
+                            py-2.5
+                            text-sm
+                            font-semibold
+                            text-white
+                            transition-all
+                            duration-200
+                            hover:bg-primary-hover
+                            active:bg-primary-hover
+                            active:scale-95
+                        "
+                    >
+                        <CheckCircleIcon
+                            size={18}
+                            weight="bold"
+                        />
+
+                        Save changes
+                    </button>
+
+                </div>
 
                 </section>
 
