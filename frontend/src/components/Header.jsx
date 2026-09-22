@@ -1,6 +1,7 @@
 import {
     ListIcon,
-    MagnifyingGlassIcon
+    MagnifyingGlassIcon,
+    XIcon
 } from "@phosphor-icons/react";
 
 import {
@@ -10,9 +11,43 @@ import {
     UploadButton
 } from "../components";
 
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import SearchDropdown from "./SearchDropDown";
 
 function Header({ onMenuClick }) {
+
+    const [searchQuery, setSearchQuery] = useState("");
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
+    const [isClearVisible, setIsClearVisible] = useState(false);
+    const boxRef = useRef(null);
+    const inputRef = useRef(null);
+
+    const searchSuggestions = [
+        "React tutorial",
+        "Node.js tutorial",
+        "MongoDB aggregation",
+        "MERN project",
+        "JavaScript tutorial",
+    ];
+
+    const filteredSuggestions = searchSuggestions.filter((item) =>
+        item.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    useEffect(() => {
+        function handleClickOutside(e) {
+            if (boxRef.current && !boxRef.current.contains(e.target)) {
+                setIsSearchFocused(false)
+            }
+        }
+
+        document.addEventListener("click", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        }
+    }, [])
 
     return (
         <header className="h-12 w-full md:h-16">
@@ -93,8 +128,8 @@ function Header({ onMenuClick }) {
 
                 </div>
 
-
                 {/* ================= TABLET SEARCH ================= */}
+
                 <div
                     className="
                         hidden md:flex lg:hidden
@@ -104,38 +139,52 @@ function Header({ onMenuClick }) {
                         px-4
                     "
                 >
-                    <div className="group relative w-full max-w-lg">
-
-                        <input
-                            type="text"
-                            placeholder="Search"
+                    <Link
+                        to="/search"
+                        className="
+                            block
+                            w-full
+                            max-w-lg
+                        "
+                    >
+                        <div
                             className="
-                                h-12 w-96
+                                flex
+                                h-12
+                                w-full
+                                items-center
                                 rounded-full
-                                border border-primary/10
+                                border
+                                border-primary/10
                                 bg-surface
-                                px-5 pr-14 mt-1
+                                px-5
                                 text-sm
-                                text-text-primary
-                                outline-none
-                                placeholder:text-text-muted
-                                transition-all duration-200
-                                focus:border-primary
-                                focus:ring-2
-                                focus:ring-primary/20
+                                text-text-muted
+                                transition-all
+                                duration-200
+                                hover:border-primary/20
+                                active:scale-[0.99]
                             "
-                        />
+                        >
+                            <MagnifyingGlassIcon
+                                size={21}
+                                weight="regular"
+                                className="mr-3 shrink-0"
+                            />
 
-                        <SearchButton />
-
-                    </div>
+                            <span>
+                                Search
+                            </span>
+                        </div>
+                    </Link>
                 </div>
 
-
                 {/* ================= DESKTOP SEARCH ================= */}
+
                 <div
                     className="
-                        hidden lg:flex
+                        hidden
+                        lg:flex
                         flex-1
                         items-center
                         justify-center
@@ -143,44 +192,108 @@ function Header({ onMenuClick }) {
                         px-6
                     "
                 >
-                    <div className="group relative w-full max-w-2xl">
+                    <div className="relative w-full max-w-2xl">
 
-                        <input
-                            type="text"
-                            placeholder="Search"
-                            className="
-                                h-14 w-full
-                                rounded-full
-                                border border-primary/10
-                                bg-surface
-                                px-5 pr-14 mt-2
-                                text-base
-                                text-text-primary
-                                outline-none
-                                placeholder:text-text-muted
-                                transition-all duration-200
-                                focus:border-primary
-                                focus:ring-2
-                                focus:ring-primary/20
-                            "
+                        {/* Search input */}
+                        <div className="group relative" ref={boxRef}>
+
+                            <input
+                                type="text"
+                                ref={inputRef}
+                                value={searchQuery}
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value);
+                                    setIsClearVisible(true);
+                                }}
+                                onFocus={() => setIsSearchFocused(true)}
+                                placeholder="Search"
+                                className="
+                                    h-14
+                                    w-full
+                                    rounded-full
+                                    border
+                                    border-primary/10
+                                    bg-surface
+                                    px-5
+                                    pr-14
+                                    mt-2
+                                    text-base
+                                    text-text-primary
+                                    outline-none
+                                    placeholder:text-text-muted
+                                    transition-all
+                                    duration-200
+                                    focus:border-primary
+                                    focus:ring-2
+                                    focus:ring-primary/20
+                                "
+                            />
+
+                            {isClearVisible &&
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSearchQuery("");
+                                        inputRef.current?.focus();
+                                        setIsClearVisible(false);
+                                    }}
+                                    aria-label="Clear"
+                                    className={`
+                                    absolute right-11
+                                    top-9
+                                    flex h-10 w-10
+                                    -translate-y-1/2
+                                    items-center justify-center
+                                    rounded-full
+                                    text-text-secondary
+                                    transition-all duration-200
+                                    hover:bg-surface-elevated
+                                    active:bg-surface-elevated
+                                    hover:text-text-primary`}
+                                >
+                                    <XIcon size={24} weight="regular" />
+                                </button>
+                            }
+
+
+                            <SearchButton classes="mt-1" />
+
+                        </div>
+
+                        {/* Search dropdown */}
+                        <SearchDropdown
+                            suggestions={isSearchFocused ? filteredSuggestions : []}
+                            onSelect={(suggestion) => {
+                                setSearchQuery(suggestion);
+                                setIsClearVisible(true);
+                                setIsSearchFocused(false);
+                            }}
                         />
-
-                        <SearchButton classes="mt-1" />
 
                     </div>
 
                     {/* Upload */}
-                    <UploadButton size={25} classes="hidden lg:flex
-                            h-10 w-10
-                            shrink-0 mt-1
-                            items-center justify-center
+                    <UploadButton
+                        size={25}
+                        classes="
+                            hidden
+                            lg:flex
+                            h-10
+                            w-10
+                            shrink-0
+                            mt-1
+                            items-center
+                            justify-center
                             rounded-full
                             bg-surface-elevated
                             text-text-primary
-                            transition-all duration-200
+                            transition-all
+                            duration-200
                             hover:bg-surface
                             active:bg-surface
-                            active:scale-95" />
+                            active:scale-95
+                        "
+                    />
                 </div>
 
                 {/* ================= RIGHT SECTION ================= */}
@@ -198,8 +311,8 @@ function Header({ onMenuClick }) {
                             active:scale-95" />
 
                     {/* Mobile Search */}
-                    <button
-                        type="button"
+                    <Link
+                        to="/search"
                         aria-label="Search"
                         className="
                             flex md:hidden
@@ -217,7 +330,7 @@ function Header({ onMenuClick }) {
                             size={32}
                             weight="regular"
                         />
-                    </button>
+                    </Link>
 
                     {/* Notifications */}
                     <NotificationMenu />

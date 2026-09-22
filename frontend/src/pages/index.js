@@ -9,6 +9,7 @@ import ManageAccount from "./ManageAccount.jsx";
 import UploadVideo from "./UploadVideo.jsx";
 import EditVideo from "./EditVideo.jsx";
 import EditChannel from "./EditChannel.jsx";
+import Search from "./Search.jsx";
 
 export {
     Home,
@@ -21,5 +22,6 @@ export {
     ManageAccount,
     UploadVideo,
     EditVideo,
-    EditChannel
+    EditChannel,
+    Search
 }

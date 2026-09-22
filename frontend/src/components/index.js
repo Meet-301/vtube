@@ -13,6 +13,7 @@ import SearchButton from "./SearchButton.jsx";
 import ChannelPageButton from "./ChannelPageButton.jsx";
 import VideoCardButton from "./VideoCardButton.jsx";
 import MoreButton from "./MoreButton.jsx";
+import SearchDropdown from "./SearchDropDown.jsx";
 
 export {
    Header,
@@ -29,5 +30,6 @@ export {
    SearchButton,
    ChannelPageButton,
    VideoCardButton,
-   MoreButton
+   MoreButton,
+   SearchDropdown
 };
