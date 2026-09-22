@@ -5,7 +5,7 @@ function UploadButton({size, classes}) {
         <button
                         type="button"
                         aria-label="Upload"
-                        title="Upload"
+                        title="Upload video"
                         className={classes}
                     >
                         <UploadSimpleIcon
