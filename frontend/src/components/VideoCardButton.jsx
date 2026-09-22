@@ -1,9 +1,10 @@
-function VideoCardButton({ icon: Icon, text }) {
+function VideoCardButton({ icon: Icon, text, onClick }) {
     return (
         <button
             type="button"
             onClick={(event) => {
                 event.stopPropagation();
+                onClick();
             }}
             className="
                 flex

@@ -3,13 +3,16 @@ import { useState } from "react";
 import {
     PencilSimpleIcon,
     PlayCircleIcon,
-    PlusIcon,
-    UploadSimpleIcon
+    PlusIcon
 } from "@phosphor-icons/react";
 
 import { ChannelPageButton, MoreButton, VideoCard } from "../components";
 
+import { useNavigate } from "react-router-dom";
+
 function Channel() {
+
+    const navigate = useNavigate()
 
     //! Dummy data — baad mein API se aayega
     const channel = {
@@ -303,6 +306,7 @@ function Channel() {
                                         views={video.views}
                                         uploadedAt={video.createdAt}
                                         isEditable={true}
+                                        onEditClick={() => navigate("/edit-video")}
                                     />
                                 ))}
                             </div>
@@ -363,6 +367,7 @@ function Channel() {
                                                     h-full
                                                     w-full
                                                     object-cover
+                                                    group-hover:scale-[1.02]
                                                 "
                                             />
 

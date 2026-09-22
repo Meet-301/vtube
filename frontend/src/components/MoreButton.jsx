@@ -40,7 +40,15 @@ function useIsMobile() {
     return isMobile;
 }
 
-function MoreButton({ isEditable = false, onlyDelete = false }) {
+function MoreButton({ 
+    isEditable = false,
+    onlyDelete = false,
+    onSaveClick = () => {},
+    onShareClick = () => {},
+    onEditClick = () => {},
+    onDeleteClick = () => {}
+}
+) {
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [coords, setCoords] = useState(null); // desktop dropdown position
@@ -53,20 +61,20 @@ function MoreButton({ isEditable = false, onlyDelete = false }) {
 
     const closeMenu = () => setIsMenuOpen(false);
 
-    const deleteAction = { key: "delete", icon: TrashIcon, text: "Delete" };
+    const deleteAction = { key: "delete", icon: TrashIcon, text: "Delete", onClick: onDeleteClick };
 
     const actions = onlyDelete
         ? [
-            { key: "share", icon: ShareNetworkIcon, text: "Share" },
-            { key: "save", icon: BookmarkSimpleIcon, text: "Save" },
+            { key: "share", icon: ShareNetworkIcon, text: "Share", onClick: onShareClick },
+            { key: "save", icon: BookmarkSimpleIcon, text: "Save", onClick: onSaveClick },
             deleteAction
         ]
         : [
-            { key: "share", icon: ShareNetworkIcon, text: "Share" },
-            { key: "save", icon: BookmarkSimpleIcon, text: "Save" },
+            { key: "share", icon: ShareNetworkIcon, text: "Share", onClick: onShareClick },
+            { key: "save", icon: BookmarkSimpleIcon, text: "Save", onClick: onSaveClick },
             ...(isEditable
                 ? [
-                    { key: "edit", icon: PencilSimpleIcon, text: "Edit" },
+                    { key: "edit", icon: PencilSimpleIcon, text: "Edit", onClick: onEditClick },
                     deleteAction,
                 ]
                 : []),
@@ -298,7 +306,6 @@ function MoreButton({ isEditable = false, onlyDelete = false }) {
                                                 key={key}
                                                 icon={icon}
                                                 text={text}
-                                                onClick={closeMenu}
                                             />
                                         ))}
                                     </div>
@@ -330,12 +337,12 @@ function MoreButton({ isEditable = false, onlyDelete = false }) {
                                     shadow-2xl
                                 "
                             >
-                                {actions.map(({ key, icon, text }) => (
+                                {actions.map(({ key, icon, text, onClick }) => (
                                     <VideoCardButton
                                         key={key}
                                         icon={icon}
                                         text={text}
-                                        onClick={closeMenu}
+                                        onClick={onClick}
                                     />
                                 ))}
                             </div>

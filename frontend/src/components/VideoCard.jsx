@@ -14,7 +14,11 @@ function VideoCard({
     duration,
     variant = "grid",
     isEditable = false,
-    onlyDelete = false
+    onlyDelete = false,
+    onSaveClick = () => {},
+    onShareClick = () => {},
+    onEditClick = () => {},
+    onDeleteClick = () => {}
 }) {
 
     const isHorizontal = variant === "horizontal";
@@ -274,7 +278,14 @@ function VideoCard({
 
                 {/* More */}
 
-                <MoreButton isEditable={isEditable} onlyDelete={onlyDelete} />
+                <MoreButton 
+                    isEditable={isEditable}
+                    onlyDelete={onlyDelete}
+                    onDeleteClick={onDeleteClick}
+                    onEditClick={onEditClick}
+                    onSaveClick={onSaveClick}
+                    onShareClick={onShareClick}
+                />
 
             </div>
 
