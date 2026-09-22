@@ -8,7 +8,7 @@ import {
   Route,
   RouterProvider
 } from 'react-router-dom'
-import {Channel, History, Home, LikedVideos, Playlists, Subscriptions, Watch} from './pages'
+import {ManageAccount, Channel, History, Home, LikedVideos, Playlists, Subscriptions, Watch} from './pages'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,6 +20,7 @@ const router = createBrowserRouter(
       <Route element={<Subscriptions/>} path='subscriptions' />
       <Route element={<Playlists/>} path='playlists' />
       <Route element={<LikedVideos/>} path='liked-videos' />
+      <Route element={<ManageAccount/>} path='manage-account' />
     </Route>
   )
 )

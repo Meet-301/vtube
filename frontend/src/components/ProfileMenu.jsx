@@ -4,13 +4,14 @@ import {
     UserCircleIcon,
 } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 function ProfileMenu() {
     const [isOpen, setIsopen] = useState(false)
     const menuRef = useRef(null)
 
     useEffect(() => {
-        function handleClickOutside(event) {
+        function handleClick(event) {
             if(
                 menuRef.current &&
                 !menuRef.current.contains(event.target) 
@@ -19,10 +20,10 @@ function ProfileMenu() {
             }
         }
 
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("mousedown", handleClick);
 
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("mousedown", handleClick);
         }
     }, [])
 
@@ -77,19 +78,21 @@ function ProfileMenu() {
                         <div className="my-1 border-t border-border" />
 
                         {/* Edit profile */}
-                        <button
-                            type="button"
+                        <Link
+                            to="/manage-account"
+                            onClick={() => setIsopen((prev) => !prev)}
                             className="flex w-full transition-transform duration-200 active:scale-95 items-center gap-4 rounded-lg px-3 py-3 text-text-secondary hover:bg-surface active:bg-surface hover:text-text-primary"
                         >
                             <UserGearIcon size={22} />
                             <span className="text-sm">
                                 Manage Account
                             </span>
-                        </button>
+                        </Link>
 
                         {/* Logout */}
                         <button
                             type="button"
+                            onClick={() => setIsopen((prev) => !prev)}
                             className="flex w-full transition-transform duration-200 active:scale-95 items-center gap-4 rounded-lg px-3 py-3 text-red-700 hover:bg-surface active:bg-surface hover:text-red-500"
                         >
                             <SignOutIcon size={22} />
