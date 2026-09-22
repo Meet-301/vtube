@@ -230,9 +230,6 @@ function Channel() {
 
                     <div
                         className="
-                            sticky
-                            top-16
-                            z-30
                             flex
                             rounded-xl
                             bg-surface
