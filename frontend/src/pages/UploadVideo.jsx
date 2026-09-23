@@ -289,6 +289,8 @@ function UploadVideo() {
                                     text-center
                                     transition-colors
                                     hover:bg-surface-elevated
+                                    active:bg-surface-elevated
+                                    active:scale-[0.99]
                                 "
                             >
                                 <ImageIcon
