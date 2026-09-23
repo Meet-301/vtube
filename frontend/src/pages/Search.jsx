@@ -6,7 +6,7 @@ import {
     XIcon,
 } from "@phosphor-icons/react";
 
-import { SearchDropdown } from "../components";
+import { SearchDropdown, VideoCard } from "../components";
 
 function Search() {
 
@@ -21,6 +21,13 @@ function Search() {
         "MongoDB aggregation",
         "MERN project",
         "JavaScript tutorial",
+    ];
+
+    const searchHistory = [
+        "React tutorial",
+        "MongoDB aggregation",
+        "MERN project",
+        "Node.js authentication",
     ];
 
     const filteredSuggestions = searchSuggestions.filter((item) =>
@@ -65,23 +72,20 @@ function Search() {
                     bg-background
                 "
             >
-
                 <div
                     className="
-                        mx-auto
                         flex
                         h-16
                         w-full
-                        max-w-3xl
                         items-center
-                        gap-2
+                        justify-center
+                        gap-3
                         px-3
                         sm:px-4
+                        lg:px-5
                     "
                 >
-
-                    {/* Back button */}
-
+                    {/* Back button — always at screen left */}
                     <button
                         type="button"
                         aria-label="Go back"
@@ -108,11 +112,17 @@ function Search() {
                         />
                     </button>
 
-
-                    {/* ================= SEARCH BOX ================= */}
-
-                    <div className="relative min-w-0 flex-1">
-
+                    {/* Search box */}
+                    <div
+                        className="
+                            relative
+                            min-w-0
+                            flex-1
+                            lg:max-w-4xl
+                            xl:max-w-5xl
+                        "
+                        ref={boxRef}
+                    >
                         <div
                             className="
                                 group
@@ -132,7 +142,7 @@ function Search() {
                                 focus-within:ring-primary/20
                             "
                         >
-
+                            {/* input */}
                             <input
                                 type="text"
                                 value={searchQuery}
@@ -156,7 +166,6 @@ function Search() {
                             />
 
                             {/* Clear */}
-
                             {searchQuery && (
                                 <button
                                     type="button"
@@ -177,7 +186,6 @@ function Search() {
                                         hover:bg-surface-elevated
                                         active:bg-surface-elevated
                                         hover:text-text-primary
-                                        active:scale-95
                                     "
                                 >
                                     <XIcon
@@ -187,8 +195,7 @@ function Search() {
                                 </button>
                             )}
 
-                            {/* Search Button */}
-
+                            {/* Search */}
                             <button
                                 type="button"
                                 aria-label="Search"
@@ -217,26 +224,23 @@ function Search() {
                                     weight="regular"
                                 />
                             </button>
-
                         </div>
 
-                        {/* ================= SUGGESTIONS ================= */}
-
-                        {searchQuery && filteredSuggestions.length > 0 && searchFocused && (
-                            <div ref={boxRef}>
-                                <SearchDropdown
-                                    suggestions={filteredSuggestions}
-                                    onSelect={handleSuggestionSelect}
-                                />
-                            </div>
+                        {/* Suggestions */}
+                        {searchFocused && (
+                            <SearchDropdown
+                                suggestions={
+                                    searchQuery
+                                        ? filteredSuggestions
+                                        : searchHistory
+                                }
+                                isHistory={!searchQuery}
+                                onSelect={handleSuggestionSelect}
+                            />
                         )}
-
                     </div>
-
                 </div>
-
             </header>
-
 
             {/* ================= SEARCH CONTENT ================= */}
 
@@ -244,15 +248,26 @@ function Search() {
                 className="
                     mx-auto
                     w-full
-                    max-w-3xl
                     px-4
                     py-6
                 "
             >
+                <div className="flex flex-col gap-6 items-center">
 
-                {/* Abhi intentionally empty.
-                    Baad mein search results yaha aayenge. */}
+                    <div className="w-full md:max-w-4xl md:ml-11 xl:max-w-5xl xl:ml-12 flex flex-col">
+                        <VideoCard
+                            thumbnail="https://picsum.photos/seed/search-result/640/360"
+                            title="Building a Full Stack Video Platform with MERN"
+                            views={1200}
+                            channelName="Meet"
+                            uploadedAt="2026-08-20"
+                            duration="12:00"
+                            isEditable={false}
+                            variant="horizontal"
+                        />
+                    </div>
 
+                </div>
             </section>
 
         </main>

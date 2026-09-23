@@ -19,7 +19,6 @@ function Header({ onMenuClick }) {
 
     const [searchQuery, setSearchQuery] = useState("");
     const [isSearchFocused, setIsSearchFocused] = useState(false);
-    const [isClearVisible, setIsClearVisible] = useState(false);
     const boxRef = useRef(null);
     const inputRef = useRef(null);
 
@@ -30,6 +29,14 @@ function Header({ onMenuClick }) {
         "MERN project",
         "JavaScript tutorial",
     ];
+
+    const searchHistory = [
+        "React tutorial",
+        "MongoDB aggregation",
+        "MERN project",
+        "Node.js authentication",
+    ];
+
 
     const filteredSuggestions = searchSuggestions.filter((item) =>
         item.toLowerCase().includes(searchQuery.toLowerCase())
@@ -166,12 +173,13 @@ function Header({ onMenuClick }) {
                                 active:scale-[0.99]
                             "
                         >
+
                             <MagnifyingGlassIcon
                                 size={21}
                                 weight="regular"
                                 className="mr-3 shrink-0"
                             />
-
+                            
                             <span>
                                 Search
                             </span>
@@ -192,10 +200,10 @@ function Header({ onMenuClick }) {
                         px-6
                     "
                 >
-                    <div className="relative w-full max-w-2xl">
+                    <div className="relative w-full max-w-2xl" ref={boxRef}>
 
                         {/* Search input */}
-                        <div className="group relative" ref={boxRef}>
+                        <div className="group relative">
 
                             <input
                                 type="text"
@@ -203,7 +211,6 @@ function Header({ onMenuClick }) {
                                 value={searchQuery}
                                 onChange={(e) => {
                                     setSearchQuery(e.target.value);
-                                    setIsClearVisible(true);
                                 }}
                                 onFocus={() => setIsSearchFocused(true)}
                                 placeholder="Search"
@@ -229,13 +236,12 @@ function Header({ onMenuClick }) {
                                 "
                             />
 
-                            {isClearVisible &&
+                            {searchQuery &&
                                 <button
                                     type="button"
                                     onClick={() => {
                                         setSearchQuery("");
                                         inputRef.current?.focus();
-                                        setIsClearVisible(false);
                                     }}
                                     aria-label="Clear"
                                     className={`
@@ -261,14 +267,20 @@ function Header({ onMenuClick }) {
                         </div>
 
                         {/* Search dropdown */}
-                        <SearchDropdown
-                            suggestions={isSearchFocused ? filteredSuggestions : []}
-                            onSelect={(suggestion) => {
-                                setSearchQuery(suggestion);
-                                setIsClearVisible(true);
+                        {isSearchFocused && <SearchDropdown
+                            suggestions={
+                                isSearchFocused
+                                    ? searchQuery
+                                        ? filteredSuggestions
+                                        : searchHistory
+                                    : []
+                            }
+                            isHistory={!searchQuery}
+                            onSelect={(item) => {
+                                setSearchQuery(item);                                
                                 setIsSearchFocused(false);
                             }}
-                        />
+                        />}
 
                     </div>
 

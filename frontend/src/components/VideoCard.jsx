@@ -268,7 +268,7 @@ function VideoCard({
                                 sm:leading-6
                             "
                         >
-                            {views} {!isHorizontal ? `• ${uploadedAt}` : ""}
+                            {views} {isHorizontal ? `• ${uploadedAt}` : ""}
                         </p>
 
                     </div>

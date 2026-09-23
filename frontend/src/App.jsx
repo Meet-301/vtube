@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { 
   Header,
   SidebarDrawer
@@ -9,6 +9,10 @@ function App() {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const location = useLocation();
+
+  const isSearchPage = location.pathname === "/search"
 
   useEffect(() => {
     function handleScroll() {
@@ -26,18 +30,20 @@ function App() {
     <div className="min-h-screen bg-background text-text-primary">
 
       {/* Sticky glass area */}
-      <div
-        className={`
-            sticky top-0 z-50
-            transition-all duration-300
-            ${isScrolled
-            ? "bg-surface/70 backdrop-blur-xl"
-            : "bg-transparent"
-          }
-        `}
-      >
-        <Header onMenuClick={() => setIsDrawerOpen(true)} />
-      </div>
+      {!isSearchPage && (
+        <div
+            className={`
+                sticky top-0 z-50
+                transition-all duration-300
+                ${isScrolled
+                    ? "bg-surface/70 backdrop-blur-xl"
+                    : "bg-transparent"
+                }
+            `}
+        >
+          <Header onMenuClick={() => setIsDrawerOpen(true)} />
+        </div>
+      )}
 
       {/* Mobile/Tablet drawer */}
       <SidebarDrawer

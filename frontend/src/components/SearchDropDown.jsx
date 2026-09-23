@@ -1,7 +1,13 @@
-import { MagnifyingGlassIcon } from "@phosphor-icons/react";
+import {
+    ClockCounterClockwiseIcon,
+    MagnifyingGlassIcon,
+} from "@phosphor-icons/react";
 
-function SearchDropdown({ suggestions = [], onSelect }) {
-
+function SearchDropdown({
+    suggestions = [],
+    isHistory = false,
+    onSelect,
+}) {
     if (!suggestions.length) {
         return null;
     }
@@ -24,7 +30,6 @@ function SearchDropdown({ suggestions = [], onSelect }) {
             "
         >
             {suggestions.map((suggestion, index) => (
-
                 <button
                     key={`${suggestion}-${index}`}
                     type="button"
@@ -45,19 +50,24 @@ function SearchDropdown({ suggestions = [], onSelect }) {
                         active:bg-surface-elevated
                     "
                 >
-
-                    <MagnifyingGlassIcon
-                        size={18}
-                        weight="regular"
-                        className="shrink-0 text-text-secondary"
-                    />
+                    {isHistory ? (
+                        <ClockCounterClockwiseIcon
+                            size={19}
+                            weight="regular"
+                            className="shrink-0 text-text-secondary"
+                        />
+                    ) : (
+                        <MagnifyingGlassIcon
+                            size={19}
+                            weight="regular"
+                            className="shrink-0 text-text-secondary"
+                        />
+                    )}
 
                     <span className="min-w-0 truncate">
                         {suggestion}
                     </span>
-
                 </button>
-
             ))}
         </div>
     );
