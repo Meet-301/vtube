@@ -262,7 +262,6 @@ function Search() {
                             channelName="Meet"
                             uploadedAt="2026-08-20"
                             duration="12:00"
-                            isEditable={false}
                             variant="horizontal"
                         />
                     </div>
