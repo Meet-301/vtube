@@ -21,7 +21,9 @@ function CategoryBar() {
                             px-5 py-2.5
                             text-base
                             font-medium
-                            transition-colors duration-200
+                            transition-colors
+                            duration-200
+                            active:scale-95
                             ${index === 0
                                 ? "bg-primary text-white"
                                 : "bg-surface text-text-secondary hover:bg-surface-elevated active:bg-surface-elevated hover:text-text-primary"
