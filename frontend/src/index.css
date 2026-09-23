@@ -86,6 +86,34 @@ video {
   font-family: "Jost Semibold", serif;
 }
 
+body {
+  /* thumb-color track-color */
+  scrollbar-color: gray transparent;
+  scrollbar-width: thin;
+}
+
+/* Width of the scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Track (background) - set to transparent */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Thumb (handle) - semi-transparent */
+::-webkit-scrollbar-thumb {
+  background: gray;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: darkgray;
+  border-radius: 5px;
+}
+
 @theme {
   --color-primary: #0074d9;
   --color-primary-hover: #2196f3;
