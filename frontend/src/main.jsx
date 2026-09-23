@@ -20,7 +20,8 @@ import {
   UploadVideo, 
   EditVideo,
   EditChannel,
-  Search
+  Search,
+  Login
 } from './pages'
 
 const router = createBrowserRouter(
@@ -38,6 +39,7 @@ const router = createBrowserRouter(
       <Route element={<EditVideo/>} path='edit-video' />
       <Route element={<EditChannel/>} path='edit-channel' />
       <Route element={<Search/>} path='search' />
+      <Route element={<Login/>} path='login' />
     </Route>
   )
 )

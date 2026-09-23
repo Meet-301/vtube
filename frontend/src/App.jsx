@@ -14,6 +14,7 @@ function App() {
 
   const isSearchPage = location.pathname === "/search"
 
+
   useEffect(() => {
     function handleScroll() {
       setIsScrolled(window.scrollY > 10);

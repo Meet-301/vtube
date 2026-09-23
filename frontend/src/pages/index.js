@@ -10,6 +10,7 @@ import UploadVideo from "./UploadVideo.jsx";
 import EditVideo from "./EditVideo.jsx";
 import EditChannel from "./EditChannel.jsx";
 import Search from "./Search.jsx";
+import Login from "./Login.jsx";
 
 export {
     Home,
@@ -23,5 +24,6 @@ export {
     UploadVideo,
     EditVideo,
     EditChannel,
-    Search
+    Search,
+    Login
 }
