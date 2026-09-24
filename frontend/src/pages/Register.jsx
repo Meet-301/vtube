@@ -1,49 +1,49 @@
-import { Link } from "react-router-dom";
-import {
-    EyeIcon,
-    EyeSlashIcon
-} from "@phosphor-icons/react";
 import { useState } from "react";
+import { EyeIcon, EyeSlashIcon, UserCircleIcon } from "@phosphor-icons/react";
+import { Link } from "react-router-dom";
 
-function Login() {
-
+function Register() {
     const [showPassword, setShowPassword] = useState(false);
+    const [avatarPreview, setAvatarPreview] = useState(null);
+
+    function handleAvatarChange(e) {
+        const file = e.target.files?.[0];
+
+        if (!file) return;
+
+        setAvatarPreview(URL.createObjectURL(file));
+    }
 
     return (
-        <main className="
-            min-h-dvh
-            bg-background
-            text-text-primary
-        ">
+        <main className="min-h-screen bg-background text-text-primary">
 
             <div className="
                 flex
-                min-h-dvh
+                min-h-screen
                 items-center
                 justify-center
                 px-3
                 py-4
                 sm:px-4
                 sm:py-6
-                lg:py-8
+                md:py-8
             ">
 
-                <div className="
-                    w-full
-                    max-w-md
-                ">
+                <div className="w-full max-w-md">
 
                     {/* ================= BRAND ================= */}
 
-                    <div className="
-                        mb-4
-                        flex
-                        items-center
-                        justify-center
-                        sm:mb-6
-                        lg:mb-8
-                    ">
-
+                    <div
+                        className="
+                            mb-4
+                            flex
+                            items-center
+                            justify-center
+                            rounded-lg
+                            sm:mb-6
+                            md:mb-8
+                        "
+                    >
                         <img
                             src="/Vtube logo.png"
                             alt="VTube"
@@ -53,8 +53,8 @@ function Login() {
                                 object-contain
                                 sm:h-12
                                 sm:w-12
-                                lg:h-14
-                                lg:w-14
+                                md:h-14
+                                md:w-14
                             "
                         />
 
@@ -64,11 +64,11 @@ function Login() {
                             text-2xl
                             tracking-tight
                             text-text-primary
-                            sm:text-3xl
+                            sm:text-2xl
+                            md:text-3xl
                         ">
                             VTUBE
                         </span>
-
                     </div>
 
 
@@ -82,20 +82,15 @@ function Login() {
                         px-4
                         py-5
                         shadow-sm
-                        sm:px-7
+                        sm:px-6
                         sm:py-7
-                        lg:px-8
-                        lg:py-8
+                        md:px-8
+                        md:py-8
                     ">
 
                         {/* Heading */}
 
-                        <div className="
-                            mb-5
-                            text-center
-                            sm:mb-6
-                            lg:mb-7
-                        ">
+                        <div className="mb-5 text-center sm:mb-6 md:mb-7">
 
                             <h1 className="
                                 text-xl
@@ -103,7 +98,7 @@ function Login() {
                                 tracking-tight
                                 sm:text-2xl
                             ">
-                                Welcome back
+                                Create your account
                             </h1>
 
                             <p className="
@@ -113,7 +108,7 @@ function Login() {
                                 sm:mt-2
                                 sm:text-sm
                             ">
-                                Login to continue to VTube
+                                Register to start using VTube
                             </p>
 
                         </div>
@@ -123,9 +118,183 @@ function Login() {
 
                         <form className="space-y-4 sm:space-y-5">
 
+                            {/* Avatar */}
+
+                            <div className="
+                                flex
+                                flex-col
+                                items-center
+                                gap-2
+                                sm:gap-3
+                            ">
+
+                                <label
+                                    htmlFor="avatar"
+                                    className="
+                                        group
+                                        relative
+                                        flex
+                                        h-20
+                                        w-20
+                                        cursor-pointer
+                                        items-center
+                                        justify-center
+                                        overflow-hidden
+                                        rounded-full
+                                        border
+                                        border-border
+                                        bg-background
+                                        transition-all
+                                        duration-200
+                                        hover:border-primary
+                                        sm:h-24
+                                        sm:w-24
+                                    "
+                                >
+
+                                    {avatarPreview ? (
+                                        <img
+                                            src={avatarPreview}
+                                            alt="Avatar preview"
+                                            className="
+                                                h-full
+                                                w-full
+                                                object-cover
+                                            "
+                                        />
+                                    ) : (
+                                        <UserCircleIcon
+                                            size={42}
+                                            weight="regular"
+                                            className="text-text-secondary sm:hidden"
+                                        />
+                                    )}
+
+                                    {!avatarPreview && (
+                                        <UserCircleIcon
+                                            size={48}
+                                            weight="regular"
+                                            className="
+                                                hidden
+                                                text-text-secondary
+                                                sm:block
+                                            "
+                                        />
+                                    )}
+
+                                </label>
+
+                                <input
+                                    id="avatar"
+                                    name="avatar"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                    className="hidden"
+                                />
+
+                                <p className="
+                                    text-[11px]
+                                    text-text-muted
+                                    sm:text-xs
+                                ">
+                                    Profile picture
+                                </p>
+
+                            </div>
+
+
+                            {/* Full Name */}
+
+                            <div className="space-y-1.5 sm:space-y-2">
+
+                                <label
+                                    htmlFor="fullName"
+                                    className="
+                                        text-sm
+                                        font-medium
+                                        text-text-primary
+                                    "
+                                >
+                                    Full name
+                                </label>
+
+                                <input
+                                    id="fullName"
+                                    name="fullName"
+                                    type="text"
+                                    placeholder="Enter your full name"
+                                    className="
+                                        h-11
+                                        w-full
+                                        rounded-xl
+                                        border
+                                        border-border
+                                        bg-background
+                                        px-4
+                                        text-sm
+                                        text-text-primary
+                                        outline-none
+                                        placeholder:text-text-muted
+                                        transition-all
+                                        duration-200
+                                        focus:border-primary
+                                        focus:ring-2
+                                        focus:ring-primary/20
+                                        sm:h-12
+                                    "
+                                />
+
+                            </div>
+
+
+                            {/* Username */}
+
+                            <div className="space-y-1.5 sm:space-y-2">
+
+                                <label
+                                    htmlFor="username"
+                                    className="
+                                        text-sm
+                                        font-medium
+                                        text-text-primary
+                                    "
+                                >
+                                    Username
+                                </label>
+
+                                <input
+                                    id="username"
+                                    name="username"
+                                    type="text"
+                                    placeholder="Choose a username"
+                                    className="
+                                        h-11
+                                        w-full
+                                        rounded-xl
+                                        border
+                                        border-border
+                                        bg-background
+                                        px-4
+                                        text-sm
+                                        text-text-primary
+                                        outline-none
+                                        placeholder:text-text-muted
+                                        transition-all
+                                        duration-200
+                                        focus:border-primary
+                                        focus:ring-2
+                                        focus:ring-primary/20
+                                        sm:h-12
+                                    "
+                                />
+
+                            </div>
+
+
                             {/* Email */}
 
-                            <div className="space-y-1.5">
+                            <div className="space-y-1.5 sm:space-y-2">
 
                                 <label
                                     htmlFor="email"
@@ -140,6 +309,7 @@ function Login() {
 
                                 <input
                                     id="email"
+                                    name="email"
                                     type="email"
                                     placeholder="Enter your email"
                                     className="
@@ -168,7 +338,7 @@ function Login() {
 
                             {/* Password */}
 
-                            <div className="space-y-1.5">
+                            <div className="space-y-1.5 sm:space-y-2">
 
                                 <label
                                     htmlFor="password"
@@ -181,17 +351,17 @@ function Login() {
                                     Password
                                 </label>
 
-
                                 <div className="relative">
 
                                     <input
                                         id="password"
+                                        name="password"
                                         type={
                                             showPassword
                                                 ? "text"
                                                 : "password"
                                         }
-                                        placeholder="Enter your password"
+                                        placeholder="Create a password"
                                         className="
                                             h-11
                                             w-full
@@ -231,8 +401,8 @@ function Login() {
                                             right-1
                                             top-1/2
                                             flex
-                                            h-9
-                                            w-9
+                                            h-10
+                                            w-10
                                             -translate-y-1/2
                                             items-center
                                             justify-center
@@ -244,18 +414,16 @@ function Login() {
                                             active:bg-surface-elevated
                                             hover:text-text-primary
                                             active:scale-95
-                                            sm:h-10
-                                            sm:w-10
                                         "
                                     >
                                         {showPassword ? (
                                             <EyeSlashIcon
-                                                size={20}
+                                                size={21}
                                                 weight="regular"
                                             />
                                         ) : (
                                             <EyeIcon
-                                                size={20}
+                                                size={21}
                                                 weight="regular"
                                             />
                                         )}
@@ -263,35 +431,15 @@ function Login() {
 
                                 </div>
 
-
-                                {/* Forgot password */}
-
-                                <div className="ml-1 pt-0.5">
-
-                                    <Link
-                                        to="/forgot-password"
-                                        className="
-                                            text-xs
-                                            font-medium
-                                            text-primary
-                                            transition-colors
-                                            hover:text-primary-hover
-                                            sm:text-sm
-                                        "
-                                    >
-                                        Forgot password?
-                                    </Link>
-
-                                </div>
-
                             </div>
 
 
-                            {/* Login */}
+                            {/* Register */}
 
                             <button
                                 type="submit"
                                 className="
+                                    mt-1
                                     h-11
                                     w-full
                                     rounded-xl
@@ -304,16 +452,17 @@ function Login() {
                                     hover:bg-primary-hover
                                     active:bg-primary-hover
                                     active:scale-[0.98]
+                                    sm:mt-2
                                     sm:h-12
                                 "
                             >
-                                Login
+                                Register
                             </button>
 
                         </form>
 
 
-                        {/* ================= REGISTER ================= */}
+                        {/* ================= LOGIN ================= */}
 
                         <div className="
                             mt-5
@@ -323,95 +472,32 @@ function Login() {
                             gap-1
                             text-xs
                             text-text-secondary
-                            sm:mt-6
+                            sm:mt-7
                             sm:text-sm
                         ">
 
                             <span>
-                                Don't have an account?
+                                Already have an account?
                             </span>
 
                             <Link
-                                to="/register"
+                                to="/login"
                                 className="
                                     font-medium
                                 "
                             >
-                                <span 
+                                <span
                                     className="
-                                        text-primary 
+                                        text-primary
                                         hover:text-primary-hover
                                         active:text-primary-hover
                                     "
                                 >
-                                    Register
+                                    Login
                                 </span>
                             </Link>
 
                         </div>
-
-
-                        {/* ================= DIVIDER ================= */}
-
-                        <div className="
-                            my-4
-                            flex
-                            items-center
-                            gap-3
-                            sm:my-5
-                        ">
-
-                            <div className="h-px flex-1 bg-border" />
-
-                            <span className="
-                                text-[10px]
-                                text-text-muted
-                                sm:text-xs
-                            ">
-                                OR
-                            </span>
-
-                            <div className="h-px flex-1 bg-border" />
-
-                        </div>
-
-
-                        {/* ================= GOOGLE LOGIN ================= */}
-
-                        <button
-                            type="button"
-                            className="
-                                flex
-                                h-11
-                                w-full
-                                items-center
-                                justify-center
-                                gap-3
-                                rounded-xl
-                                border
-                                border-border
-                                bg-background
-                                text-sm
-                                font-medium
-                                text-text-primary
-                                transition-all
-                                duration-200
-                                hover:bg-surface-elevated
-                                active:bg-surface-elevated
-                                active:scale-[0.98]
-                                sm:h-12
-                            "
-                        >
-
-                            <img
-                                src="/google_logo.webp"
-                                alt="Google"
-                                className="h-5 w-5"
-                            />
-
-                            Login with Google
-
-                        </button>
 
                     </div>
 
@@ -423,4 +509,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default Register;

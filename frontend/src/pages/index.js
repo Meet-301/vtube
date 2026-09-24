@@ -11,6 +11,10 @@ import EditVideo from "./EditVideo.jsx";
 import EditChannel from "./EditChannel.jsx";
 import Search from "./Search.jsx";
 import Login from "./Login.jsx";
+import Register from "./Register.jsx";
+import ForgotPassword from "./ForgotPassword.jsx";
+import VerifyEmail from "./VerifyEmail.jsx";
+import ResetPassword from "./ResetPassword.jsx";
 
 export {
     Home,
@@ -25,5 +29,9 @@ export {
     EditVideo,
     EditChannel,
     Search,
-    Login
+    Login,
+    Register,
+    ForgotPassword,
+    VerifyEmail,
+    ResetPassword
 }

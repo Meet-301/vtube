@@ -12,8 +12,16 @@ function App() {
 
   const location = useLocation();
 
-  const isSearchPage = location.pathname === "/search"
+  const pages = [
+    "/search",
+    "/login",
+    "/register",
+    "/verify-email",
+    "/forgot-password",
+    "/reset-password"
+  ]
 
+  const isCheckPage = pages.includes(location.pathname);
 
   useEffect(() => {
     function handleScroll() {
@@ -31,7 +39,7 @@ function App() {
     <div className="min-h-screen bg-background text-text-primary">
 
       {/* Sticky glass area */}
-      {!isSearchPage && (
+      {!isCheckPage && (
         <div
             className={`
                 sticky top-0 z-50
@@ -47,10 +55,12 @@ function App() {
       )}
 
       {/* Mobile/Tablet drawer */}
-      <SidebarDrawer
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-      />
+      {!isCheckPage && 
+        <SidebarDrawer
+          isOpen={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+        />
+      }
 
       {/* Main */}
       <div className="flex min-w-0">

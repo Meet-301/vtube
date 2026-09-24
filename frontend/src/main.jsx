@@ -21,7 +21,11 @@ import {
   EditVideo,
   EditChannel,
   Search,
-  Login
+  Login,
+  Register,
+  ForgotPassword,
+  VerifyEmail,
+  ResetPassword
 } from './pages'
 
 const router = createBrowserRouter(
@@ -40,6 +44,10 @@ const router = createBrowserRouter(
       <Route element={<EditChannel/>} path='edit-channel' />
       <Route element={<Search/>} path='search' />
       <Route element={<Login/>} path='login' />
+      <Route element={<Register/>} path='register' />
+      <Route element={<ForgotPassword/>} path='forgot-password' />
+      <Route element={<VerifyEmail/>} path='verify-email' />
+      <Route element={<ResetPassword/>} path='reset-password' />
     </Route>
   )
 )
