@@ -128,7 +128,7 @@ const registerUser = asyncHandler(async (req, res) => {
    try {
       await sendEmail({
          to: createdUser.email,
-         subject: "Welcome to Vtube - Verify your email",
+         subject: "Welcome to VTube - Verify your email",
          html: `
             <h2>Welcome, ${createdUser.fullName}</h2>
 
