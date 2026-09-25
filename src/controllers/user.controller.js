@@ -44,7 +44,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
    //! get user details from frontend
-   const { fullName, email, username, password } = req.body;
+   const { fullName, email, username, password, channelDescription } = req.body;
 
    //! validation
    if (
@@ -111,7 +111,7 @@ const registerUser = asyncHandler(async (req, res) => {
       password: password.trim(),
       username: username.toLowerCase(),
       fullName: fullName.trim(),
-      description: description.trim(),
+      channelDescription: channelDescription?.trim() || "",
       avatar: avatar.url,
       coverImage: coverImage?.url || "",
       isVerified: false,
@@ -536,7 +536,7 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
    //! extract data from request
-   const { fullName, username, description } = req.body;
+   const { fullName, username, channelDescription } = req.body;
 
    //! match the current username for uniqueness purpose
    if (username) {
@@ -556,13 +556,13 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
    if (username) {
       updateFields.username = username;
    }
-   if(description) {
-      updateFields.description = description;
+   if(channelDescription) {
+      updateFields.channelDescription = channelDescription;
    }
-   if (fullName && username && description) {
+   if (fullName && username && channelDescription) {
       updateFields.fullName = fullName;
       updateFields.username = username;
-      updateFields.description = description;
+      updateFields.channelDescription = channelDescription;
    }
 
    //! check whether both fields are empty or not
