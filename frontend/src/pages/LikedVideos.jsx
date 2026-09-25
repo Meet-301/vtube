@@ -91,8 +91,7 @@ function LikedVideos() {
                                         views={video.views}
                                         uploadedAt={video.uploadedAt}
                                         duration={video.duration}
-                                        isEditable={false}
-                                        onlyDelete={true}
+                                        editButton={false}
                                     />
                                 ))}
 

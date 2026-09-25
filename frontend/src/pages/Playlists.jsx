@@ -1,6 +1,5 @@
 import {
     PlusIcon,
-    PlaylistIcon,
     PlayCircleIcon,
 } from "@phosphor-icons/react";
 
@@ -8,6 +7,8 @@ import {
     MoreButton,
     Sidebar,
 } from "../components";
+
+import { Link } from "react-router-dom";
 
 function Playlists() {
 
@@ -83,8 +84,8 @@ function Playlists() {
 
                         {/* Create playlist */}
 
-                        <button
-                            type="button"
+                        <Link
+                            to="/playlists/create"
                             className="
                                 flex
                                 w-fit
@@ -115,7 +116,7 @@ function Playlists() {
                                 Create playlist
                             </span>
 
-                        </button>
+                        </Link>
 
                     </div>
 

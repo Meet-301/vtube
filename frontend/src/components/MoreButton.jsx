@@ -41,14 +41,16 @@ function useIsMobile() {
 }
 
 function MoreButton({ 
-    isEditable = false,
-    onlyDelete = false,
+    saveButton = true,
+    shareButton = true,
+    editButton = true,
+    deleteButton = true,
+    deleteText = "Delete",
     onSaveClick = () => {},
     onShareClick = () => {},
     onEditClick = () => {},
     onDeleteClick = () => {}
-}
-) {
+}) {
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [coords, setCoords] = useState(null); // desktop dropdown position
@@ -61,24 +63,23 @@ function MoreButton({
 
     const closeMenu = () => setIsMenuOpen(false);
 
-    const deleteAction = { key: "delete", icon: TrashIcon, text: "Delete", onClick: onDeleteClick };
+    let actions = [];
 
-    const actions = onlyDelete
-        ? [
-            { key: "share", icon: ShareNetworkIcon, text: "Share", onClick: onShareClick },
-            { key: "save", icon: BookmarkSimpleIcon, text: "Save", onClick: onSaveClick },
-            deleteAction
-        ]
-        : [
-            { key: "share", icon: ShareNetworkIcon, text: "Share", onClick: onShareClick },
-            { key: "save", icon: BookmarkSimpleIcon, text: "Save", onClick: onSaveClick },
-            ...(isEditable
-                ? [
-                    { key: "edit", icon: PencilSimpleIcon, text: "Edit", onClick: onEditClick },
-                    deleteAction,
-                ]
-                : []),
-        ];
+    if (saveButton) {
+        actions.push({ key: "save", icon: BookmarkSimpleIcon, text: "Save", onClick: onSaveClick });
+    }
+
+    if (shareButton) {
+        actions.push({ key: "share", icon: ShareNetworkIcon, text: "Share", onClick: onShareClick });
+    }
+
+    if(editButton) {
+        actions.push({ key: "edit", icon: PencilSimpleIcon, text: "Edit", onClick: onEditClick });
+    }
+
+    if(deleteButton) {
+        actions.push({ key: "delete", icon: TrashIcon, text: deleteText, onClick: onDeleteClick });
+    }
 
     //! Outside click / Escape / (desktop) scroll + resize => close
     useEffect(() => {

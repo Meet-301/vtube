@@ -13,8 +13,11 @@ function VideoCard({
     uploadedAt,
     duration,
     variant = "grid",
-    isEditable = false,
-    onlyDelete = false,
+    deleteText = "Delete",
+    saveButton = true,
+    shareButton = true,
+    editButton = true,
+    deleteButton = true,
     onSaveClick = () => {},
     onShareClick = () => {},
     onEditClick = () => {},
@@ -278,9 +281,12 @@ function VideoCard({
 
                 {/* More */}
 
-                <MoreButton 
-                    isEditable={isEditable}
-                    onlyDelete={onlyDelete}
+                <MoreButton
+                    deleteText={deleteText}
+                    saveButton={saveButton}
+                    shareButton={shareButton}
+                    editButton={editButton}
+                    deleteButton={deleteButton}
                     onDeleteClick={onDeleteClick}
                     onEditClick={onEditClick}
                     onSaveClick={onSaveClick}

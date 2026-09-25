@@ -114,6 +114,8 @@ function Home() {
                         <VideoCard
                             key={index}
                             {...video}
+                            editButton={false}
+                            deleteButton={false}
                         />
                     ))}
                 </div>

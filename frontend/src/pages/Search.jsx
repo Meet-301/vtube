@@ -263,6 +263,8 @@ function Search() {
                             uploadedAt="2026-08-20"
                             duration="12:00"
                             variant="horizontal"
+                            editButton={false}
+                            deleteButton={false}
                         />
                     </div>
 

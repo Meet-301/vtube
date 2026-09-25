@@ -153,8 +153,7 @@ function History() {
                                 uploadedAt="2 days ago"
                                 duration="8:55"
                                 variant="horizontal"
-                                isEditable={false}
-                                onlyDelete={true}
+                                editButton={false}
                             />
                         </div>
 

@@ -309,7 +309,8 @@ function Channel() {
                                         title={video.title}
                                         views={video.views}
                                         uploadedAt={video.createdAt}
-                                        isEditable={true}
+                                        editButton={isOwner}
+                                        deleteButton={isOwner}
                                         onEditClick={() => navigate("/edit-video")}
                                     />
                                 ))}

@@ -25,7 +25,9 @@ import {
   Register,
   ForgotPassword,
   VerifyEmail,
-  ResetPassword
+  ResetPassword,
+  CreatePlaylist,
+  EditPlaylist
 } from './pages'
 
 const router = createBrowserRouter(
@@ -37,6 +39,8 @@ const router = createBrowserRouter(
       <Route element={<Channel/>} path='channel' />
       <Route element={<Subscriptions/>} path='subscriptions' />
       <Route element={<Playlists/>} path='playlists' />
+      <Route element={<CreatePlaylist/>} path='playlists/create' />
+      <Route element={<EditPlaylist/>} path='playlists/edit' />
       <Route element={<LikedVideos/>} path='liked-videos' />
       <Route element={<ManageAccount/>} path='manage-account' />
       <Route element={<UploadVideo/>} path='upload-video' />

@@ -358,6 +358,8 @@ function Subscriptions() {
 
                                 <VideoCard
                                     key={index}
+                                    editButton={false}
+                                    deleteButton={false}
                                     {...video}
                                 />
 
