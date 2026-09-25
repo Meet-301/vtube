@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { EyeIcon, EyeSlashIcon, UserCircleIcon } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import api from "../api/axios.js";
 
 function Register() {
     const [showPassword, setShowPassword] = useState(false);
@@ -12,6 +14,32 @@ function Register() {
         if (!file) return;
 
         setAvatarPreview(URL.createObjectURL(file));
+    }
+
+    const {register, handleSubmit, setValue} = useForm();
+
+    async function onSubmit(formData) {
+        const data = new FormData();
+
+        data.append("fullName", formData.fullName);
+        data.append("username", formData.username);
+        data.append("email", formData.email);
+        data.append("password", formData.password);
+
+        if(formData.avatar?.[0]) {
+            data.append("avatar", formData.avatar[0]);
+        }
+
+        try {
+            const response = await api.post(
+                "/users/register",
+                data
+            )
+
+            console.log(response.data);
+        } catch (error) {
+            console.log(error.response?.data || error);
+        }
     }
 
     return (
@@ -116,7 +144,7 @@ function Register() {
 
                         {/* ================= FORM ================= */}
 
-                        <form className="space-y-4 sm:space-y-5">
+                        <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit(onSubmit)}>
 
                             {/* Avatar */}
 
@@ -189,8 +217,10 @@ function Register() {
                                     name="avatar"
                                     type="file"
                                     accept="image/*"
-                                    onChange={handleAvatarChange}
                                     className="hidden"
+                                    {...register("avatar", {
+                                        onChange: handleAvatarChange
+                                    })}
                                 />
 
                                 <p className="
@@ -243,6 +273,7 @@ function Register() {
                                         focus:ring-primary/20
                                         sm:h-12
                                     "
+                                    {...register("fullName")}
                                 />
 
                             </div>
@@ -287,6 +318,7 @@ function Register() {
                                         focus:ring-primary/20
                                         sm:h-12
                                     "
+                                    {...register("username")}
                                 />
 
                             </div>
@@ -331,6 +363,7 @@ function Register() {
                                         focus:ring-primary/20
                                         sm:h-12
                                     "
+                                    {...register("email")}
                                 />
 
                             </div>
@@ -382,6 +415,7 @@ function Register() {
                                             focus:ring-primary/20
                                             sm:h-12
                                         "
+                                        {...register("password")}
                                     />
 
                                     <button
