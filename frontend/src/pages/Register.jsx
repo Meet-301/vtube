@@ -1,10 +1,17 @@
 import { useState } from "react";
-import { EyeIcon, EyeSlashIcon, UserCircleIcon, XIcon, CheckCircleIcon, WarningCircleIcon } from "@phosphor-icons/react";
-import { Link } from "react-router-dom";
+import { 
+    EyeIcon, 
+    EyeSlashIcon, 
+    UserCircleIcon, 
+    CheckCircleIcon, 
+    WarningCircleIcon, 
+    InfoIcon
+} from "@phosphor-icons/react";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import api from "../api/axios.js";
 
-import { LoadingOverlay } from "@mantine/core";
+import { LoadingOverlay, Modal, Text, Tooltip } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useDisclosure } from "@mantine/hooks";
  
@@ -12,6 +19,10 @@ function Register() {
     const [showPassword, setShowPassword] = useState(false);
     const [avatarPreview, setAvatarPreview] = useState(null);
     const [isloading, setIsLoading] = useState(false);
+
+    const [opened, { open, close }] = useDisclosure(false);
+
+    const navigate = useNavigate();
 
     function handleAvatarChange(e) {
         const file = e.target.files?.[0];
@@ -36,25 +47,28 @@ function Register() {
         }
 
         try {
+
             setIsLoading(true);
 
             const response = await api.post(
                 "/users/register",
                 data
-            )
+            );
 
             notifications.show({
-                title: "Success",
+                title: response.data?.message,
                 color: "vtube",
-                icon: <CheckCircleIcon/>,
-                message: response.data?.message
-            })
+                icon: <CheckCircleIcon />
+            });
+
+            navigate("/verify-email");
+
         } catch (error) {
             notifications.show({
-                title: error?.response?.data?.message,
+                title: error?.response?.data?.message || "Registration failed",
                 color: "red",
-                icon: <WarningCircleIcon/>  
-            })
+                icon: <WarningCircleIcon />
+            });
         } finally {
             setIsLoading(false);
         }
@@ -68,6 +82,36 @@ function Register() {
                 overlayProps={{radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black"}}
                 loaderProps={{color: "blue", type: "oval"}}
             />
+
+            <Modal 
+                opened={opened} 
+                onClose={close}
+                title="Password format"
+                sx={{
+                    border: "var(--color-surface-elevated)"
+                }}
+                styles={{
+                   body: {
+                        backgroundColor: "var(--color-surface-elevated)",
+                        color: "var(--color-text-secondary)"
+                   },
+                   header: {
+                        backgroundColor: "var(--color-surface-elevated)"
+                   },
+                   title: {
+                        color: "var(--color-text-primary)",
+                        fontSize: 20
+                   }
+                }
+            }
+            >
+                It must contain:<br/>
+                At least 8 characters<br/>
+                At least 1 uppercase letter<br/>
+                At least 1 lowercase letter<br/>
+                At least 1 number<br/>
+                At least 1 special character
+            </Modal>
 
             <div className="
                 flex
@@ -242,7 +286,6 @@ function Register() {
                                     type="file"
                                     accept="image/*"
                                     className="hidden"
-                                    required
                                     {...register("avatar", {
                                         onChange: handleAvatarChange
                                     })}
@@ -251,9 +294,10 @@ function Register() {
                                 <p className="
                                     text-[11px]
                                     text-text-muted
-                                    sm:text-xs
+                                    sm:text-sm
                                 ">
-                                    Profile picture
+                                    Avatar
+                                    <span className="text-error"> * </span>
                                 </p>
 
                             </div>
@@ -272,6 +316,7 @@ function Register() {
                                     "
                                 >
                                     Full name
+                                    <span className="text-error"> * </span>
                                 </label>
 
                                 <input
@@ -318,6 +363,7 @@ function Register() {
                                     "
                                 >
                                     Username
+                                    <span className="text-error"> * </span>
                                 </label>
 
                                 <input
@@ -364,6 +410,7 @@ function Register() {
                                     "
                                 >
                                     Email
+                                    <span className="text-error"> * </span>
                                 </label>
 
                                 <input
@@ -410,6 +457,19 @@ function Register() {
                                     "
                                 >
                                     Password
+                                    <span className="text-error"> * </span>
+                                    <Tooltip label="Password format guidelines">
+                                        <button 
+                                            className="
+                                                ml-1
+                                                text-text-secondary
+                                                hover:text-text-primary
+                                            "
+                                            onClick={open}
+                                        >
+                                            <InfoIcon size={16}/>
+                                        </button>
+                                    </Tooltip>
                                 </label>
 
                                 <div className="relative">
