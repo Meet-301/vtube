@@ -1,12 +1,17 @@
 import { useState } from "react";
-import { EyeIcon, EyeSlashIcon, UserCircleIcon } from "@phosphor-icons/react";
+import { EyeIcon, EyeSlashIcon, UserCircleIcon, XIcon, CheckCircleIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import api from "../api/axios.js";
 
+import { LoadingOverlay } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { useDisclosure } from "@mantine/hooks";
+ 
 function Register() {
     const [showPassword, setShowPassword] = useState(false);
     const [avatarPreview, setAvatarPreview] = useState(null);
+    const [isloading, setIsLoading] = useState(false);
 
     function handleAvatarChange(e) {
         const file = e.target.files?.[0];
@@ -31,19 +36,38 @@ function Register() {
         }
 
         try {
+            setIsLoading(true);
+
             const response = await api.post(
                 "/users/register",
                 data
             )
 
-            console.log(response.data);
+            notifications.show({
+                title: "Success",
+                color: "vtube",
+                icon: <CheckCircleIcon/>,
+                message: response.data?.message
+            })
         } catch (error) {
-            console.log(error.response?.data || error);
+            notifications.show({
+                title: error?.response?.data?.message,
+                color: "red",
+                icon: <WarningCircleIcon/>  
+            })
+        } finally {
+            setIsLoading(false);
         }
     }
 
     return (
         <main className="min-h-screen bg-background text-text-primary">
+            <LoadingOverlay
+                visible={isloading}
+                zIndex={1000}
+                overlayProps={{radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black"}}
+                loaderProps={{color: "blue", type: "oval"}}
+            />
 
             <div className="
                 flex
@@ -218,6 +242,7 @@ function Register() {
                                     type="file"
                                     accept="image/*"
                                     className="hidden"
+                                    required
                                     {...register("avatar", {
                                         onChange: handleAvatarChange
                                     })}
@@ -253,6 +278,7 @@ function Register() {
                                     id="fullName"
                                     name="fullName"
                                     type="text"
+                                    required
                                     placeholder="Enter your full name"
                                     className="
                                         h-11
@@ -298,6 +324,7 @@ function Register() {
                                     id="username"
                                     name="username"
                                     type="text"
+                                    required
                                     placeholder="Choose a username"
                                     className="
                                         h-11
@@ -343,6 +370,7 @@ function Register() {
                                     id="email"
                                     name="email"
                                     type="email"
+                                    required
                                     placeholder="Enter your email"
                                     className="
                                         h-11
@@ -389,6 +417,7 @@ function Register() {
                                     <input
                                         id="password"
                                         name="password"
+                                        required
                                         type={
                                             showPassword
                                                 ? "text"

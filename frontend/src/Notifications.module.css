@@ -1,0 +1,27 @@
+
+.root {
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
+}
+.title { color: var(--color-text-primary) }
+.description { color: var(--color-text-secondary) }
+.closeButton { color: var(--color-text-secondary) }
+
+:root {
+  /* Brand */
+  --color-primary: #0074d9;
+  --color-primary-hover: #2196f3;
+
+  /* Backgrounds */
+  --color-background: #0f1115;
+  --color-surface: #151922;
+  --color-surface-elevated: #1b202b;
+
+  /* Text */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #a7b0c0;
+  --color-text-muted: #70798a;
+
+  /* Borders */
+  --color-border: #252b36;
+}

@@ -1,6 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import { MantineProvider, createTheme, Notification } from '@mantine/core'
+import '@mantine/core/styles.css'
+import { Notifications } from '@mantine/notifications'
+import '@mantine/notifications/styles.css'
 import App from './App.jsx'
 import { 
   createBrowserRouter,
@@ -30,6 +34,38 @@ import {
   EditPlaylist
 } from './pages'
 
+import classes from './Notifications.module.css'
+
+const theme = createTheme({
+    primaryColor: "vtube",
+
+    components: {
+      Notification: Notification.extend({
+        classNames: classes
+      })
+    },
+
+    colors: {
+        vtube: [
+            "#e8f1ff",
+            "#cfe0ff",
+            "#a8c7ff",
+            "#7facff",
+            "#568fff",
+            "#2f75ff",
+            "#0066ff",
+            "#0052cc",
+            "#003d99",
+            "#002966",
+        ],
+    },
+
+    defaultRadius: "md",
+
+    fontFamily:
+        "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+});
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<App/>} path='/'>
@@ -58,6 +94,9 @@ const router = createBrowserRouter(
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <MantineProvider theme={theme}>
+      <Notifications />
+      <RouterProvider router={router} />
+    </MantineProvider>
   </StrictMode>,
 )

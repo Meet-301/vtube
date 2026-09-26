@@ -14,7 +14,6 @@ import ChannelPageButton from "./ChannelPageButton.jsx";
 import VideoCardButton from "./VideoCardButton.jsx";
 import MoreButton from "./MoreButton.jsx";
 import SearchDropdown from "./SearchDropDown.jsx";
-import Toast from "./Toast.jsx";
 
 export {
    Header,
@@ -32,6 +31,5 @@ export {
    ChannelPageButton,
    VideoCardButton,
    MoreButton,
-   SearchDropdown,
-   Toast
+   SearchDropdown
 };
