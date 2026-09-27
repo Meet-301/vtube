@@ -2,10 +2,64 @@ import {
     ArrowLeftIcon,
     EnvelopeSimpleIcon
 } from "@phosphor-icons/react";
-
-import { Link } from "react-router-dom";
+import { 
+    Link, 
+    useLocation,
+    useNavigate,
+    useSearchParams
+} from "react-router-dom";
+import api from "../api/axios.js";
+import { useEffect } from "react";
 
 function VerifyEmail() {
+
+    const location = useLocation();
+    const userEmail  = location.state;
+
+    const [searchParams] = useSearchParams();
+
+    const token = searchParams.get("token");
+    const email = searchParams.get("email");
+
+    const navigate = useNavigate();
+
+    async function verify() {
+        try {
+
+            setIsLoading(true);
+
+            const response = await api.post(
+                "/users/verify-email",
+                {
+                    email,
+                    token
+                }
+            );
+
+            notifications.show({
+                title: response.data?.message,
+                color: "vtube",
+            });
+
+            navigate("/login");
+
+        } catch (error) {
+
+            notifications.show({
+                title: error.response?.data?.message || "Invalid or expired verification link",
+                color: "red",
+            });
+
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        if(!token || !email) return;
+
+        verify();
+    }, [token, email])
 
     return (
         <main className="min-h-screen bg-background text-text-primary">
@@ -158,7 +212,7 @@ function VerifyEmail() {
                                 text-text-primary
                             "
                         >
-                            user@example.com
+                            {userEmail}
                         </p>
 
 
@@ -210,7 +264,7 @@ function VerifyEmail() {
                         {/* ================= BACK TO LOGIN ================= */}
 
                         <Link
-                            to="/login"
+                            to="/register"
                             className="
                                 mt-4
                                 inline-flex
@@ -240,7 +294,7 @@ function VerifyEmail() {
                                     weight="regular"
 
                                 />
-                                Back to login
+                                Back to registration
                             </span>
 
                         </Link>

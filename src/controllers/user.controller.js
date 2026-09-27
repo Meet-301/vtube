@@ -125,6 +125,9 @@ const registerUser = asyncHandler(async (req, res) => {
       "-password -googleId -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordResetExpiry"
    );
 
+   const verificationUrl =
+    `${process.env.FRONTEND_URL}/verify-email?token=${emailVerificationToken}&email=${encodeURIComponent(createdUser.email)}`;
+
    try {
       await sendEmail({
          to: createdUser.email,
@@ -134,7 +137,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
             <p>Your verification code is:</p>
 
-            <h1>${emailVerificationToken}</h1>
+            <h1>${verificationUrl}</h1>
 
             <p>This code is valid for 15 minutes</p>
          `,
@@ -228,7 +231,7 @@ const resendVerificationEmail = asyncHandler(async (req, res) => {
    try {
       await sendEmail({
          to: user.email,
-         subject: "Vtube - Verify your email again",
+         subject: "VTube - Verify your email again",
          html: `
             <h2>Hi, ${user.fullName}</h2>
 

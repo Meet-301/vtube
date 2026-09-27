@@ -61,7 +61,10 @@ function Register() {
                 icon: <CheckCircleIcon />
             });
 
-            navigate("/verify-email");
+            navigate("/verify-email", {
+                state: formData.email,
+                replace: true
+            });
 
         } catch (error) {
             notifications.show({
@@ -459,7 +462,8 @@ function Register() {
                                     Password
                                     <span className="text-error"> * </span>
                                     <Tooltip label="Password format guidelines">
-                                        <button 
+                                        <button
+                                            type="button"
                                             className="
                                                 ml-1
                                                 text-text-secondary
