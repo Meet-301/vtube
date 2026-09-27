@@ -135,9 +135,9 @@ const registerUser = asyncHandler(async (req, res) => {
          html: `
             <h2>Welcome, ${createdUser.fullName}</h2>
 
-            <p>Your verification code is:</p>
+            <p>Please click below link to verify your email</p>
 
-            <h1>${verificationUrl}</h1>
+            <a href=${verificationUrl}>Verify</a>
 
             <p>This code is valid for 15 minutes</p>
          `,
