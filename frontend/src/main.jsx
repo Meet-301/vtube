@@ -93,7 +93,7 @@ const router = createBrowserRouter(
 
 createRoot(document.getElementById('root')).render(
   <MantineProvider theme={theme}>
-    <Notifications autoClose={3000} />
+    <Notifications autoClose={4000} />
     <RouterProvider router={router} />
   </MantineProvider>
 )
