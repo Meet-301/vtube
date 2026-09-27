@@ -139,7 +139,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
             <p>Please click the button below to verify your email:</p>
 
-            <a href="${verificationUrl}" targer="_blank">
+            <a href="${verificationUrl}" target="_blank">
                Verify Email
             </a>
 
@@ -232,6 +232,9 @@ const resendVerificationEmail = asyncHandler(async (req, res) => {
 
    await user.save({ validateBeforeSave: false });
 
+   const verificationUrl =
+    `${process.env.FRONTEND_URL}/verify-email?token=${resendEmailToken}&email=${encodeURIComponent(email)}`;
+
    try {
       await sendEmail({
          to: user.email,
@@ -239,11 +242,13 @@ const resendVerificationEmail = asyncHandler(async (req, res) => {
          html: `
             <h2>Hi, ${user.fullName}</h2>
 
-            <p>Your verification code is:</p>
+            <p>Please click the button below to verify your email again:</p>
 
-            <h1>${resendEmailToken}</h1>
+            <a href="${verificationUrl}" target="_blank">
+               Verify Email
+            </a>
 
-            <p>This code is valid for 15 minutes</p>
+            <p>This link is valid for 15 minutes.</p>
          `,
       });
    } catch (error) {
