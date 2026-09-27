@@ -128,32 +128,24 @@ const registerUser = asyncHandler(async (req, res) => {
    const verificationUrl =
     `${process.env.FRONTEND_URL}/verify-email?token=${emailVerificationToken}&email=${encodeURIComponent(createdUser.email)}`;
 
+   console.log(verificationUrl);
+
    try {
       await sendEmail({
-      to: createdUser.email,
-      subject: "Welcome to VTube - Verify your email",
-      html: `
-         <h2>Welcome, ${createdUser.fullName}</h2>
+         to: createdUser.email,
+         subject: "Welcome to VTube - Verify your email",
+         html: `
+            <h2>Welcome, ${createdUser.fullName}</h2>
 
-         <p>Please click the button below to verify your email:</p>
+            <p>Please click the button below to verify your email:</p>
 
-         <a
-               href="${verificationUrl}"
-               style="
-                  display: inline-block;
-                  padding: 12px 20px;
-                  background-color: #0074d9;
-                  color: white;
-                  text-decoration: none;
-                  border-radius: 8px;
-               "
-         >
+            <a href="${verificationUrl}" targer="_blank">
                Verify Email
-         </a>
+            </a>
 
-         <p>This link is valid for 15 minutes.</p>
-      `,
-});
+            <p>This link is valid for 15 minutes.</p>
+         `,
+      });
    } catch (error) {
       console.error("Email sending failed: ", error);
    }
