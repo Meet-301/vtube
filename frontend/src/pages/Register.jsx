@@ -11,7 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import api from "../api/axios.js";
 
-import { LoadingOverlay, Modal, Text, Tooltip } from "@mantine/core";
+import { LoadingOverlay, Modal, Tooltip } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useDisclosure } from "@mantine/hooks";
  
