@@ -209,6 +209,7 @@ function ResetPassword() {
                                                 ? "text"
                                                 : "password"
                                         }
+                                        required
                                         placeholder="Enter new password"
                                         className="
                                             h-11
