@@ -270,16 +270,19 @@ function Login() {
 
                                     <Link
                                         to="/forgot-password"
-                                        className="
-                                            text-xs
-                                            font-medium
-                                            text-primary
-                                            transition-colors
-                                            hover:text-primary-hover
-                                            sm:text-sm
-                                        "
                                     >
-                                        Forgot password?
+                                        <span 
+                                            className="
+                                                text-xs
+                                                font-medium
+                                                text-primary
+                                                transition-colors
+                                                hover:text-primary-hover
+                                                sm:text-sm
+                                            "
+                                        >
+                                            Forgot password?
+                                        </span>
                                     </Link>
 
                                 </div>
