@@ -1,17 +1,81 @@
 import {
     EyeIcon,
-    EyeSlashIcon
+    EyeSlashIcon,
+    WarningCircleIcon,
+    CheckCircleIcon
 } from "@phosphor-icons/react";
-
-import { Link } from "react-router-dom";
+import { 
+    Link, 
+    useNavigate, 
+    useSearchParams
+} from "react-router-dom";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import api from "../api/axios.js";
+import { LoadingOverlay } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 
 function ResetPassword() {
 
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [searchParams] = useSearchParams();
+    const {register, handleSubmit, reset} = useForm();
+    const navigate = useNavigate();
+
+    const token = searchParams.get("token");
+
+    function showError(error) {
+        notifications.show({
+            title: error || "Something went wrong",
+            color: "red",
+            icon: <WarningCircleIcon/>
+        });
+    }
+
+    function showSuccess(message) {
+        notifications.show({
+            title: message,
+            icon: <CheckCircleIcon/>,
+            color: "vtube",
+        });
+    }
+
+    async function resetPassword(formData) {
+        try {
+           setIsLoading(true);
+
+           const newPassword = formData.password;
+
+           const response = await api.patch(
+                "/users/reset-password",
+                {
+                    token,
+                    newPassword
+                }
+            );
+
+            showSuccess(response.data?.message);
+            navigate("/login");
+        } catch (error) {
+            showError(error.response?.data?.message);
+        } finally {
+            setIsLoading(false);
+            reset();
+        }
+    }
 
     return (
         <main className="min-h-screen bg-background text-text-primary">
+
+            {isLoading && 
+                <LoadingOverlay
+                    visible={isLoading}
+                    zIndex={1000}
+                    overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+                    loaderProps={{ color: "blue", type: "oval" }}
+                />
+            }
 
             <div
                 className="
@@ -118,7 +182,7 @@ function ResetPassword() {
 
                         {/* ================= FORM ================= */}
 
-                        <form className="space-y-4 sm:space-y-5">
+                        <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit(resetPassword)}>
 
                             {/* New Password */}
 
@@ -139,7 +203,7 @@ function ResetPassword() {
 
                                     <input
                                         id="password"
-                                        name="password"
+                                        {...register("password")}
                                         type={
                                             showPassword
                                                 ? "text"

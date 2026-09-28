@@ -32,7 +32,7 @@ function Register() {
         setAvatarPreview(URL.createObjectURL(file));
     }
 
-    const {register, handleSubmit, setValue} = useForm();
+    const {register, handleSubmit} = useForm();
 
     async function onSubmit(formData) {
         const data = new FormData();

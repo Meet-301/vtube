@@ -1,9 +1,67 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../api/axios.js";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { notifications } from "@mantine/notifications";
+import { LoadingOverlay } from "@mantine/core";
+import {
+    CheckCircleIcon,
+    WarningCircleIcon
+} from "@phosphor-icons/react";
 
 function ForgotPassword() {
+    const [isLoading, setIsLoading] = useState(false);
+    const {register, handleSubmit, reset} = useForm();
+    const navigate = useNavigate();
+
+    function showError(error) {
+        notifications.show({
+            title: error || "Invalid or expired verification link",
+            color: "red",
+            icon: <WarningCircleIcon/>
+        });
+    }
+
+    function showSuccess(message) {
+        notifications.show({
+            title: message,
+            icon: <CheckCircleIcon/>,
+            color: "vtube",
+        });
+    }
+
+    async function onSubmit(formData) {
+        try {
+
+            setIsLoading(true);
+
+            const response = await api.post(
+                "/users/forgot-password",
+                {
+                    email: formData.email
+                }
+            );
+
+            showSuccess(response.data?.message || "Email sent to reset the password");
+            navigate("/reset-password");        
+
+        } catch (error) {
+            showError(error.response?.data?.message || "Something went wrong. Please try again");
+        } finally {
+            setIsLoading(false);
+            reset();
+        }
+    }
 
     return (
         <main className="min-h-screen bg-background text-text-primary">
+
+            <LoadingOverlay
+                visible={isLoading}
+                zIndex={1000}
+                overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+                loaderProps={{ color: "blue", type: "oval" }}
+            />
 
             <div
                 className="
@@ -111,7 +169,7 @@ function ForgotPassword() {
 
                         {/* ================= FORM ================= */}
 
-                        <form className="space-y-4 sm:space-y-5">
+                        <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit(onSubmit)}>
 
                             {/* Email */}
 
@@ -130,7 +188,6 @@ function ForgotPassword() {
 
                                 <input
                                     id="email"
-                                    name="email"
                                     type="email"
                                     placeholder="Enter your email"
                                     className="
@@ -152,6 +209,9 @@ function ForgotPassword() {
                                         focus:ring-primary/20
                                         sm:h-12
                                     "
+                                    {...register("email", {
+                                        required: "Email is required"
+                                    })}
                                 />
 
                             </div>
