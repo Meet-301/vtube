@@ -283,16 +283,23 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
    await user.save({ validateBeforeSave: false });
 
+   const verificationUrl =
+    `${process.env.FRONTEND_URL}/verify-email?token=${forgotPasswordToken}&email=${encodeURIComponent(email)}`;
+
    try {
       await sendEmail({
          to: email,
-         subject: "Vtube - Reset password link",
+         subject: "VTube - Reset password link",
          html: `
-         <h2>Hi, ${user.fullName}</h2>
+            <h2>Hi, ${user.fullName}</h2>
 
-         <p>Your code for password reset is:</p>
+            <pClick below link to reset your password</p>
 
-         <h1>${forgotPasswordToken}</h1>
+            <a href="${verificationUrl}" target="_blank">
+               Verify Email
+            </a>
+
+            <p>This link is valid for 15 minutes.</p>
          `,
       });
    } catch (error) {
