@@ -32,8 +32,9 @@ import {
   CreatePlaylist,
   EditPlaylist
 } from './pages'
-
 import classes from './Notifications.module.css'
+import { Provider } from "react-redux";
+import store from './app/store.js';
 
 const theme = createTheme({
   primaryColor: "vtube",
@@ -92,8 +93,10 @@ const router = createBrowserRouter(
 )
 
 createRoot(document.getElementById('root')).render(
-  <MantineProvider theme={theme}>
-    <Notifications autoClose={4000} />
-    <RouterProvider router={router} />
-  </MantineProvider>
+  <Provider store={store}>
+    <MantineProvider theme={theme}>
+      <Notifications autoClose={4000} />
+      <RouterProvider router={router} />
+    </MantineProvider>
+  </Provider>
 )

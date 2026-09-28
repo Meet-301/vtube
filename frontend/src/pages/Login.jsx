@@ -1,13 +1,72 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
     EyeIcon,
-    EyeSlashIcon
+    EyeSlashIcon,
+    CheckCircleIcon,
+    WarningCircleIcon
 } from "@phosphor-icons/react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import api from "../api/axios.js";
+import { LoadingOverlay } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { useDispatch } from "react-redux";
+import { login } from "../features/authSlice.js";
 
 function Login() {
 
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const {register, handleSubmit, reset} = useForm();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    function showError(error) {
+        notifications.show({
+            title: error || "Invalid or expired verification link",
+            color: "red",
+            icon: <WarningCircleIcon/>
+        });
+    }
+
+    function showSuccess(message) {
+        notifications.show({
+            title: message,
+            icon: <CheckCircleIcon/>,
+            color: "vtube",
+        });
+    }
+
+    async function loginUser(formData) {
+        try {
+           setIsLoading(true);
+
+           const email = formData.email;
+           const password = formData.password;
+
+           const response = await api.post(
+                "/users/login",
+                {
+                    email,
+                    password
+                }
+            );
+
+            showSuccess(response.data?.message);
+            dispatch(
+                login({
+                    user: response.data?.data?.user,
+                    accessToken: response.data?.data?.accessToken,
+                })
+            );
+            navigate("/");
+        } catch (error) {
+            showError(error?.response?.data?.message);
+        } finally {
+            setIsLoading(false);
+            reset();
+        }
+    }
 
     return (
         <main className="
@@ -15,6 +74,15 @@ function Login() {
             bg-background
             text-text-primary
         ">
+
+            {isLoading &&
+                <LoadingOverlay
+                    visible={isLoading}
+                    zIndex={1000}
+                    overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+                    loaderProps={{ color: "blue", type: "oval" }}
+                />
+            }
 
             <div className="
                 flex
@@ -121,7 +189,7 @@ function Login() {
 
                         {/* ================= FORM ================= */}
 
-                        <form className="space-y-4 sm:space-y-5">
+                        <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit(loginUser)}>
 
                             {/* Email */}
 
@@ -141,6 +209,8 @@ function Login() {
                                 <input
                                     id="email"
                                     type="email"
+                                    {...register("email")}
+                                    required
                                     placeholder="Enter your email"
                                     className="
                                         h-11
@@ -181,7 +251,6 @@ function Login() {
                                     Password
                                 </label>
 
-
                                 <div className="relative">
 
                                     <input
@@ -192,6 +261,8 @@ function Login() {
                                                 : "password"
                                         }
                                         placeholder="Enter your password"
+                                        {...register("password")}
+                                        required
                                         className="
                                             h-11
                                             w-full
@@ -262,7 +333,6 @@ function Login() {
                                     </button>
 
                                 </div>
-
 
                                 {/* Forgot password */}
 
