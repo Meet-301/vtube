@@ -284,7 +284,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
    await user.save({ validateBeforeSave: false });
 
    const verificationUrl =
-    `${process.env.FRONTEND_URL}/verify-email?token=${forgotPasswordToken}&email=${encodeURIComponent(email)}`;
+    `${process.env.FRONTEND_URL}/reset-password?token=${forgotPasswordToken}`;
 
    try {
       await sendEmail({
@@ -296,7 +296,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
             <pClick below link to reset your password</p>
 
             <a href="${verificationUrl}" target="_blank">
-               Verify Email
+               Reset password
             </a>
 
             <p>This link is valid for 15 minutes.</p>
