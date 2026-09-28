@@ -59,7 +59,7 @@ select {
   font: inherit;
 }
 
-button {
+button:not(:disabled) {
   cursor: pointer;
 }
 

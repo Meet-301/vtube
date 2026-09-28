@@ -1,11 +1,9 @@
 import {
-    ArrowLeftIcon,
     CheckCircleIcon,
     EnvelopeSimpleIcon,
     WarningCircleIcon
 } from "@phosphor-icons/react";
 import {
-    Link,
     useLocation,
     useNavigate,
     useSearchParams
@@ -18,7 +16,8 @@ import { notifications } from "@mantine/notifications";
 function VerifyEmail() {
 
     const location = useLocation();
-    const userEmail = location.state;
+    const userEmail = location.state?.email || "";
+    const startCooldown = location.state?.startCooldown || 0;
 
     const [searchParams] = useSearchParams();
 
@@ -28,7 +27,24 @@ function VerifyEmail() {
     const navigate = useNavigate();
 
     const [isloading, setIsLoading] = useState(false);
+    const [resendCooldown, setResendCooldown] = useState(startCooldown ? 60 : 0);
     const verifyStarted = useRef(false); //! to prevent unnecessary re-renders of useEffect()
+
+    function showError(error) {
+        notifications.show({
+            title: error || "Invalid or expired verification link",
+            color: "red",
+            icon: <WarningCircleIcon/>
+        });
+    }
+
+    function showSuccess(message) {
+        notifications.show({
+            title: message,
+            icon: <CheckCircleIcon/>,
+            color: "vtube",
+        });
+    }
 
     async function verify() {
         try {
@@ -43,26 +59,58 @@ function VerifyEmail() {
                 }
             );
 
-            notifications.show({
-                title: response.data?.message,
-                icon: <CheckCircleIcon/>,
-                color: "vtube",
-            });
-
+            showSuccess(response.data?.message);
+            setResendCooldown(60);
             navigate("/login");
 
         } catch (error) {
-
-            notifications.show({
-                title: error.response?.data?.message || "Invalid or expired verification link",
-                color: "red",
-                icon: <WarningCircleIcon/>
-            });
-
+            showError(error.response?.data?.message || "Invalid or expired verification link");
         } finally {
             setIsLoading(false);
         }
     }
+
+    async function resendVerificationEmail(email) {
+        if(resendCooldown > 0) return;
+
+        try {
+
+            setIsLoading(true);
+
+            const response = await api.post(
+                "/users/resend-email", 
+                {
+                    email
+                }
+            );
+
+            showSuccess(response?.data.message);
+            setResendCooldown(60);
+            navigate("/login");
+
+        } catch (error) {
+            showError(error.response?.data?.message);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        if(startCooldown) {
+            setResendCooldown(60);
+        }
+    }, [startCooldown])
+
+    //! countdown effect using intevals
+    useEffect(() => {
+        if (resendCooldown <= 0) return;
+
+        const timer = setInterval(() => {
+            setResendCooldown((prev) => prev - 1);
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [resendCooldown]);
 
     useEffect(() => {
         if (!token || !email) return;
@@ -72,7 +120,7 @@ function VerifyEmail() {
         verifyStarted.current = true;
 
         verify();
-    }, [token, email])
+    }, [token, email]);
 
     return (
         <main className="min-h-screen bg-background text-text-primary">
@@ -258,8 +306,10 @@ function VerifyEmail() {
 
                             {/* ================= RESEND ================= */}
 
-                            <button
+                                <button
                                 type="button"
+                                onClick={() => resendVerificationEmail(userEmail)}
+                                disabled={resendCooldown > 0 || isloading}
                                 className="
                                     mt-6
                                     h-11
@@ -271,6 +321,9 @@ function VerifyEmail() {
                                     text-white
                                     transition-all
                                     duration-200
+                                    cursor-pointer
+                                    disabled:cursor-not-allowed
+                                    disabled:opacity-60
                                     hover:bg-primary-hover
                                     active:bg-primary-hover
                                     active:scale-[0.98]
@@ -278,47 +331,11 @@ function VerifyEmail() {
                                     sm:h-12
                                 "
                             >
-                                Resend verification email
+                                {resendCooldown > 0 
+                                    ? `Resend email in ${resendCooldown} seconds` 
+                                    :  `Resend verification email`
+                                }
                             </button>
-
-
-                            {/* ================= BACK TO LOGIN ================= */}
-
-                            <Link
-                                to="/register"
-                                className="
-                                    mt-4
-                                    inline-flex
-                                    items-center
-                                    justify-center
-                                    gap-2
-                                    text-sm
-                                    font-medium
-                                    text-text-secondary
-                                    transition-colors
-                                    hover:text-text-primary
-                                    sm:mt-5
-                                "
-                            >
-                                <span
-                                    className="
-                                        text-text-secondary
-                                        hover:text-text-primary
-                                        active:text-text-primary
-                                        flex
-                                        gap-2
-
-                                    "
-                                >
-                                    <ArrowLeftIcon
-                                        size={18}
-                                        weight="regular"
-
-                                    />
-                                    Back to registration
-                                </span>
-
-                            </Link>
 
                         </div>
 

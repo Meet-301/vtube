@@ -62,7 +62,10 @@ function Register() {
             });
 
             navigate("/verify-email", {
-                state: formData.email,
+                state: {
+                    email: formData.email,
+                    startCooldown: true
+                },
                 replace: true
             });
 
