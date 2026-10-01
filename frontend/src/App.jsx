@@ -1,9 +1,13 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { 
+import {
   Header,
   SidebarDrawer
 } from "./components";
 import { useState, useEffect } from "react";
+import api from "./api/axios.js";
+import { useDispatch, useSelector } from "react-redux";
+import { login, setAccessToken, setInitializing } from "./features/authSlice.js";
+import { LoadingOverlay } from "@mantine/core";
 
 function App() {
 
@@ -11,6 +15,9 @@ function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const location = useLocation();
+  const dispatch = useDispatch();
+
+  const isInitializing = useSelector(state => state.auth.isInitializing);
 
   const pages = [
     "/search",
@@ -24,6 +31,58 @@ function App() {
   const isCheckPage = pages.includes(location.pathname);
 
   useEffect(() => {
+    async function restoreAuth() {
+      try {
+        const refreshResponse = await api.post(
+          "/users/refresh-token"
+        );
+
+        console.log(
+          "Refresh response:",
+          refreshResponse.data
+        );
+
+        const accessToken =
+          refreshResponse.data?.data?.accessToken;
+
+        if (!accessToken) {
+          return;
+        }
+
+        dispatch(setAccessToken(accessToken));
+
+        const userResponse = await api.get(
+          "/users/current-user"
+        );
+
+        console.log(
+          "Current user:",
+          userResponse.data
+        );
+
+        const user = userResponse.data?.data;
+
+        dispatch(
+          login({
+            user,
+            accessToken
+          })
+        );
+
+      } catch (error) {
+        console.log(
+          "Auth restore failed:",
+          error.response?.data || error
+        );
+      } finally {
+        dispatch(setInitializing(false));
+      }
+    }
+
+    restoreAuth();
+  }, [dispatch]);
+
+  useEffect(() => {
     function handleScroll() {
       setIsScrolled(window.scrollY > 10);
     }
@@ -35,19 +94,38 @@ function App() {
     };
   }, []);
 
+  if (isInitializing) {
+    return (
+      <div className="
+            flex
+            min-h-screen
+            items-center
+            justify-center
+            bg-background
+        ">
+        <LoadingOverlay
+          visible={isInitializing}
+          zIndex={1000}
+          overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+          loaderProps={{ color: "blue", type: "oval" }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-text-primary">
 
       {/* Sticky glass area */}
       {!isCheckPage && (
         <div
-            className={`
+          className={`
                 sticky top-0 z-50
                 transition-all duration-300
                 ${isScrolled
-                    ? "bg-surface/70 backdrop-blur-xl"
-                    : "bg-transparent"
-                }
+              ? "bg-surface/70 backdrop-blur-xl"
+              : "bg-transparent"
+            }
             `}
         >
           <Header onMenuClick={() => setIsDrawerOpen(true)} />
@@ -55,7 +133,7 @@ function App() {
       )}
 
       {/* Mobile/Tablet drawer */}
-      {!isCheckPage && 
+      {!isCheckPage &&
         <SidebarDrawer
           isOpen={isDrawerOpen}
           onClose={() => setIsDrawerOpen(false)}

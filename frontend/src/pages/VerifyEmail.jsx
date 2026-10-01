@@ -4,6 +4,7 @@ import {
     WarningCircleIcon
 } from "@phosphor-icons/react";
 import {
+    Navigate,
     useLocation,
     useNavigate,
     useSearchParams
@@ -16,6 +17,8 @@ import { notifications } from "@mantine/notifications";
 function VerifyEmail() {
 
     const location = useLocation();
+    const navigate = useNavigate();
+
     const userEmail = location.state?.email || "";
     const startCooldown = location.state?.startCooldown || 0;
 
@@ -24,7 +27,9 @@ function VerifyEmail() {
     const token = searchParams.get("token");
     const email = searchParams.get("email");
 
-    const navigate = useNavigate();
+    if(!token || !email) {
+        return <Navigate to="/login" replace />
+    }
 
     const [isloading, setIsLoading] = useState(false);
     const [resendCooldown, setResendCooldown] = useState(startCooldown ? 60 : 0);

@@ -2,21 +2,50 @@ import {
     UserGearIcon,
     SignOutIcon,
     UserCircleIcon,
+    CheckCircleIcon,
+    WarningCircleIcon
 } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { logout } from "../features/authSlice.js";
+import api from "../api/axios.js";
+import { notifications } from "@mantine/notifications";
+import { LoadingOverlay } from "@mantine/core";
 
 function ProfileMenu() {
-    const [isOpen, setIsopen] = useState(false)
-    const menuRef = useRef(null)
+    const [isOpen, setIsopen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const menuRef = useRef(null);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const user = useSelector(state => state?.auth?.user);
+
+    if(!user) return null;
+
+    function showError(error) {
+        notifications.show({
+            title: error || "Invalid or expired verification link",
+            color: "red",
+            icon: <WarningCircleIcon />
+        });
+    }
+
+    function showSuccess(message) {
+        notifications.show({
+            title: message,
+            icon: <CheckCircleIcon />,
+            color: "vtube",
+        });
+    }
 
     useEffect(() => {
         function handleClick(event) {
-            if(
+            if (
                 menuRef.current &&
-                !menuRef.current.contains(event.target) 
+                !menuRef.current.contains(event.target)
             ) {
-                setIsopen(false)
+                setIsopen(false);
             }
         }
 
@@ -25,7 +54,27 @@ function ProfileMenu() {
         return () => {
             document.removeEventListener("mousedown", handleClick);
         }
-    }, [])
+    }, []);
+
+    async function handleLogout() {
+        try {
+            setIsLoading(true);
+
+            await api.post("/users/logout");
+
+            dispatch(logout());
+
+            setIsopen(false);
+
+            showSuccess("Logged out successfully");
+
+            navigate("/login");
+        } catch (error) {
+            showError(error?.response?.data?.message || "Something went wrong");
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     return (
         <div ref={menuRef} className="relative">
@@ -35,18 +84,18 @@ function ProfileMenu() {
                 type="button"
                 onClick={() => setIsopen(!isOpen)}
                 className="
-                            flex
-                            h-9 w-9 mt-1
-                            items-center justify-center
-                            rounded-full
-                            transition-all duration-200
-                            text-text-primary
-                            active:scale-95
-                            overflow-hidden
-                            "
+                    flex
+                    h-14 w-14 mt-1
+                    items-center justify-center
+                    rounded-full
+                    transition-all duration-200
+                    text-text-primary
+                    active:scale-95
+                    overflow-hidden
+                "
             >
                 <img
-                    src="https://i.pravatar.cc/150?img=12"
+                    src={user.avatar}
                     alt="Profile"
                     className="h-full w-full object-cover"
                 />
@@ -55,6 +104,12 @@ function ProfileMenu() {
             {/* Profile menu */}
             {isOpen &&
                 <div className="absolute right-0 top-full z-50 w-64">
+                    <LoadingOverlay
+                        visible={isLoading}
+                        zIndex={1000}
+                        overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+                        loaderProps={{ color: "blue", type: "oval" }}
+                    />
                     <div className="rounded-2xl bg-surface-elevated p-2 mt-2 shadow-2xl">
 
                         {/* Account header */}
@@ -92,7 +147,7 @@ function ProfileMenu() {
                         {/* Logout */}
                         <button
                             type="button"
-                            onClick={() => setIsopen((prev) => !prev)}
+                            onClick={handleLogout}
                             className="flex w-full transition-transform duration-200 active:scale-95 items-center gap-4 rounded-lg px-3 py-3 text-red-700 hover:bg-surface active:bg-surface hover:text-red-500"
                         >
                             <SignOutIcon size={22} />

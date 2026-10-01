@@ -35,6 +35,7 @@ import {
 import classes from './Notifications.module.css'
 import { Provider } from "react-redux";
 import store from './app/store.js';
+import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 const theme = createTheme({
   primaryColor: "vtube",
@@ -69,23 +70,26 @@ const theme = createTheme({
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<App />} path='/'>
-      <Route element={<Home />} path='' />
-      <Route element={<Watch />} path='watch' />
-      <Route element={<History />} path='history' />
-      <Route element={<Channel />} path='channel' />
-      <Route element={<Subscriptions />} path='subscriptions' />
-      <Route element={<Playlists />} path='playlists' />
-      <Route element={<CreatePlaylist />} path='playlists/create' />
-      <Route element={<EditPlaylist />} path='playlists/edit' />
-      <Route element={<LikedVideos />} path='liked-videos' />
-      <Route element={<ManageAccount />} path='manage-account' />
-      <Route element={<UploadVideo />} path='upload-video' />
-      <Route element={<EditVideo />} path='edit-video' />
-      <Route element={<EditChannel />} path='edit-channel' />
-      <Route element={<Search />} path='search' />
+      <Route element={<ProtectedRoute/>}>
+        <Route element={<Home />} path='' />
+        <Route element={<Watch />} path='watch' />
+        <Route element={<History />} path='history' />
+        <Route element={<Channel />} path='channel' />
+        <Route element={<Subscriptions />} path='subscriptions' />
+        <Route element={<Playlists />} path='playlists' />
+        <Route element={<CreatePlaylist />} path='playlists/create' />
+        <Route element={<EditPlaylist />} path='playlists/edit' />
+        <Route element={<LikedVideos />} path='liked-videos' />
+        <Route element={<ManageAccount />} path='manage-account' />
+        <Route element={<UploadVideo />} path='upload-video' />
+        <Route element={<EditVideo />} path='edit-video' />
+        <Route element={<EditChannel />} path='edit-channel' />
+        <Route element={<Search />} path='search' />
+      </Route>
+
       <Route element={<Login />} path='login' />
       <Route element={<Register />} path='register' />
-      <Route element={<ForgotPassword />} path='forgot-password' />
+      <Route element={<ForgotPassword/>} path='forgot-password' />
       <Route element={<VerifyEmail />} path='verify-email' />
       <Route element={<ResetPassword />} path='reset-password' />
     </Route>
