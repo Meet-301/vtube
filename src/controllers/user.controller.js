@@ -13,15 +13,15 @@ import sendEmail from "../utils/mailer.js";
 
 const accessOptions = {
    httpOnly: true, //! hides the cookie from malicious client side scripts
-   secure: false, //! ensures it is never sent in plaintext and can only be accessbile in https(not in http)
+   secure: true, //! ensures it is never sent in plaintext and can only be accessbile in https(not in http)
    maxAge: 24 * 60 * 60 * 1000, //! cookie expiry time(1 day),
    sameSite: "none"
 };
 
 const refreshOptions = {
    httpOnly: true,
-   secure: false,
-   maxAge: 10 * (24 * 60 * 60 * 1000), //! (10 days),
+   secure: true,
+   maxAge: 10 * 24 * 60 * 60 * 1000, //! (10 days),
    sameSite: "none"
 };
 
@@ -507,11 +507,13 @@ const logoutUser = asyncHandler(async (req, res, next) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res, next) => {
-   console.log(req?.cookies);
+   console.log("========== REFRESH REQUEST ==========");
 
    //! get refresh token from request's cookies
    const incomingRefreshToken =
       req.cookies?.refreshToken || req.body?.refreshToken;
+
+   console.log(`Incoming: ${incomingRefreshToken}`);
 
    //! if incoming refresh token is null or undefined
    if (!incomingRefreshToken) {
@@ -540,6 +542,12 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
 
       const { accessToken, refreshToken } =
          await generateAccessAndRefreshTokens(user._id);
+
+      console.log("DB:", user?.refreshToken);
+      console.log(
+         "MATCH:",
+         incomingRefreshToken === user?.refreshToken
+      );
 
       return res
          .status(200)
