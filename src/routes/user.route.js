@@ -17,6 +17,7 @@ import {
    forgotPassword,
    resetPassword,
    googleLogin,
+   getUserById,
 } from "../controllers/user.controller.js";
 import { multerUpload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -57,6 +58,7 @@ userRouter
 
 //! :username is used for params(dynamic binbding)
 userRouter.route("/current-user").get(verifyJWT, getCurrentUser);
+userRouter.route("/:userId").get(verifyJWT, getUserById);
 userRouter.route("/channel/:username").get(verifyJWT, getUserChannelProfile);
 userRouter.route("/watch-history").get(verifyJWT, getWatchHistory);
 userRouter.route("/auth/google").get(

@@ -733,7 +733,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
 const getUserById = asyncHandler(async (req, res) => {
 
-   const { userId } = req.body;
+   const { userId } = req.params;
 
    const user = await User.findById(userId).select(
       "-password -googleId -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordResetExpiry"
