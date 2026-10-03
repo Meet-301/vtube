@@ -507,13 +507,9 @@ const logoutUser = asyncHandler(async (req, res, next) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res, next) => {
-   console.log("========== REFRESH REQUEST ==========");
-
    //! get refresh token from request's cookies
    const incomingRefreshToken =
       req.cookies?.refreshToken || req.body?.refreshToken;
-
-   console.log(`Incoming: ${incomingRefreshToken}`);
 
    //! if incoming refresh token is null or undefined
    if (!incomingRefreshToken) {
@@ -542,12 +538,6 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
 
       const { accessToken, refreshToken } =
          await generateAccessAndRefreshTokens(user._id);
-
-      console.log("DB:", user?.refreshToken);
-      console.log(
-         "MATCH:",
-         incomingRefreshToken === user?.refreshToken
-      );
 
       return res
          .status(200)
@@ -647,18 +637,6 @@ const updateCurrentPassword = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
-const getCurrentUser = asyncHandler(async (req, res) => {
-   const currentUser = await User.findById(req.user._id).select(
-      "-password -googleId -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordResetExpiry"
-   );
-
-   return res
-      .status(200)
-      .json(
-         new ApiResponse(200, currentUser, "Current user fetched successfully")
-      );
-});
-
 const updateAvatar = asyncHandler(async (req, res) => {
    //! getting fields access
    const avatarLocalPath = req.file?.path;
@@ -738,6 +716,33 @@ const updateCoverImage = asyncHandler(async (req, res) => {
             newCoverImage.url,
             "Cover image updated successfully"
          )
+      );
+});
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+   const currentUser = await User.findById(req.user._id).select(
+      "-password -googleId -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordResetExpiry"
+   );
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(200, currentUser, "Current user fetched successfully")
+      );
+});
+
+const getUserById = asyncHandler(async (req, res) => {
+
+   const { userId } = req.body;
+
+   const user = await User.findById(userId).select(
+      "-password -googleId -refreshToken -emailVerificationToken -emailVerificationExpiry -passwordResetToken -passwordResetExpiry"
+   );
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(200, user, "User fetched successfully")
       );
 });
 
@@ -973,6 +978,7 @@ export {
    refreshAccessToken,
    updateCurrentPassword,
    getCurrentUser,
+   getUserById,
    updateAccountDetails,
    updateCoverImage,
    updateAvatar,
