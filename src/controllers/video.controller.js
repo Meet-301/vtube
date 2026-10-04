@@ -4,6 +4,7 @@ import {
    deleteFromCloudinary,
    uploadOnCloudinary,
 } from "../utils/cloudinary.js";
+import {v2 as cloudinary} from "cloudinary";
 import { getVideoDurationInSeconds } from "get-video-duration";
 import { Video } from "../models/video.model.js";
 import fs from "fs";
@@ -40,11 +41,15 @@ const createVideo = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Video duration exceeds the limit of 30 minutes");
    }
 
-   const videoFile = await uploadOnCloudinary(videoFileLocalPath);
+   const videoFile = await uploadOnCloudinary(videoFileLocalPath, {
+      type: "authenticated",
+      resource_type: "video"
+   });
+
    const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
 
    if (!videoFile) {
-      await deleteFromCloudinary(videoFile.url, "video");
+      await deleteFromCloudinary(videoFile.videoPublicId, "video", "authenticated");
       fs.unlinkSync(videoFileLocalPath);
       fs.unlinkSync(thumbnailLocalPath);
       throw new ApiError(500, "Video upload failure on cloudinary");
@@ -60,7 +65,8 @@ const createVideo = asyncHandler(async (req, res) => {
    const userId = req.user._id;
 
    const createdVideo = await Video.create({
-      videoFile: videoFile.url,
+      videoFile: videoFile.secure_url,
+      videoPublicId: videoFile.public_id,
       title: title.trim(),
       description: description?.trim() ?? "",
       thumbnail: thumbnail.url,
@@ -109,9 +115,10 @@ const watchVideo = asyncHandler(async (req, res) => {
    const currentUserId = String(req.user._id);
    const videoOwnerId = String(video.owner);
 
-   //! increment the views with the help of $inc
+   let videoDoc = video;
+
    if (currentUserId !== videoOwnerId) {
-      const updatedVideo = await Video.findByIdAndUpdate(
+      videoDoc = await Video.findByIdAndUpdate(
          videoId,
          {
             $inc: { views: 1 },
@@ -120,17 +127,27 @@ const watchVideo = asyncHandler(async (req, res) => {
             returnDocument: "after",
          }
       );
-
-      return res
-         .status(200)
-         .json(
-            new ApiResponse(200, updatedVideo, "Video watched successfully")
-         );
-   } else {
-      return res
-         .status(200)
-         .json(new ApiResponse(200, {}, "Video watched successfully"));
    }
+
+   //! make the signed URl for authenticated video
+   let videoFileUrl = videoDoc.videoFile;
+
+   if (videoDoc.videoPublicId) {
+      videoFileUrl = cloudinary.url(videoDoc.videoPublicId, {
+         resource_type: "video",
+         type: "authenticated",
+         sign_url: true,
+         secure: true,
+      });
+   }
+
+   return res.status(200).json(
+      new ApiResponse(
+         200,
+         { ...videoDoc.toObject(), videoFile: videoFileUrl },
+         "Video watched successfully"
+      )
+   );
 });
 
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -470,7 +487,7 @@ const deleteVideoById = asyncHandler(async (req, res) => {
       throw new ApiError(403, "You are not authorized to delete the video");
    }
 
-   await deleteFromCloudinary(video.videoFile, "video");
+   await deleteFromCloudinary(video.videoPublicId, "video", "authenticated");
    await deleteFromCloudinary(video.thumbnail);
 
    await Video.deleteOne({
@@ -496,7 +513,7 @@ const deleteVideosByUsername = asyncHandler(async (req, res) => {
    const videos = await Video.find({ owner: user._id });
 
    for (const video of videos) {
-      await deleteFromCloudinary(video.videoFile, "video");
+      await deleteFromCloudinary(video.videoPublicId, "video", "authenticated");
       await deleteFromCloudinary(video.thumbnail);
    }
 

@@ -8,32 +8,41 @@ cloudinary.config({
    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadOnCloudinary = async (localFilePath) => {
+const uploadOnCloudinary = async (localFilePath, options = {}) => {
    try {
       if (!localFilePath) return null;
 
       //! cloudinary file upload
       const response = await cloudinary.uploader.upload(localFilePath, {
          resource_type: "auto",
+         ...options, //! like { type: "authenticated" }
       });
 
       //! after successful file upload
       fs.unlinkSync(localFilePath);
       return response;
    } catch (error) {
-      fs.unlinkSync(localFilePath); //! remove the file from local server as the upload operation failure
+      if (fs.existsSync(localFilePath)) fs.unlinkSync(localFilePath);
       return null;
    }
 };
 
-const deleteFromCloudinary = async (cloudinaryUrl, resource_type = "image") => {
-   if (!cloudinaryUrl) return null;
+const deleteFromCloudinary = async (
+   cloudinaryUrlOrPublicId,
+   resource_type = "image",
+   type = "upload"
+) => {
+   if (!cloudinaryUrlOrPublicId) return null;
 
    try {
-      const publicId = extractPublicId(cloudinaryUrl);
+      //! If there's a URL then extract its public id
+      const publicId = cloudinaryUrlOrPublicId.startsWith("http")
+         ? extractPublicId(cloudinaryUrlOrPublicId)
+         : cloudinaryUrlOrPublicId;
 
-      const response = await cloudinary.uploader.destroy(publicId, {
-         resource_type: resource_type,
+      await cloudinary.uploader.destroy(publicId, {
+         resource_type,
+         type,
       });
 
       return true;
@@ -43,4 +52,4 @@ const deleteFromCloudinary = async (cloudinaryUrl, resource_type = "image") => {
    }
 };
 
-export { uploadOnCloudinary, deleteFromCloudinary };
+export {uploadOnCloudinary, deleteFromCloudinary};
