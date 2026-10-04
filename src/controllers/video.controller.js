@@ -74,9 +74,13 @@ const createVideo = asyncHandler(async (req, res) => {
       owner: userId,
    });
 
+   const safeVideo = createdVideo.toObject();
+   delete safeVideo.videoFile;
+   delete safeVideo.videoPublicId;
+
    return res
       .status(201)
-      .json(new ApiResponse(200, createdVideo, "Video created successfully"));
+      .json(new ApiResponse(201, safeVideo, "Video created successfully"));
 });
 
 const watchVideo = asyncHandler(async (req, res) => {
