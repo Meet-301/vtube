@@ -124,6 +124,30 @@ const getLikedVideos = asyncHandler(async (req, res) => {
       );
 });
 
+const getCurrentVideoLikes = asyncHandler(async (req, res) => {
+   const { videoId } = req.params;
+
+   if (!mongoose.Types.ObjectId.isValid(videoId)) {
+      throw new ApiError(400, "Invalid video id");
+   }
+
+   const video = await Video.findById(videoId);
+
+   if (!video) {
+      throw new ApiError(404, "Video not found");
+   }
+
+   const likes = await Like.aggregate([
+      {
+         $match: {
+            video: new mongoose.Types.ObjectId(videoId)
+         }
+      }
+   ]);
+
+   return res.status(200).json(new ApiResponse(200, likes, "Likes fetched successfully"));
+})
+
 const isLiked = asyncHandler(async (req, res) => {
    const { videoId } = req.params;
 
@@ -147,4 +171,4 @@ const isLiked = asyncHandler(async (req, res) => {
       );
 });
 
-export { toggleLikes, getLikedVideos, isLiked };
+export { toggleLikes, getLikedVideos, isLiked, getCurrentVideoLikes };

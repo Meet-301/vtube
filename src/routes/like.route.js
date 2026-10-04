@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
+   getCurrentVideoLikes,
    getLikedVideos,
    isLiked,
    toggleLikes,
@@ -12,5 +13,6 @@ likeRouter.route("/toggle/:videoId").patch(verifyJWT, toggleLikes);
 
 likeRouter.route("/all").get(verifyJWT, getLikedVideos);
 likeRouter.route("/status/:videoId").get(verifyJWT, isLiked);
+likeRouter.route("/current-video/:videoId").get(verifyJWT, getCurrentVideoLikes);
 
 export default likeRouter;
