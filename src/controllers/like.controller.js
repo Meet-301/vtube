@@ -145,7 +145,7 @@ const getCurrentVideoLikes = asyncHandler(async (req, res) => {
       }
    ]);
 
-   return res.status(200).json(new ApiResponse(200, likes, "Likes fetched successfully"));
+   return res.status(200).json(new ApiResponse(200, likes.length, "Like count fetched successfully"));
 })
 
 const isLiked = asyncHandler(async (req, res) => {
