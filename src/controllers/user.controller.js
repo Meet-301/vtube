@@ -921,6 +921,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                      views: 1,
                      owner: 1,
                      title: 1,
+                     createdAt: 1
                   },
                },
             ],
