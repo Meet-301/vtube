@@ -944,6 +944,30 @@ const getWatchHistory = asyncHandler(async (req, res) => {
       );
 });
 
+const clearWatchHistory = asyncHandler(async (req, res) => {
+   const updatedWatchHistory = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+         $set: {
+            watchHistory: [],
+         },
+      },
+      {
+         returnDocument: "after",
+      }
+   );
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(
+            200,
+            updatedWatchHistory.watchHistory,
+            "Watch history cleared successfully"
+         )
+      );
+});
+
 const removeFromWatchHistory = asyncHandler(async (req, res) => {
    const { videoId } = req.query;
 
@@ -997,4 +1021,5 @@ export {
    getUserChannelProfile,
    getWatchHistory,
    removeFromWatchHistory,
+   clearWatchHistory
 };

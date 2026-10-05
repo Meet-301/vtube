@@ -18,6 +18,7 @@ import {
    resetPassword,
    googleLogin,
    getUserById,
+   clearWatchHistory,
 } from "../controllers/user.controller.js";
 import { multerUpload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -76,5 +77,8 @@ userRouter.route("/auth/google/callback").get(
 userRouter
    .route("/watch-history/remove")
    .delete(verifyJWT, removeFromWatchHistory);
+userRouter
+   .route("/watch-history/clear")
+   .delete(verifyJWT, clearWatchHistory);
 
 export default userRouter;
