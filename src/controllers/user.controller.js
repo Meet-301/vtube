@@ -390,17 +390,7 @@ const googleLogin = asyncHandler(async (req, res) => {
          .status(200)
          .cookie("accessToken", accessToken, accessOptions)
          .cookie("refreshToken", refreshToken, refreshOptions)
-         .json(
-            new ApiResponse(
-               200,
-               {
-                  user: existingUser,
-                  accessToken,
-                  refreshToken,
-               },
-               "Google login successful"
-            )
-         );
+         .redirect(`${process.env.FRONTEND_URL}/`);
    } else {
       const user = await User.create({
          fullName,
@@ -418,17 +408,7 @@ const googleLogin = asyncHandler(async (req, res) => {
          .status(200)
          .cookie("accessToken", accessToken, accessOptions)
          .cookie("refreshToken", refreshToken, refreshOptions)
-         .json(
-            new ApiResponse(
-               200,
-               {
-                  user,
-                  accessToken,
-                  refreshToken,
-               },
-               "Google login successful"
-            )
-         );
+         .redirect(`${process.env.FRONTEND_URL}/`);
    }
 });
 
