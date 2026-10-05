@@ -375,7 +375,7 @@ const googleLogin = asyncHandler(async (req, res) => {
 
    if (existingUser) {
       const { accessToken, refreshToken } =
-         await generateAccessAndRefreshTokens(req.user._id);
+         await generateAccessAndRefreshTokens(existingUser._id);
 
       return res
          .status(200)
