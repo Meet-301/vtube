@@ -1,11 +1,11 @@
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
     EyeIcon,
     EyeSlashIcon,
     CheckCircleIcon,
     WarningCircleIcon
 } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import api from "../api/axios.js";
 import { LoadingOverlay } from "@mantine/core";
@@ -17,9 +17,23 @@ function Login() {
 
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
     const {register, handleSubmit, reset} = useForm();
+
     const dispatch = useDispatch();
+
     const navigate = useNavigate();
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const oAuthError = searchParams.get("error");
+
+    useEffect(() => {
+        if(oAuthError) {
+            showError(oAuthError);
+
+            setSearchParams({}, {replace: true});
+        }
+    }, [oAuthError])
 
     function showError(error) {
         notifications.show({
@@ -68,21 +82,33 @@ function Login() {
         }
     }
 
+    async function handleGoogleLogin() {
+        try {
+            setIsLoading(true);
+
+            const res = await api.get("/users/auth/google");
+
+            showSuccess(res.data?.message);
+        } catch (error) {
+            showError(error?.response?.data?.message || "Something went wrong");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     return (
         <main className="
             min-h-dvh
             bg-background
             text-text-primary
         ">
-
-            {isLoading &&
-                <LoadingOverlay
-                    visible={isLoading}
-                    zIndex={1000}
-                    overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
-                    loaderProps={{ color: "blue", type: "oval" }}
-                />
-            }
+            
+            <LoadingOverlay
+                visible={isLoading}
+                zIndex={1000}
+                overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+                loaderProps={{ color: "blue", type: "oval" }}
+            />
 
             <div className="
                 flex
@@ -453,6 +479,9 @@ function Login() {
 
                         <button
                             type="button"
+                            onClick={() => {
+                                window.location.href = `${import.meta.env.VITE_API_URL}/users/auth/google`;
+                            }}
                             className="
                                 flex
                                 h-11

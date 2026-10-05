@@ -72,7 +72,7 @@ const router = createBrowserRouter(
     <Route element={<App />} path='/'>
       <Route element={<ProtectedRoute/>}>
         <Route element={<Home />} path='' />
-        <Route element={<Watch />} path='watch' />
+        <Route element={<Watch />} path='watch/:videoId' />
         <Route element={<History />} path='history' />
         <Route element={<Channel />} path='channel' />
         <Route element={<Subscriptions />} path='subscriptions' />

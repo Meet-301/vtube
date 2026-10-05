@@ -1,14 +1,91 @@
-import { TrashIcon } from "@phosphor-icons/react";
-
+import { TrashIcon, WarningCircleIcon, CheckCircleIcon, ClockCounterClockwiseIcon } from "@phosphor-icons/react";
 import {
     SearchButton,
-    Sidebar,
     VideoCard,
 } from "../components";
+import { useEffect, useState } from "react";
+import api from "../api/axios.js";
+import { LoadingOverlay } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { Link } from "react-router-dom";
+import { Loader } from "@mantine/core";
 
 function History() {
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [historyVideos, setHistoryVideos] = useState([]);
+
+    function showError(error) {
+        notifications.show({
+            title: error || "Invalid or expired verification link",
+            color: "red",
+            icon: <WarningCircleIcon/>
+        });
+    }
+
+    function showSuccess(message) {
+        notifications.show({
+            title: message,
+            icon: <CheckCircleIcon/>,
+            color: "vtube",
+        });
+    }
+
+    async function loadHistory() {
+        try {
+            const res = await api.get("/users/history/watch-history");
+
+            setHistoryVideos(res.data?.data);
+        } catch (error) {
+            showError(error?.response?.data?.message || "Something went wrong");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    async function handleDelete(id) {
+        try {
+            setIsLoading(true);
+
+            const res = await api.delete(
+                "/users/watch-history/remove", 
+                {params: {
+                    videoId: id
+                }}
+            );
+
+            showSuccess(res.data?.message || "Video removed successfully");
+            await loadHistory();
+        } catch (error) {
+            showError(error?.response?.data?.message || "Something went wrong");
+        }
+    }
+
+    async function clearHistory() {
+        try {
+            setIsLoading(true);
+
+            const res = await api.delete("/users/watch-history/clear");
+
+            showSuccess(res.data?.message || "Watch history cleared successfully");
+            await loadHistory();
+        } catch (error) {
+            showError(error?.response?.data?.message || "Something went wrong");
+        }
+    }
+
+    useEffect(() => {loadHistory()}, [historyVideos]);
+
     return (
         <main className="min-w-0">
+
+            <LoadingOverlay
+                visible={isLoading}
+                zIndex={1000}
+                overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+                loaderProps={{ color: "blue", type: "oval" }}
+            />
+
             <div className="min-w-0 p-4">
 
                 <div
@@ -86,6 +163,7 @@ function History() {
                             {/* Clear history */}
                             <button
                                 type="button"
+                                onClick={clearHistory}
                                 className="
                                     flex
                                     w-full
@@ -125,18 +203,27 @@ function History() {
                             xl:pr-80
                         "
                     >
-                        <h2
-                            className="
-                                text-lg
-                                font-semibold
-                                text-text-primary
-                                md:text-xl
-                            "
-                        >
-                            Today
-                        </h2>
+                        {historyVideos.length === 0 && !isLoading && (
+                            <div className="flex flex-col items-center justify-center py-20 text-center">
+                                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-surface">
+                                    <ClockCounterClockwiseIcon
+                                        size={48}
+                                        weight="regular"
+                                        className="text-text-muted"
+                                    />
+                                </div>
 
-                        {/* TODAY VIDEOS */}
+                                <h2 className="mt-5 text-lg font-semibold text-text-primary">
+                                    No watch history yet
+                                </h2>
+
+                                <p className="mt-1 max-w-sm text-sm text-text-secondary">
+                                    Videos you watch will show up here.
+                                </p>
+                            </div>
+                        )}
+
+                        {/* VIDEOS */}
                         <div
                             className="
                                 mt-5
@@ -145,16 +232,29 @@ function History() {
                                 space-y-6
                             "
                         >
-                            <VideoCard
-                                thumbnail="https://picsum.photos/seed/history1/640/360"
-                                title="🔥 *FREE TEMPLATE* Create ATS Resume from Scratch | Freshers & Experienced"
-                                channelName="Riya Ranjan"
-                                views="5.7K views"
-                                uploadedAt="2 days ago"
-                                duration="8:55"
-                                variant="horizontal"
-                                editButton={false}
-                            />
+                            {
+                                isLoading
+                                ?
+                                    <Loader
+                                        color="blue"
+                                        size={21}
+                                    />
+                                :
+                               historyVideos.map((video) => (
+                                    <Link to={`/watch/${video._id}`}>
+                                        <VideoCard
+                                            key={video._id}
+                                            channelName={video.owner?.fullName}
+                                            variant="horizontal"
+                                            editButton={false}
+                                            onDeleteClick={() => handleDelete(video._id)}
+                                            deleteText="Remove"
+                                            {...video}
+                                        />
+                                    </Link>
+                                ))
+                            }
+
                         </div>
 
                     </section>

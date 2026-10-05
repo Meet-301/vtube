@@ -85,7 +85,7 @@ function ProfileMenu() {
                 onClick={() => setIsopen(!isOpen)}
                 className="
                     flex
-                    h-14 w-14 mt-1
+                    h-11 w-11 mt-1
                     items-center justify-center
                     rounded-full
                     transition-all duration-200

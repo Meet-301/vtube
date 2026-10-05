@@ -1,96 +1,45 @@
+import api from "../api/axios";
 import {
     VideoCard,
     CategoryBar,
     Sidebar
 } from "../components";
+import { useState, useEffect } from "react";
+import { LoadingOverlay } from "@mantine/core";
+import { Link } from "react-router-dom";
 
 function Home() {
-    const videos = [
-        {
-            thumbnail: "https://picsum.photos/seed/vtube1/640/360",
-            title: "Building a Full Stack Video Platform with MERN",
-            avatar: "https://i.pravatar.cc/150?img=12",
-            channelName: "Code With Meet",
-            views: "12K views",
-            duration: "5:07",
-            uploadedAt: "2 days ago",
-        },
-        {
-            thumbnail: "https://picsum.photos/seed/vtube2/640/360",
-            title: "React Hooks Explained in Simple Terms",
-            avatar: "https://i.pravatar.cc/150?img=32",
-            channelName: "Dev Academy",
-            views: "8.4K views",
-            duration: "5:07",
-            uploadedAt: "5 days ago",
-        },
-        {
-            thumbnail: "https://picsum.photos/seed/vtube3/640/360",
-            title: "MongoDB Aggregation Pipeline Tutorial",
-            avatar: "https://i.pravatar.cc/150?img=45",
-            channelName: "Backend Lab",
-            views: "21K views",
-            duration: "5:07",
-            uploadedAt: "1 week ago",
-        },
-        {
-            thumbnail: "https://picsum.photos/seed/vtube4/640/360",
-            title: "How I Built My First Production Web App",
-            avatar: "https://i.pravatar.cc/150?img=56",
-            channelName: "Code Stories",
-            views: "34K views",
-            duration: "5:07",
-            uploadedAt: "2 weeks ago",
-        },
-        {
-            thumbnail: "https://picsum.photos/seed/vtube5/640/360",
-            title: "JavaScript Async Await Finally",
-            avatar: "https://i.pravatar.cc/150?img=68",
-            channelName: "JS Simplified",
-            views: "17K views",
-            duration: "5:07",
-            uploadedAt: "3 weeks ago",
-        },
-        {
-            thumbnail: "https://picsum.photos/seed/vtube6/640/360",
-            title: "What Actually Happens When You Call an API?",
-            avatar: "https://i.pravatar.cc/150?img=11",
-            channelName: "Web Dev Daily",
-            views: "9.7K views",
-            duration: "1:35:07",
-            uploadedAt: "1 month ago",
-        },
-        {
-            thumbnail: "https://picsum.photos/seed/vtube4/640/360",
-            title: "How I Built My First Production Web App",
-            avatar: "https://i.pravatar.cc/150?img=56",
-            channelName: "Code Stories",
-            views: "34K views",
-            duration: "42:14",
-            uploadedAt: "2 weeks ago",
-        },
-        {
-            thumbnail: "https://picsum.photos/seed/vtube5/640/360",
-            title: "JavaScript Async Await Finally Explained",
-            avatar: "https://i.pravatar.cc/150?img=68",
-            channelName: "JS Simplified",
-            views: "17K views",
-            duration: "5:07",
-            uploadedAt: "3 weeks ago",
-        },
-        {
-            thumbnail: "https://picsum.photos/seed/vtube6/640/360",
-            title: "What Actually Happens When You Call an API?",
-            avatar: "https://i.pravatar.cc/150?img=11",
-            channelName: "Web Dev Daily",
-            views: "9.7K views",
-            duration: "5:07",
-            uploadedAt: "1 month ago",
-        },
-    ];
+    const [videos, setVideos] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchVideos() {
+            try {
+                const response = await api.get("/videos/all");
+
+                setVideos(response.data?.data || []);
+            } catch (error) {
+                console.log(
+                    "Failed to fetch videos:",
+                    error.response?.data || error
+                );
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchVideos();
+    }, []);
 
     return (
         <main className="flex min-w-0">
+
+            <LoadingOverlay
+                visible={isLoading}
+                zIndex={1000}
+                overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+                loaderProps={{ color: "blue", type: "oval" }}
+            />
 
             <Sidebar />
 
@@ -110,13 +59,17 @@ function Home() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-                    {videos.map((video, index) => (
-                        <VideoCard
-                            key={index}
-                            {...video}
-                            editButton={false}
-                            deleteButton={false}
-                        />
+                    {videos.map((video) => (
+                        <Link to={`/watch/${video._id}`}>
+                            <VideoCard
+                                key={video._id}
+                                channelName={video.owner.fullName}
+                                avatar={video.owner.avatar}
+                                {...video}
+                                editButton={false}
+                                deleteButton={false}
+                            />
+                        </Link>
                     ))}
                 </div>
 

@@ -37,11 +37,6 @@ function App() {
           "/users/refresh-token"
         );
 
-        console.log(
-          "Refresh response:",
-          refreshResponse.data
-        );
-
         const accessToken =
           refreshResponse.data?.data?.accessToken;
 
@@ -53,11 +48,6 @@ function App() {
 
         const userResponse = await api.get(
           "/users/current-user"
-        );
-
-        console.log(
-          "Current user:",
-          userResponse.data
         );
 
         const user = userResponse.data?.data;

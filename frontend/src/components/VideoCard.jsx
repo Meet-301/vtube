@@ -3,6 +3,7 @@ import {
 } from "@phosphor-icons/react";
 
 import { MoreButton } from "./index.js";
+import { formatDuration, formatViews, timeAgo } from "../utils/formatters.js";
 
 function VideoCard({
     thumbnail,
@@ -10,7 +11,7 @@ function VideoCard({
     avatar,
     channelName,
     views,
-    uploadedAt,
+    createdAt,
     duration,
     variant = "grid",
     deleteText = "Delete",
@@ -156,7 +157,7 @@ function VideoCard({
                                 text-white
                             "
                         >
-                            {duration}
+                            {formatDuration(duration)}
                         </span>
                     )}
 
@@ -271,7 +272,7 @@ function VideoCard({
                                 sm:leading-6
                             "
                         >
-                            {views} • {uploadedAt}
+                            {views === 0 ? "No views" : formatViews(views)} • {timeAgo(createdAt)}
                         </p>
 
                     </div>
