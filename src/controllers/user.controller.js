@@ -374,6 +374,15 @@ const googleLogin = asyncHandler(async (req, res) => {
    const existingUser = await User.findOne({ email });
 
    if (existingUser) {
+
+      if (!existingUser.googleId) {
+         return res.redirect(
+            `${process.env.FRONTEND_URL}/login?error=${encodeURIComponent(
+               "This email is registered with password. Please login with email and password."
+            )}`
+         );
+      }
+
       const { accessToken, refreshToken } =
          await generateAccessAndRefreshTokens(existingUser._id);
 
