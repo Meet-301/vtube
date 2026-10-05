@@ -928,6 +928,10 @@ const getWatchHistory = asyncHandler(async (req, res) => {
       },
    ]);
 
+   if(!videos) {
+      throw new ApiError(400, "Something went wrong");
+   }
+
    return res
       .status(200)
       .json(

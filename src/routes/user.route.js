@@ -60,7 +60,7 @@ userRouter
 userRouter.route("/current-user").get(verifyJWT, getCurrentUser);
 userRouter.route("/:userId").get(verifyJWT, getUserById);
 userRouter.route("/channel/:username").get(verifyJWT, getUserChannelProfile);
-userRouter.route("/watch-history").get(verifyJWT, getWatchHistory);
+userRouter.route("/history/watch-history").get(verifyJWT, getWatchHistory);
 userRouter.route("/auth/google").get(
    passport.authenticate("google", {
       scope: ["profile", "email"]
