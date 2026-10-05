@@ -367,7 +367,7 @@ const googleLogin = asyncHandler(async (req, res) => {
 
    const fullName = profile.displayName;
    const email = profile.emails[0].value;
-   const avatar = profile.photos[0].value;
+   let avatar = profile.photos[0].value;
    const googleId = profile.id;
    const username = email.split("@")[0];
 
@@ -386,6 +386,15 @@ const googleLogin = asyncHandler(async (req, res) => {
       const { accessToken, refreshToken } =
          await generateAccessAndRefreshTokens(existingUser._id);
 
+      avatar = await uploadOnCloudinary(avatar);
+
+      if (!avatar) {
+         throw new ApiError(
+            400,
+            "Something went wrong while uploading avatar on cloudinary"
+         );
+      }
+
       return res
          .status(200)
          .cookie("accessToken", accessToken, accessOptions)
@@ -395,7 +404,7 @@ const googleLogin = asyncHandler(async (req, res) => {
       const user = await User.create({
          fullName,
          email,
-         avatar,
+         avatar: avatar.url,
          googleId,
          username,
          isVerified: true,
