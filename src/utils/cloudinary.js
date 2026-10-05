@@ -8,6 +8,19 @@ cloudinary.config({
    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const uploadFromUrl = async (remoteUrl) => {
+   try {
+      if (!remoteUrl) return null;
+
+      return await cloudinary.uploader.upload(remoteUrl, {
+         resource_type: "image",
+      });
+   } catch (error) {
+      console.log(error?.message);
+      return null;
+   }
+};
+
 const uploadOnCloudinary = async (localFilePath, options = {}) => {
    try {
       if (!localFilePath) return null;
@@ -52,4 +65,4 @@ const deleteFromCloudinary = async (
    }
 };
 
-export {uploadOnCloudinary, deleteFromCloudinary};
+export {uploadOnCloudinary, deleteFromCloudinary, uploadFromUrl};

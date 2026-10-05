@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import {
    uploadOnCloudinary,
    deleteFromCloudinary,
+   uploadFromUrl,
 } from "../utils/cloudinary.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
@@ -363,61 +364,69 @@ const resetPassword = asyncHandler(async (req, res) => {
 });
 
 const googleLogin = asyncHandler(async (req, res) => {
-   const profile = req.user;
+   const redirectWithError = (message) =>
+      res.redirect(
+         `${process.env.FRONTEND_URL}/login?error=${encodeURIComponent(message)}`
+      );
 
-   const fullName = profile.displayName;
-   const email = profile.emails[0].value;
-   let avatar = profile.photos[0].value;
-   const googleId = profile.id;
-   const username = email.split("@")[0];
+   try {
+      const profile = req.user;
 
-   const existingUser = await User.findOne({ email });
+      const fullName = profile.displayName;
+      const email = profile.emails[0].value;
+      const googleAvatar = profile.photos?.[0]?.value;
+      const googleId = profile.id;
+      const baseUsername = email.split("@")[0].toLowerCase();
 
-   if (existingUser) {
+      let existingUser = await User.findOne({ email });
 
-      if (!existingUser.googleId) {
-         return res.redirect(
-            `${process.env.FRONTEND_URL}/login?error=${encodeURIComponent(
-               "This email is registered with password. Please login with email and password."
-            )}`
+      if (existingUser && !existingUser.googleId) {
+         return redirectWithError(
+            "This email is registered with password. Please login with email and password."
          );
       }
 
-      const { accessToken, refreshToken } =
-         await generateAccessAndRefreshTokens(existingUser._id);
+      let userId;
 
-      avatar = await uploadOnCloudinary(avatar);
+      if (existingUser) {
+         userId = existingUser._id;
+      } else {
+         //! save the avatar on cloudinary.. if fails, fall on google URL callbacl
+         const uploadedAvatar = await uploadFromUrl(googleAvatar);
+         const avatar = uploadedAvatar?.secure_url || googleAvatar;
 
-      if (!avatar) {
-         throw new ApiError(
-            400,
-            "Something went wrong while uploading avatar on cloudinary"
-         );
+         if (!avatar) {
+            return redirectWithError("Could not get profile picture from Google");
+         }
+
+         //! keep the username unique
+         let finalUsername = baseUsername;
+         while (await User.findOne({ username: finalUsername })) {
+            finalUsername = `${baseUsername}${Math.floor(Math.random() * 10000)}`;
+         }
+
+         const user = await User.create({
+            fullName,
+            email,
+            avatar,
+            googleId,
+            username: finalUsername,
+            isVerified: true,
+         });
+
+         userId = user._id;
       }
 
-      return res
-         .status(200)
-         .cookie("accessToken", accessToken, accessOptions)
-         .cookie("refreshToken", refreshToken, refreshOptions)
-         .redirect(`${process.env.FRONTEND_URL}/`);
-   } else {
-      const user = await User.create({
-         fullName,
-         email,
-         avatar: avatar.url,
-         googleId,
-         username,
-         isVerified: true,
-      });
-
       const { accessToken, refreshToken } =
-         await generateAccessAndRefreshTokens(user._id);
+         await generateAccessAndRefreshTokens(userId);
 
       return res
-         .status(200)
          .cookie("accessToken", accessToken, accessOptions)
          .cookie("refreshToken", refreshToken, refreshOptions)
          .redirect(`${process.env.FRONTEND_URL}/`);
+   } catch (error) {
+      console.log("Google login error:", error);
+      return redirectWithError("Google login failed. Please try again.");
    }
 });
 
