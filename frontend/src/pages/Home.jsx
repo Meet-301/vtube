@@ -12,10 +12,16 @@ function Home() {
     const [videos, setVideos] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    const [sortBy, setSortBy] = useState("latest");
+
     useEffect(() => {
         async function fetchVideos() {
             try {
-                const response = await api.get("/videos/all");
+                setIsLoading(true);
+
+                const response = await api.get("/videos/all", {
+                    params: { sortBy },
+                });
 
                 setVideos(response.data?.data || []);
             } catch (error) {
@@ -29,7 +35,7 @@ function Home() {
         }
 
         fetchVideos();
-    }, []);
+    }, [sortBy]);
 
     return (
         <main className="flex min-w-0">
@@ -55,16 +61,15 @@ function Home() {
                         backdrop-blur-xl
                     "
                 >
-                    <CategoryBar />
+                    <CategoryBar selected={sortBy} onSelect={setSortBy} />
                 </div>
 
                 <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
                     {videos.map((video) => (
-                        <Link to={`/watch/${video._id}`}>
+                        <Link key={video._id} to={`/watch/${video._id}`}>
                             <VideoCard
-                                key={video._id}
-                                channelName={video.owner.fullName}
-                                avatar={video.owner.avatar}
+                                channelName={video.owner?.fullName}
+                                avatar={video.owner?.avatar}
                                 {...video}
                                 editButton={false}
                                 deleteButton={false}

@@ -155,12 +155,21 @@ const watchVideo = asyncHandler(async (req, res) => {
 });
 
 const getAllVideos = asyncHandler(async (req, res) => {
-   const { page = 1, limit = 10 } = req.query;
+   const { page = 1, limit = 10, sortBy = "latest" } = req.query;
 
    const pageNumber = Number(page);
    const limitNumber = Number(limit);
 
    const skip = (pageNumber - 1) * limitNumber;
+
+   const sortMap = {
+      latest: { createdAt: -1 },
+      oldest: { createdAt: 1 },
+      mostliked: { likes: -1, createdAt: -1 },
+      mostviewed: { views: -1, createdAt: -1 },
+   };
+
+   const sort = sortMap[sortBy] || sortMap.latest;
 
    const videos = await Video.aggregate([
       {
@@ -193,7 +202,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
       },
       {
          $sort: {
-            createdAt: -1
+            createdAt: sort
          }
       }
    ]);

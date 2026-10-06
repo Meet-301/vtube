@@ -1,19 +1,20 @@
-function CategoryBar() {
+function CategoryBar({ selected = "latest", onSelect }) {
 
     const categories = [
-        "All Videos",
-        "Most Liked",
-        "Most Viewed",
-        "Oldest",
+        { label: "All Videos", value: "latest" },
+        { label: "Most Liked", value: "mostliked" },
+        { label: "Most Viewed", value: "mostviewed" },
+        { label: "Oldest", value: "oldest" }
     ];
-
+    
     return (
         <div className="w-full min-w-0 overflow-x-auto px-4 py-3">
             <div className="flex w-max gap-3">
-                {categories.map((category, index) => (
+                {categories.map((category) => (
                     <button
-                        key={category}
+                        key={category.value}
                         type="button"
+                        onClick={() => onSelect?.(category.value)}
                         className={`
                             shrink-0
                             whitespace-nowrap
@@ -24,13 +25,13 @@ function CategoryBar() {
                             transition-colors
                             duration-200
                             active:scale-95
-                            ${index === 0
+                            ${selected === category.value
                                 ? "bg-primary text-white"
                                 : "bg-surface text-text-secondary hover:bg-surface-elevated active:bg-surface-elevated hover:text-text-primary"
                             }
                         `}
                     >
-                        {category}
+                        {category.label}
                     </button>
                 ))}
             </div>
