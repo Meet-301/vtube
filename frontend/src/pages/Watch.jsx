@@ -11,7 +11,7 @@ import {
 import { useParams } from "react-router-dom";
 import api from "../api/axios";
 import { Loader, LoadingOverlay } from "@mantine/core";
-import { formatViews, timeAgo } from "../utils/formatters";
+import { formatViews, timeAgo, formatDuration } from "../utils/formatters";
 import { useForm } from "react-hook-form";
 import {
     CheckCircleIcon,
@@ -22,18 +22,37 @@ import { notifications } from "@mantine/notifications";
 function Watch() {
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [openUpward, setOpenUpward] = useState(false);
+
     const [isLoading, setIsLoading] = useState(true);
-    const [commentLoading, setCommentLoading] = useState(true);
-    const [likeLoading, setLikeLoading] = useState(false);
+    
     const [videoData, setVideoData] = useState({});
+
     const [userData, setUserData] = useState({});
     const [currentUserData, setCurrentUserData] = useState({});
+
     const [channelData, setChannelData] = useState({});
+    
+    const [commentLoading, setCommentLoading] = useState(true);
     const [commentData, setCommentData] = useState([]);
+    
     const [editingId, setEditingId] = useState(null);
     const [editText, setEditText] = useState("");
+    
+    const [likeLoading, setLikeLoading] = useState(false);
     const [isLiked, setIsLiked] = useState(null);
     const [likeCount, setLikeCount] = useState(null);
+
+    const [notes, setNotes] = useState([]);
+    const [notesLoading, setNotesLoading] = useState(true);
+    const [isAddingNote, setIsAddingNote] = useState(false);
+    const [newNoteTitle, setNewNoteTitle] = useState("");
+    const [newNoteDescription, setNewNoteDescription] = useState("");
+    const [newNoteTime, setNewNoteTime] = useState(1);
+    const [editingNoteId, setEditingNoteId] = useState(null);
+    const [editNoteTitle, setEditNoteTitle] = useState("");
+    const [editNoteDescription, setEditNoteDescription] = useState("");
+
+    const videoRef = useRef(null);
 
     const { register, handleSubmit, reset } = useForm();
 
@@ -88,11 +107,13 @@ function Watch() {
         }
     }
 
+    //! comment edit function
     function startEdit(comment) {
         setEditingId(comment._id);
         setEditText(comment.content);
     }
 
+    //! comment edit cancel
     function cancelEdit() {
         setEditingId(null);
         setEditText("");
@@ -122,6 +143,7 @@ function Watch() {
         }
     }
 
+    //! comment update
     async function handleUpdate(commentId) {
         if (!editText.trim()) {
             showError("Comment cannot be empty");
@@ -141,6 +163,7 @@ function Watch() {
         }
     }
 
+    //! comment delete
     async function handleDelete(commentId) {
         if (!window.confirm("Delete this comment?")) return;
 
@@ -152,6 +175,112 @@ function Watch() {
         } catch (error) {
             showError(error?.response?.data?.message || "Something went wrong");
         }
+    }
+
+    //! fetch notes (sorted according to timestamp)
+    async function fetchNotes() {
+        try {
+            setNotesLoading(true);
+            const res = await api.get(`/video-notes/${params.videoId}`);
+            const data = res.data?.data || [];
+
+            setNotes([...data].sort((a, b) => a.timestamp - b.timestamp));
+        } catch (error) {
+            console.log(`Failed to load the notes ${error}`);
+        } finally {
+            setNotesLoading(false);
+        }
+    }
+
+    //! Grab the video timestamp immediately after clicking "Add note"
+    function openAddNote() {
+        //! minimum 1 second validation
+        const time = Math.max(1, Math.floor(videoRef.current?.currentTime || 0));
+
+        setNewNoteTime(time);
+        setNewNoteTitle("");
+        setNewNoteDescription("");
+        setIsAddingNote(true);
+    }
+
+    function cancelAddNote() {
+        setIsAddingNote(false);
+        setNewNoteTitle("");
+        setNewNoteDescription("");
+    }
+
+    async function handleAddNote() {
+        if (!newNoteTitle.trim() || !newNoteDescription.trim()) {
+            showError("Title and description both are required");
+            return;
+        }
+
+        try {
+            const res = await api.post(`/video-notes/${params.videoId}`, {
+                title: newNoteTitle.trim(),
+                description: newNoteDescription.trim(),
+                timestamp: newNoteTime,
+            });
+
+            showSuccess(res.data?.message || "Note added successfully");
+            cancelAddNote();
+            await fetchNotes();
+        } catch (error) {
+            showError(error?.response?.data?.message || "Something went wrong");
+        }
+    }
+
+    function startEditNote(note) {
+        setEditingNoteId(note._id);
+        setEditNoteTitle(note.title);
+        setEditNoteDescription(note.description);
+    }
+
+    function cancelEditNote() {
+        setEditingNoteId(null);
+        setEditNoteTitle("");
+        setEditNoteDescription("");
+    }
+
+    async function handleUpdateNote(noteId) {
+        if (!editNoteTitle.trim() || !editNoteDescription.trim()) {
+            showError("Title and description both are required");
+            return;
+        }
+
+        try {
+            const res = await api.patch(`/video-notes/${noteId}`, {
+                title: editNoteTitle.trim(),
+                description: editNoteDescription.trim(),
+            });
+
+            showSuccess(res.data?.message || "Note updated successfully");
+            cancelEditNote();
+            await fetchNotes();
+        } catch (error) {
+            showError(error?.response?.data?.message || "Something went wrong");
+        }
+    }
+
+    async function handleDeleteNote(noteId) {
+        if (!window.confirm("Delete this note?")) return;
+
+        try {
+            const res = await api.delete(`/video-notes/${noteId}`);
+
+            showSuccess(res.data?.message || "Note deleted successfully");
+            await fetchNotes();
+        } catch (error) {
+            showError(error?.response?.data?.message || "Something went wrong");
+        }
+    }
+
+    //! jump to the specific timestamp of the video by cliking the note
+    function seekTo(seconds) {
+        if (!videoRef.current) return;
+
+        videoRef.current.currentTime = seconds;
+        videoRef.current.play();
     }
 
     useEffect(() => {
@@ -188,11 +317,14 @@ function Watch() {
                 const channel = await api.get(`/users/channel/${res.data?.data?.username}`);
                 setChannelData(channel.data?.data || {});
 
-                //! fetch comments initially at the time entering the page
+                //! fetch comments
                 fetchComments();
 
-                //! fetch likes initially
+                //! fetch likes
                 fetchLikeDetails();
+
+                //! fetch timestamp notes
+                fetchNotes();
             } catch (error) {
                 console.log(`Failed to load the video ${error}`);
             } finally {
@@ -249,6 +381,7 @@ function Watch() {
                         {/* Video Player */}
                         <div className="aspect-video overflow-hidden rounded-2xl bg-surface">
                             <video
+                                ref={videoRef}
                                 key={videoData.videoFile}
                                 className="h-full w-full"
                                 controls
@@ -550,6 +683,7 @@ function Watch() {
 
                                 <button
                                     type="button"
+                                    onClick={openAddNote}
                                     className="
                                         shrink-0
                                         rounded-full
@@ -572,76 +706,157 @@ function Watch() {
 
                             <div className="my-4 border-t border-border" />
 
-                            {/* Dummy Notes */}
-                            <div className="space-y-3">
+                            {/* Add note form */}
+                            {isAddingNote && (
+                                <div className="mb-4 rounded-xl bg-background p-3">
 
-                                <button
-                                    type="button"
-                                    className="
-                                        w-full
-                                        rounded-xl
-                                        p-3
-                                        text-left
-                                        transition-colors
-                                        hover:bg-surface-elevated
-                                        active:bg-surface-elevated
-                                        active:scale-[0.99]
-                                    "
-                                >
                                     <span className="text-sm font-semibold text-primary">
-                                        02:14
+                                        {formatDuration(newNoteTime)}
                                     </span>
 
-                                    <p className="mt-1 text-sm leading-5 text-text-secondary">
-                                        Important concept explained here.
+                                    <input
+                                        type="text"
+                                        value={newNoteTitle}
+                                        onChange={(e) => setNewNoteTitle(e.target.value)}
+                                        placeholder="Note title"
+                                        autoFocus
+                                        className="mt-2 w-full border-b border-primary bg-transparent px-1 py-2 text-sm text-text-primary outline-none placeholder:text-text-muted"
+                                    />
+
+                                    <textarea
+                                        rows={3}
+                                        value={newNoteDescription}
+                                        onChange={(e) => setNewNoteDescription(e.target.value)}
+                                        placeholder="Description"
+                                        className="mt-2 w-full resize-none border-b border-border bg-transparent px-1 py-2 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-primary"
+                                    />
+
+                                    <div className="mt-3 flex justify-end gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={cancelAddNote}
+                                            className="rounded-full bg-surface-elevated px-4 py-2 text-sm font-semibold text-text-primary transition-all active:scale-95"
+                                        >
+                                            Cancel
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={handleAddNote}
+                                            className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary-hover active:scale-95"
+                                        >
+                                            Save
+                                        </button>
+                                    </div>
+
+                                </div>
+                            )}
+
+                            {/* Notes list */}
+                            <div className="relative min-h-16 space-y-3">
+
+                                {notesLoading ? (
+                                    <LoadingOverlay
+                                        visible={notesLoading}
+                                        zIndex={10}
+                                        overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+                                        loaderProps={{ color: "blue", type: "oval" }}
+                                    />
+                                ) : notes.length === 0 ? (
+                                    <p className="py-6 text-center text-sm text-text-secondary">
+                                        No notes yet. Pause the video and add one.
                                     </p>
-                                </button>
+                                ) : (
+                                    notes.map((note) => (
+                                        <div
+                                            key={note._id}
+                                            className="rounded-xl p-3 transition-colors hover:bg-surface-elevated"
+                                        >
 
-                                <button
-                                    type="button"
-                                    className="
-                                        w-full
-                                        rounded-xl
-                                        p-3
-                                        text-left
-                                        transition-colors
-                                        hover:bg-surface-elevated
-                                        active:bg-surface-elevated
-                                        active:scale-[0.99]
-                                    "
-                                >
-                                    <span className="text-sm font-semibold text-primary">
-                                        05:37
-                                    </span>
+                                            <div className="flex items-center justify-between gap-2">
 
-                                    <p className="mt-1 text-sm leading-5 text-text-secondary">
-                                        MongoDB aggregation pipeline starts.
-                                    </p>
-                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => seekTo(note.timestamp)}
+                                                    className="text-sm font-semibold text-primary active:scale-95"
+                                                >
+                                                    {formatDuration(note.timestamp)}
+                                                </button>
 
+                                                {editingNoteId !== note._id && (
+                                                    <div className="flex items-center gap-1">
+                                                        <button
+                                                            type="button"
+                                                            aria-label="Edit note"
+                                                            onClick={() => startEditNote(note)}
+                                                            className="rounded-full p-2 text-text-secondary transition-all hover:bg-surface active:scale-95"
+                                                        >
+                                                            <PencilSimpleIcon size={16} />
+                                                        </button>
 
+                                                        <button
+                                                            type="button"
+                                                            aria-label="Delete note"
+                                                            onClick={() => handleDeleteNote(note._id)}
+                                                            className="rounded-full p-2 text-text-secondary transition-all hover:bg-surface active:scale-95"
+                                                        >
+                                                            <TrashIcon size={16} />
+                                                        </button>
+                                                    </div>
+                                                )}
 
-                                <button
-                                    type="button"
-                                    className="
-                                        w-full
-                                        rounded-xl
-                                        p-3
-                                        text-left
-                                        transition-colors
-                                        hover:bg-surface-elevated
-                                        active:bg-surface-elevated
-                                        active:scale-[0.99]
-                                    "
-                                >
-                                    <span className="text-sm font-semibold text-primary">
-                                        11:42
-                                    </span>
+                                            </div>
 
-                                    <p className="mt-1 text-sm leading-5 text-text-secondary">
-                                        Error handling explanation.
-                                    </p>
-                                </button>
+                                            {editingNoteId === note._id ? (
+                                                <div className="mt-1">
+                                                    <input
+                                                        type="text"
+                                                        value={editNoteTitle}
+                                                        onChange={(e) => setEditNoteTitle(e.target.value)}
+                                                        autoFocus
+                                                        className="w-full border-b border-primary bg-transparent px-1 py-2 text-sm text-text-primary outline-none"
+                                                    />
+
+                                                    <textarea
+                                                        rows={3}
+                                                        value={editNoteDescription}
+                                                        onChange={(e) => setEditNoteDescription(e.target.value)}
+                                                        className="mt-2 w-full resize-none border-b border-border bg-transparent px-1 py-2 text-sm text-text-primary outline-none focus:border-primary"
+                                                    />
+
+                                                    <div className="mt-3 flex justify-end gap-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={cancelEditNote}
+                                                            className="rounded-full bg-surface px-4 py-2 text-sm font-semibold text-text-primary transition-all active:scale-95"
+                                                        >
+                                                            Cancel
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleUpdateNote(note._id)}
+                                                            className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary-hover active:scale-95"
+                                                        >
+                                                            Save
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <p className="mt-1 text-sm font-semibold text-text-primary">
+                                                        {note.title}
+                                                    </p>
+
+                                                    <p className="mt-1 whitespace-pre-line text-sm leading-5 text-text-secondary">
+                                                        {note.description}
+                                                    </p>
+                                                </>
+                                            )}
+
+                                        </div>
+                                    ))
+                                )}
 
                             </div>
 
