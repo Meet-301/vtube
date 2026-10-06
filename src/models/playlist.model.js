@@ -17,6 +17,7 @@ const playlistSchema = new Schema(
       },
       playlistCover: {
          type: String,
+         required: true
       },
       videos: [
          {

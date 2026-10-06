@@ -18,7 +18,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
    const playlistCover = req.file?.path;
    let playlistCoverPath;
 
-   if (name === "" || description === "") {
+   if (name === "" || description === "" || !playlistCoverPath) {
       throw new ApiError(400, "All fields are required");
    }
 
