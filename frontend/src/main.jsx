@@ -29,7 +29,6 @@ import {
   ForgotPassword,
   VerifyEmail,
   ResetPassword,
-  CreatePlaylist,
   EditPlaylist
 } from './pages'
 import classes from './Notifications.module.css'
@@ -77,7 +76,6 @@ const router = createBrowserRouter(
         <Route element={<Channel />} path='channel' />
         <Route element={<Subscriptions />} path='subscriptions' />
         <Route element={<Playlists />} path='playlists' />
-        <Route element={<CreatePlaylist />} path='playlists/create' />
         <Route element={<EditPlaylist />} path='playlists/edit' />
         <Route element={<LikedVideos />} path='liked-videos' />
         <Route element={<ManageAccount />} path='manage-account' />

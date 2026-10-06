@@ -18,6 +18,7 @@ import {
     WarningCircleIcon
 } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications";
+import { SaveToPlaylistModal } from "../components";
 
 function Watch() {
     const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -31,6 +32,8 @@ function Watch() {
     const [currentUserData, setCurrentUserData] = useState({});
 
     const [channelData, setChannelData] = useState({});
+
+    const [isSaveOpen, setIsSaveOpen] = useState(false);
     
     const [commentLoading, setCommentLoading] = useState(true);
     const [commentData, setCommentData] = useState([]);
@@ -618,6 +621,10 @@ function Watch() {
                                             {/* Save */}
                                             <button
                                                 type="button"
+                                                onClick={() => {
+                                                    setIsMoreOpen(false);
+                                                    setIsSaveOpen(true);
+                                                }}
                                                 className="
                                                     flex
                                                     w-full
@@ -1058,6 +1065,14 @@ function Watch() {
                 </div>
 
             </div>
+
+            {/* Save Modal */}
+
+            <SaveToPlaylistModal
+                isOpen={isSaveOpen}
+                onClose={() => setIsSaveOpen(false)}
+                videoId={params.videoId}
+            />
         </main>
     );
 }
