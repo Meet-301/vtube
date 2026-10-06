@@ -201,9 +201,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
          },
       },
       {
-         $sort: {
-            createdAt: sort
-         }
+         $sort: sort
       }
    ]);
 
