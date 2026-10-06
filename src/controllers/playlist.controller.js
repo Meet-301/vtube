@@ -18,25 +18,23 @@ const createPlaylist = asyncHandler(async (req, res) => {
    const playlistCover = req.file?.path;
    let playlistCoverPath;
 
-   if (name === "" || description === "" || !playlistCoverPath) {
+   if (name === "" || description === "" || !playlistCover) {
       throw new ApiError(400, "All fields are required");
    }
 
-   if (playlistCover) {
-      playlistCoverPath = await uploadOnCloudinary(playlistCover);
+   playlistCoverPath = await uploadOnCloudinary(playlistCover);
 
-      if (!playlistCoverPath) {
-         throw new ApiError(
-            500,
-            "Something went wrong while uploading cover on cloudinary"
-         );
-      }
+   if (!playlistCoverPath) {
+      throw new ApiError(
+         500,
+         "Something went wrong while uploading cover on cloudinary"
+      );
    }
 
    const playlist = await Playlist.create({
       name,
       description,
-      playlistCover: playlistCover ? playlistCoverPath.url : "",
+      playlistCover: playlistCoverPath.url,
       owner: req.user._id,
       videoCount: 0
    });
