@@ -1,39 +1,63 @@
-import { Sidebar, VideoCard } from "../components";
+import { useEffect, useState } from "react";
+import { VideoCard } from "../components";
+import { LoadingOverlay } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import {
+  WarningCircleIcon, 
+  CheckCircleIcon,
+  ThumbsUpIcon
+} from "@phosphor-icons/react";
+import api from "../api/axios";
 
 function LikedVideos() {
 
-    const likedVideos = [
-        {
-            _id: 1,
-            thumbnail:
-                "https://picsum.photos/seed/liked1/640/360",
-            title: "Building a Full Stack Video Platform",
-            channelName: "Viraj Thakkar",
-            views: "12K views",
-            uploadedAt: "2 days ago",
-            duration: "18:21",
-        },
-        {
-            _id: 2,
-            thumbnail:
-                "https://picsum.photos/seed/liked2/640/360",
-            title: "MongoDB Aggregation Pipeline Tutorial",
-            channelName: "Code With Me",
-            views: "5.7K views",
-            uploadedAt: "5 days ago",
-            duration: "12:34",
-        },
-        {
-            _id: 3,
-            thumbnail:
-                "https://picsum.photos/seed/liked3/640/360",
-            title: "React Advanced Patterns",
-            channelName: "Frontend Daily",
-            views: "21K views",
-            uploadedAt: "1 week ago",
-            duration: "15:42",
-        },
-    ];
+    const [likedVideos, setLikedVideos] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    function showError(error) {
+        notifications.show({
+            title: error || "Invalid or expired verification link",
+            color: "red",
+            icon: <WarningCircleIcon/>
+        });
+    }
+
+    function showSuccess(message) {
+        notifications.show({
+            title: message,
+            icon: <CheckCircleIcon/>,
+            color: "vtube",
+        });
+    }
+
+    async function fetchLikedVideos() {
+        try {
+            const res = await api.get("/likes/all");
+
+            setLikedVideos(res.data?.data.map((item) => item.video) ?? []);
+        } catch (error) {
+            showError(error?.response?.data?.message || "Something went wrong");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {fetchLikedVideos()}, []);
+
+    async function handleDelete(id) {
+        try {
+            setIsLoading(true);
+
+            const res = await api.patch(`/likes/toggle/${id}`);
+
+            showSuccess(res.data?.message || "Video unliked successfully");
+            await fetchLikedVideos();
+        } catch (error) {
+            showError(error?.response?.data?.message || "Something went wrong");
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     return (
         <main className="flex min-w-0">
@@ -68,6 +92,18 @@ function LikedVideos() {
 
                     <section className="mt-8">
 
+                        {isLoading 
+                        ? 
+                            <LoadingOverlay
+                                visible={isLoading}
+                                zIndex={1000}
+                                overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+                                loaderProps={{ color: "blue", type: "oval" }}
+                            /> 
+                        : 
+                            ""
+                        }
+
                         {likedVideos.length > 0 ? (
 
                             <div
@@ -85,13 +121,12 @@ function LikedVideos() {
                                 {likedVideos.map((video) => (
                                     <VideoCard
                                         key={video._id}
-                                        thumbnail={video.thumbnail}
-                                        title={video.title}
-                                        channelName={video.channelName}
-                                        views={video.views}
-                                        uploadedAt={video.uploadedAt}
-                                        duration={video.duration}
+                                        channelName={video.owner.fullName}
+                                        avatar={video.owner.avatar}
                                         editButton={false}
+                                        onDeleteClick={() => handleDelete(video._id)}
+                                        deleteText="Remove"
+                                        {...video}
                                     />
                                 ))}
 
@@ -101,39 +136,22 @@ function LikedVideos() {
 
                             /* ================= EMPTY STATE ================= */
 
-                            <div
-                                className="
-                                    flex
-                                    min-h-60
-                                    items-center
-                                    justify-center
-                                    rounded-2xl
-                                    bg-surface
-                                    px-6
-                                    text-center
-                                "
-                            >
-                                <div>
-                                    <h2
-                                        className="
-                                            text-lg
-                                            font-semibold
-                                            text-text-primary
-                                        "
-                                    >
-                                        No liked videos yet
-                                    </h2>
-
-                                    <p
-                                        className="
-                                            mt-2
-                                            text-sm
-                                            text-text-secondary
-                                        "
-                                    >
-                                        Videos you like will appear here.
-                                    </p>
+                            <div className="flex flex-col items-center justify-center py-20 text-center">
+                                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-surface">
+                                    <ThumbsUpIcon
+                                        size={48}
+                                        weight="regular"
+                                        className="text-text-muted"
+                                    />
                                 </div>
+
+                                <h2 className="mt-5 text-lg font-semibold text-text-primary">
+                                    No liked videos yet
+                                </h2>
+
+                                <p className="mt-1 max-w-sm text-sm text-text-secondary">
+                                    Videos you like will appear here.
+                                </p>
                             </div>
 
                         )}

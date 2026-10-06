@@ -1,20 +1,150 @@
 import {
     CameraIcon,
     SignOutIcon,
-    EyeIcon,
-    EyeSlashIcon,
     XIcon,
-    CheckCircleIcon
+    CheckCircleIcon,
+    WarningCircleIcon
 } from "@phosphor-icons/react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { 
+    useEffect, 
+    useState,
+    useRef
+} from "react";
+import { LoadingOverlay } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { data, Link, useNavigate } from "react-router-dom";
+import api from "../api/axios";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { logout, updateUser } from "../features/authSlice.js";
 
 function ManageAccount() {
 
-    const [passwordVisible, setPasswordVisible] = useState(false);
+    const [accountDetails, setAccountDetails] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+
+    const { register, handleSubmit, reset } = useForm();
+    const fileInputRef = useRef(null);
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    function showError(error) {
+        notifications.show({
+            title: error || "Invalid or expired verification link",
+            color: "red",
+            icon: <WarningCircleIcon />
+        });
+    }
+
+    function showSuccess(message) {
+        notifications.show({
+            title: message,
+            icon: <CheckCircleIcon />,
+            color: "vtube",
+        });
+    }
+
+    async function handleAvatarChange(e) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            showError("Please select an image file");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("avatar", file);
+
+        try {
+            setIsLoading(true);
+
+            const res = await api.patch("/users/update-avatar", formData);
+
+            showSuccess(res.data?.message || "Avatar updated successfully");
+            await fetchAccountDetails();
+            dispatch(
+                updateUser({
+                    avatar: res.data?.data
+                })
+            );
+        } catch (error) {
+            console.log(error);
+            showError(error?.response?.data?.message || "Something went wrong");
+        } finally {
+            setIsLoading(false);
+            e.target.value = ""; //! run onChange by selecting the same file again
+        }
+    }
+
+    async function fetchAccountDetails() {
+        try {
+            const res = await api.get("/users/current-user");
+            const resData = res.data?.data ?? {};
+
+            setAccountDetails(resData);
+            reset({ fullName: data.fullName });
+        } catch (error) {
+            showError(error?.response?.data?.message || "Something went wrong");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchAccountDetails();
+    }, []);
+
+    async function handleLogout() {
+        try {
+            setIsLoading(true);
+
+            await api.post("/users/logout");
+
+            dispatch(logout());
+
+            showSuccess("Logged out successfully");
+
+            navigate("/login");
+        } catch (error) {
+            showError(error?.response?.data?.message || "Something went wrong");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    async function onSubmit(formData) {
+        try {
+            setIsLoading(true);
+
+            const res = await api.patch(
+                "/users/update-account",
+                {
+                    fullName: formData.fullName ?? accountDetails.fullName,
+                    avatar: formData.avatar ?? accountDetails.avatar
+                }
+            );
+
+            setAccountDetails(res.data?.data);
+            fetchAccountDetails();
+            showSuccess(res.data?.message);
+        } catch (error) {
+            showError(error.response?.data?.message || "Something went wrong");
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     return (
         <main className="px-4 py-6">
+
+            <LoadingOverlay
+                visible={isLoading}
+                zIndex={1000}
+                overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+                loaderProps={{ color: "blue", type: "oval" }}
+            />
 
             <div
                 className="
@@ -63,7 +193,7 @@ function ManageAccount() {
                         <div className="relative">
 
                             <img
-                                src="https://i.pravatar.cc/300?img=12"
+                                src={accountDetails.avatar}
                                 alt="Profile"
                                 className="
                                     h-28
@@ -78,6 +208,7 @@ function ManageAccount() {
                             <button
                                 type="button"
                                 title="Change profile picture"
+                                onClick={() => fileInputRef.current?.click()}
                                 className="
                                     absolute
                                     bottom-0
@@ -106,250 +237,177 @@ function ManageAccount() {
                                 />
                             </button>
 
+                            <input
+                                type="file"
+                                accept="image/*"
+                                ref={fileInputRef}
+                                onChange={handleAvatarChange}
+                                className="hidden"
+                            />
+
                         </div>
 
                     </div>
-
 
                     {/* Divider */}
 
                     <div className="my-6 border-t border-border" />
 
-
                     {/* ================= FIELDS ================= */}
 
-                    <div className="space-y-5">
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <div className="space-y-5">
 
-                        {/* Full Name */}
+                            {/* Full Name */}
 
-                        <div>
+                            <div>
 
-                            <label
-                                className="
+                                <label
+                                    className="
                                     mb-2
                                     block
                                     text-sm
                                     font-medium
                                     text-text-primary
                                 "
-                            >
-                                Full name
-                            </label>
-
-                            <input
-                                type="text"
-                                defaultValue="Viraj thakkar"
-                                className="
-                                    h-11
-                                    w-full
-                                    rounded-xl
-                                    border
-                                    border-border
-                                    bg-background
-                                    px-4
-                                    text-sm
-                                    text-text-primary
-                                    outline-none
-                                    transition-colors
-                                    focus:border-primary
-                                "
-                            />
-
-                        </div>
-
-                        {/* Email */}
-
-                        <div>
-
-                            <label
-                                className="
-                                    mb-2
-                                    block
-                                    text-sm
-                                    font-medium
-                                    text-text-primary
-                                "
-                            >
-                                Email
-                            </label>
-
-                            <input
-                                type="email"
-                                defaultValue="viraj@example.com"
-                                className="
-                                    h-11
-                                    w-full
-                                    rounded-xl
-                                    border
-                                    border-border
-                                    bg-background
-                                    px-4
-                                    text-sm
-                                    text-text-primary
-                                    outline-none
-                                    transition-colors
-                                    focus:border-primary
-                                "
-                            />
-
-                        </div>
-
-                        {/* Password */}
-
-                        <div>
-
-                            <label
-                                className="
-                                    mb-2
-                                    block
-                                    text-sm
-                                    font-medium
-                                    text-text-primary
-                                "
-                            >
-                                Password
-                            </label>
-
-                            <div className="relative">
-
-                                {passwordVisible ? <input
-                                    type="text"
-                                    defaultValue="password123"
-                                    className="
-                                        h-11
-                                        w-full
-                                        rounded-xl
-                                        border
-                                        border-border
-                                        bg-background
-                                        px-4
-                                        pr-12
-                                        text-sm
-                                        text-text-primary
-                                        outline-none
-                                        transition-colors
-                                        focus:border-primary
-                                    "
-                                /> : <input
-                                    type="password"
-                                    defaultValue="password123"
-                                    className="
-                                        h-11
-                                        w-full
-                                        rounded-xl
-                                        border
-                                        border-border
-                                        bg-background
-                                        px-4
-                                        pr-12
-                                        text-sm
-                                        text-text-primary
-                                        outline-none
-                                        transition-colors
-                                        focus:border-primary
-                                    "
-                                />}
-
-                                <button
-                                    type="button"
-                                    onClick={() => setPasswordVisible((prev) => !prev)}
-                                    className="
-                                        absolute
-                                        right-3
-                                        top-1/2
-                                        -translate-y-1/2
-                                        text-text-secondary
-                                        transition-colors
-                                        hover:text-text-primary
-                                        active:text-text-primary
-                                    "
                                 >
-                                    {passwordVisible ? <EyeSlashIcon
-                                        size={20}
-                                        weight="regular"
-                                    /> : <EyeIcon
-                                        size={20}
-                                        weight="regular"
-                                    />}
-                                </button>
+                                    Full name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    {...register("fullName")}
+                                    defaultValue={accountDetails.fullName}
+                                    className="
+                                    h-11
+                                    w-full
+                                    rounded-xl
+                                    border
+                                    border-border
+                                    bg-background
+                                    px-4
+                                    text-sm
+                                    text-text-primary
+                                    outline-none
+                                    transition-colors
+                                    focus:border-primary
+                                "
+                                />
+
+                            </div>
+
+                            {/* Email */}
+
+                            <div>
+
+                                <label
+                                    className="
+                                    mb-2
+                                    block
+                                    text-sm
+                                    font-medium
+                                    text-text-primary
+                                "
+                                >
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    disabled
+                                    defaultValue={accountDetails.email}
+                                    className="
+                                    h-11
+                                    w-full
+                                    rounded-xl
+                                    border
+                                    border-border
+                                    bg-background
+                                    px-4
+                                    text-sm
+                                    text-text-primary
+                                    outline-none
+                                    transition-colors
+                                    focus:border-primary
+                                "
+                                />
 
                             </div>
 
                         </div>
 
-                    </div>
+                        {/* ================= ACTIONS ================= */}
 
-                    {/* ================= ACTIONS ================= */}
+                        <div
+                            className="
+                                mt-6
+                                flex
+                                flex-col-reverse
+                                gap-3
+                                sm:flex-row
+                                sm:justify-end
+                            "
+                        >
 
-                <div
-                    className="
-                        mt-6
-                        flex
-                        flex-col-reverse
-                        gap-3
-                        sm:flex-row
-                        sm:justify-end
-                    "
-                >
+                            <Link
+                                to="/"
+                                className="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    gap-2
+                                    rounded-full
+                                    border
+                                    border-border
+                                    bg-surface
+                                    px-6
+                                    py-2.5
+                                    text-sm
+                                    font-semibold
+                                    text-text-primary
+                                    transition-all
+                                    duration-200
+                                    hover:bg-surface-elevated
+                                    active:bg-surface-elevated
+                                    active:scale-95
+                                "
+                            >
+                                <XIcon size={18} />
 
-                    <Link
-                        to="/"
-                        className="
-                            flex
-                            items-center
-                            justify-center
-                            gap-2
-                            rounded-full
-                            border
-                            border-border
-                            bg-surface
-                            px-6
-                            py-2.5
-                            text-sm
-                            font-semibold
-                            text-text-primary
-                            transition-all
-                            duration-200
-                            hover:bg-surface-elevated
-                            active:bg-surface-elevated
-                            active:scale-95
-                        "
-                    >
-                        <XIcon size={18} />
+                                Cancel
+                            </Link>
 
-                        Cancel
-                    </Link>
+                            <button
+                                type="submit"
+                                className="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    gap-2
+                                    rounded-full
+                                    bg-primary
+                                    px-6
+                                    py-2.5
+                                    text-sm
+                                    font-semibold
+                                    text-white
+                                    transition-all
+                                    duration-200
+                                    hover:bg-primary-hover
+                                    active:bg-primary-hover
+                                    active:scale-95
+                                "
+                            >
+                                <CheckCircleIcon
+                                    size={18}
+                                    weight="bold"
+                                />
 
-                    <button
-                        type="button"
-                        className="
-                            flex
-                            items-center
-                            justify-center
-                            gap-2
-                            rounded-full
-                            bg-primary
-                            px-6
-                            py-2.5
-                            text-sm
-                            font-semibold
-                            text-white
-                            transition-all
-                            duration-200
-                            hover:bg-primary-hover
-                            active:bg-primary-hover
-                            active:scale-95
-                        "
-                    >
-                        <CheckCircleIcon
-                            size={18}
-                            weight="bold"
-                        />
+                                Save changes
+                            </button>
 
-                        Save changes
-                    </button>
-
-                </div>
+                        </div>
+                    </form>
 
                 </section>
 
@@ -358,6 +416,7 @@ function ManageAccount() {
 
                 <button
                     type="button"
+                    onClick={handleLogout}
                     className="
                         mt-6
                         flex

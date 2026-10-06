@@ -1,4 +1,9 @@
-import { TrashIcon, WarningCircleIcon, CheckCircleIcon, ClockCounterClockwiseIcon } from "@phosphor-icons/react";
+import { 
+    TrashIcon, 
+    WarningCircleIcon, 
+    CheckCircleIcon, 
+    ClockCounterClockwiseIcon 
+} from "@phosphor-icons/react";
 import {
     SearchButton,
     VideoCard,
@@ -35,7 +40,7 @@ function History() {
         try {
             const res = await api.get("/users/history/watch-history");
 
-            setHistoryVideos(res.data?.data);
+            setHistoryVideos(res.data?.data ?? []);
         } catch (error) {
             showError(error?.response?.data?.message || "Something went wrong");
         } finally {
