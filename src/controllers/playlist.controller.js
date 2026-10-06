@@ -169,6 +169,8 @@ const getPlaylist = asyncHandler(async (req, res) => {
                      thumbnail: 1,
                      owner: 1,
                      createdAt: 1,
+                     views: 1,
+                     duration: 1
                   },
                },
                {
