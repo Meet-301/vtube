@@ -131,39 +131,6 @@ function History() {
                                 xl:w-72
                             "
                         >
-                            {/* Search */}
-                            <div className="group relative">
-                                <input
-                                    type="text"
-                                    placeholder="Search watch history"
-                                    className="
-                                        h-11
-                                        w-full
-                                        rounded-full
-                                        border
-                                        border-border
-                                        bg-background
-                                        px-4
-                                        pr-12
-                                        text-sm
-                                        text-text-primary
-                                        outline-none
-                                        placeholder:text-text-muted
-                                        focus:border-primary
-                                    "
-                                />
-
-                                <SearchButton />
-                            </div>
-
-                            {/* Divider */}
-                            <div
-                                className="
-                                    my-4
-                                    border-t
-                                    border-border
-                                "
-                            />
 
                             {/* Clear history */}
                             <button
@@ -232,6 +199,8 @@ function History() {
                         <div
                             className="
                                 mt-5
+                                flex
+                                flex-col
                                 w-full
                                 max-w-5xl
                                 space-y-6
