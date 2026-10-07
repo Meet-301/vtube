@@ -758,6 +758,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 
    const currentUser = await User.findOne({ username });
 
+   const isOwner = req.user?._id && String(req.user._id) === String(currentUser._id);
+
    if (!currentUser) {
       throw new ApiError(404, "User not found");
    }
@@ -796,11 +798,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
             foreignField: "owner",
             as: "videos",
             pipeline: [
-               {
-                  $match: {
-                     isPublished: true
-                  }
-               }
+               ...(isOwner ? [] : [{ $match: { isPublished: true } }]),
             ]
          }
       },
