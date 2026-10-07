@@ -19,6 +19,7 @@ import {
 } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications";
 import { SaveToPlaylistModal } from "../components";
+import { useShare } from "../hooks/useShare";
 
 function Watch() {
     const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -63,6 +64,8 @@ function Watch() {
 
     const moreRef = useRef(null);
     const buttonRef = useRef(null);
+
+    const { share } = useShare();
 
     function showError(error) {
         notifications.show({
@@ -388,6 +391,7 @@ function Watch() {
                                 key={videoData.videoFile}
                                 className="h-full w-full"
                                 controls
+                                autoPlay
                                 controlsList="nodownload noplaybackrate"
                                 disablePictureInPicture
                                 onContextMenu={(e) => e.preventDefault()}
@@ -589,6 +593,13 @@ function Watch() {
                                             {/* Share */}
                                             <button
                                                 type="button"
+                                                onClick={() => {
+                                                    setIsMoreOpen(false);
+                                                    share({
+                                                        path: `/watch/${params.videoId}`,
+                                                        title: videoData.title
+                                                    })
+                                                }}
                                                 className="
                                                     flex
                                                     w-full

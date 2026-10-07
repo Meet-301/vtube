@@ -7,6 +7,8 @@ import {
 import { useState, useEffect } from "react";
 import { LoadingOverlay } from "@mantine/core";
 import { Link } from "react-router-dom";
+import { useSaveToPlaylist } from "../context/SaveToPlaylistContext";
+import { useShare } from "../hooks/useShare";
 
 function Home() {
     const [videos, setVideos] = useState([]);
@@ -36,6 +38,9 @@ function Home() {
 
         fetchVideos();
     }, [sortBy]);
+
+    const { openSave } = useSaveToPlaylist();
+    const { share } = useShare();
 
     return (
         <main className="flex min-w-0">
@@ -73,6 +78,11 @@ function Home() {
                                 {...video}
                                 editButton={false}
                                 deleteButton={false}
+                                onSaveClick={() => openSave(video._id)}
+                                onShareClick={() => share({
+                                    path: `/watch/${video._id}`,
+                                    title: `${video.title}`
+                                })}
                             />
                         </Link>
                     ))}

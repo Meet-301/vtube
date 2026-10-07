@@ -11,11 +11,12 @@ import {
     Sidebar,
 } from "../components";
 
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { LoadingOverlay } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import api from "../api/axios";
+import { useShare } from "../hooks/useShare";
 
 function Playlists() {
 
@@ -23,6 +24,8 @@ function Playlists() {
     const [isLoading, setIsLoading] = useState(true);
 
     const navigate = useNavigate();
+
+    const { share } = useShare();
 
     function showError(error) {
         notifications.show({
@@ -235,7 +238,16 @@ function Playlists() {
                                                 z-10
                                             "
                                         >
-                                            <MoreButton isEditable={true} />
+                                            <MoreButton 
+                                                isEditable={true}
+                                                saveButton={false}
+                                                editButton={false}
+                                                deleteButton={false}
+                                                onShareClick={() => share({
+                                                    path: `/playlists/${playlist._id}`,
+                                                    title: `${playlist.name}`
+                                                })}
+                                            />
                                         </div>
 
                                     </div>

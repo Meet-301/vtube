@@ -166,11 +166,12 @@ function SaveToPlaylistModal({ isOpen, onClose, videoId }) {
             //! add the video after creating a new playlist
             await api.post(`/playlists/${created._id}/add-video/${videoId}`);
 
-            showSuccess(`Saved to ${created.name}`);
-
             setName("");
             setDescription("");
             setIsCreating(false);
+            setCoverPreview(null);
+            
+            showSuccess(`Saved to ${created.name}`);
 
             await fetchPlaylists();
         } catch (error) {

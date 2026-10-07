@@ -8,6 +8,7 @@ import api from "./api/axios.js";
 import { useDispatch, useSelector } from "react-redux";
 import { login, setAccessToken, setInitializing } from "./features/authSlice.js";
 import { LoadingOverlay } from "@mantine/core";
+import { SaveToPlaylistProvider } from "./context/SaveToPlaylistContext.jsx";
 
 function App() {
 
@@ -104,42 +105,44 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-text-primary">
+    <SaveToPlaylistProvider>
+      <div className="min-h-screen bg-background text-text-primary">
 
-      {/* Sticky glass area */}
-      {!isCheckPage && (
-        <div
-          className={`
-                sticky top-0 z-50
-                transition-all duration-300
-                ${isScrolled
-              ? "bg-surface/70 backdrop-blur-xl"
-              : "bg-transparent"
-            }
-            `}
-        >
-          <Header onMenuClick={() => setIsDrawerOpen(true)} />
+        {/* Sticky glass area */}
+        {!isCheckPage && (
+          <div
+            className={`
+                  sticky top-0 z-50
+                  transition-all duration-300
+                  ${isScrolled
+                ? "bg-surface/70 backdrop-blur-xl"
+                : "bg-transparent"
+              }
+              `}
+          >
+            <Header onMenuClick={() => setIsDrawerOpen(true)} />
+          </div>
+        )}
+
+        {/* Mobile/Tablet drawer */}
+        {!isCheckPage &&
+          <SidebarDrawer
+            isOpen={isDrawerOpen}
+            onClose={() => setIsDrawerOpen(false)}
+          />
+        }
+
+        {/* Main */}
+        <div className="flex min-w-0">
+
+          <main className="min-w-0 flex-1">
+            {/* pages */}
+            <Outlet />
+          </main>
         </div>
-      )}
 
-      {/* Mobile/Tablet drawer */}
-      {!isCheckPage &&
-        <SidebarDrawer
-          isOpen={isDrawerOpen}
-          onClose={() => setIsDrawerOpen(false)}
-        />
-      }
-
-      {/* Main */}
-      <div className="flex min-w-0">
-
-        <main className="min-w-0 flex-1">
-          {/* pages */}
-          <Outlet />
-        </main>
       </div>
-
-    </div>
+    </SaveToPlaylistProvider>
   );
 }
 

@@ -29,7 +29,7 @@ import {
   ForgotPassword,
   VerifyEmail,
   ResetPassword,
-  EditPlaylist
+  PlaylistDetails
 } from './pages'
 import classes from './Notifications.module.css'
 import { Provider } from "react-redux";
@@ -76,7 +76,7 @@ const router = createBrowserRouter(
         <Route element={<Channel />} path='channel' />
         <Route element={<Subscriptions />} path='subscriptions' />
         <Route element={<Playlists />} path='playlists' />
-        <Route element={<EditPlaylist />} path='playlists/edit' />
+        <Route element={<PlaylistDetails />} path='playlists/:id' />
         <Route element={<LikedVideos />} path='liked-videos' />
         <Route element={<ManageAccount />} path='manage-account' />
         <Route element={<UploadVideo />} path='upload-video' />
