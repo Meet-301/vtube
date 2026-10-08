@@ -189,6 +189,8 @@ function PlaylistDetails() {
 
     const videos = playlist?.videos ?? [];
 
+    console.log(playlist);
+
     return (
 
         <main className="min-h-[calc(100vh-64px)] bg-background text-text-primary">
@@ -239,7 +241,7 @@ function PlaylistDetails() {
                                     {playlist.description}
                                 </p>
 
-                                <Link to="/" className="mt-4 flex items-center gap-3">
+                                <Link to={`/channel/${playlist.owner.username}`} className="mt-4 flex items-center gap-3">
                                     <img
                                         src={playlist.owner?.avatar}
                                         alt={playlist.owner?.fullName}

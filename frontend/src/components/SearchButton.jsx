@@ -1,10 +1,12 @@
 import { MagnifyingGlassIcon } from "@phosphor-icons/react";
 
-function SearchButton({classes}) {
+function SearchButton({ classes = "", onClick, type = "button", ...props }) {
     return (
         <button
-            type="button"
+            type={type}
             aria-label="Search"
+            onClick={onClick}
+            {...props}
             className={`
                 absolute right-2 top-1/2
                 flex h-10 w-10
@@ -19,7 +21,7 @@ function SearchButton({classes}) {
         >
             <MagnifyingGlassIcon size={23} weight="regular" />
         </button>
-    )
+    );
 }
 
-export default SearchButton
+export default SearchButton;

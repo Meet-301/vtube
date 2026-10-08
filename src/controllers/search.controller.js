@@ -77,13 +77,13 @@ const search = asyncHandler(async (req, res) => {
       return [
          {
             name: {
-               $regex: word,
+               $regex: escaped,
                $options: "i",
             },
          },
          {
             description: {
-               $regex: word,
+               $regex: escaped,
                $options: "i",
             },
          },
@@ -96,13 +96,13 @@ const search = asyncHandler(async (req, res) => {
       return [
          {
             fullName: {
-               $regex: word,
+               $regex: escaped,
                $options: "i",
             },
          },
          {
             username: {
-               $regex: word,
+               $regex: escaped,
                $options: "i",
             },
          },
@@ -110,31 +110,35 @@ const search = asyncHandler(async (req, res) => {
    });
 
    async function addToSearchHistory() {
-      const searchExists = await Search.exists({
-         user: req.user._id,
-      });
-
-      if (searchExists) {
-         await Search.findByIdAndUpdate(searchExists._id, {
-            $pull: {
-               recentSearches: query,
-            },
-         });
-
-         await Search.findByIdAndUpdate(searchExists._id, {
-            $push: {
-               recentSearches: {
-                  $each: [query],
-                  $position: 0,
-                  $slice: 20,
-               },
-            },
-         });
-      } else {
-         await Search.create({
+      try {
+         const searchExists = await Search.exists({
             user: req.user._id,
-            recentSearches: [query],
          });
+
+         if (searchExists) {
+            await Search.findByIdAndUpdate(searchExists._id, {
+               $pull: {
+                  recentSearches: query,
+               },
+            });
+
+            await Search.findByIdAndUpdate(searchExists._id, {
+               $push: {
+                  recentSearches: {
+                     $each: [query],
+                     $position: 0,
+                     $slice: 20,
+                  },
+               },
+            });
+         } else {
+            await Search.create({
+               user: req.user._id,
+               recentSearches: [query],
+            });
+         }
+      } catch (err) {
+         console.error("addToSearchHistory error:", err);
       }
    }
 
@@ -169,6 +173,7 @@ const search = asyncHandler(async (req, res) => {
                      $project: {
                         avatar: 1,
                         fullName: 1,
+                        username: 1,
                      },
                   },
                ],
@@ -377,7 +382,7 @@ const getSearchHistory = asyncHandler(async (req, res) => {
       .json(
          new ApiResponse(
             200,
-            history[0]?.recentSearches,
+            history[0]?.recentSearches || [],
             "Search history fetched successfully"
          )
       );

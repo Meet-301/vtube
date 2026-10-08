@@ -15,7 +15,8 @@ function Sidebar() {
         <aside
           className="
             hidden
-            w-60
+            w-30
+            -ml-1
             shrink-0
             sticky
             top-16

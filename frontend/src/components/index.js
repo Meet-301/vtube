@@ -15,6 +15,7 @@ import VideoCardButton from "./VideoCardButton.jsx";
 import MoreButton from "./MoreButton.jsx";
 import SearchDropdown from "./SearchDropDown.jsx";
 import SaveToPlaylistModal from "./SaveToPlaylistModal.jsx";
+import VideoPlayer from "./VideoPlayer.jsx";
 
 export {
    Header,
@@ -33,5 +34,6 @@ export {
    VideoCardButton,
    MoreButton,
    SearchDropdown,
-   SaveToPlaylistModal
+   SaveToPlaylistModal,
+   VideoPlayer
 };

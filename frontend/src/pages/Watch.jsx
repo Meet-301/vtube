@@ -18,15 +18,15 @@ import {
     WarningCircleIcon
 } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications";
-import { SaveToPlaylistModal } from "../components";
-import { useShare } from "../hooks/useShare";
+import { SaveToPlaylistModal, VideoPlayer } from "../components";
+import { useShare } from "../hooks/useShare.jsx";
 
 function Watch() {
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [openUpward, setOpenUpward] = useState(false);
 
     const [isLoading, setIsLoading] = useState(true);
-    
+
     const [videoData, setVideoData] = useState({});
 
     const [userData, setUserData] = useState({});
@@ -35,13 +35,13 @@ function Watch() {
     const [channelData, setChannelData] = useState({});
 
     const [isSaveOpen, setIsSaveOpen] = useState(false);
-    
+
     const [commentLoading, setCommentLoading] = useState(true);
     const [commentData, setCommentData] = useState([]);
-    
+
     const [editingId, setEditingId] = useState(null);
     const [editText, setEditText] = useState("");
-    
+
     const [likeLoading, setLikeLoading] = useState(false);
     const [isLiked, setIsLiked] = useState(null);
     const [likeCount, setLikeCount] = useState(null);
@@ -386,17 +386,12 @@ function Watch() {
 
                         {/* Video Player */}
                         <div className="aspect-video overflow-hidden rounded-2xl bg-surface">
-                            <video
-                                ref={videoRef}
+                            <VideoPlayer
                                 key={videoData.videoFile}
-                                className="h-full w-full"
-                                controls
-                                autoPlay
-                                controlsList="nodownload noplaybackrate"
-                                disablePictureInPicture
-                                onContextMenu={(e) => e.preventDefault()}
-                                poster={videoData.thumbnail}
+                                videoRef={videoRef}
                                 src={videoData.videoFile}
+                                poster={videoData.thumbnail}
+                                autoPlay
                             />
                         </div>
 
@@ -465,12 +460,12 @@ function Watch() {
                             <div className="flex shrink-0 items-center gap-2">
 
                                 {/* Like + Count */}
-                                {likeLoading ? 
+                                {likeLoading ?
                                     <Loader
                                         color="blue"
                                         size={21}
                                     />
-                                : 
+                                    :
                                     <button
                                         type="button"
                                         onClick={() => toggleLike()}
@@ -503,39 +498,6 @@ function Watch() {
                                         </span>
                                     </button>
                                 }
-                                
-
-                                {/* Comments Count */}
-                                <button
-                                    type="button"
-                                    aria-label="Like video"
-                                    className="
-                                        flex
-                                        items-center
-                                        gap-2
-                                        rounded-full
-                                        bg-surface
-                                        px-4
-                                        py-2.5
-                                        text-sm
-                                        font-medium
-                                        text-text-primary
-                                        transition-all
-                                        duration-200
-                                        hover:bg-surface-elevated
-                                        active:bg-surface-elevated
-                                        active:scale-95
-                                    "
-                                >
-                                    <ChatTextIcon
-                                        size={21}
-                                        weight="regular"
-                                    />
-
-                                    <span>
-                                        {commentData.length}
-                                    </span>
-                                </button>
 
                                 {/* More */}
                                 <div
@@ -918,7 +880,7 @@ function Watch() {
 
                                     <input
                                         type="text"
-                                        {...register("comment", {required: "Please add some data"})}
+                                        {...register("comment", { required: "Please add some data" })}
                                         placeholder="Add a comment..."
                                         className="
                                             w-full

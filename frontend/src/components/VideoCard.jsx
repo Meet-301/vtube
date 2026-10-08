@@ -13,6 +13,7 @@ function VideoCard({
     views,
     createdAt,
     duration,
+    description,
     variant = "grid",
     deleteText = "Delete",
     saveButton = true,
@@ -246,18 +247,26 @@ function VideoCard({
                         {/* Channel */}
 
                         {channelName && (
-                            <p
-                                className="
-                                    mt-1
-                                    text-sm
-                                    leading-5
-                                    text-text-secondary
-                                    sm:text-base
-                                    sm:leading-6
-                                "
-                            >
-                                {channelName}
-                            </p>
+                            <div className="mt-1 flex items-center gap-2">
+                                {isHorizontal && avatar && (
+                                    <img
+                                        src={avatar}
+                                        alt={channelName}
+                                        className="h-6 w-6 rounded-full object-cover shrink-0"
+                                    />
+                                )}
+                                <p
+                                    className="
+                                        text-sm
+                                        leading-5
+                                        text-text-secondary
+                                        sm:text-base
+                                        sm:leading-6
+                                    "
+                                >
+                                    {channelName}
+                                </p>
+                            </div>
                         )}
 
 
@@ -274,7 +283,6 @@ function VideoCard({
                         >
                             {views === 0 ? "No views" : formatViews(views)} • {timeAgo(createdAt)}
                         </p>
-
                     </div>
 
                 </button>

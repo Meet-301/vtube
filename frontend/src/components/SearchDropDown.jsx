@@ -1,14 +1,16 @@
 import {
     ClockCounterClockwiseIcon,
     MagnifyingGlassIcon,
+    XIcon
 } from "@phosphor-icons/react";
 
 function SearchDropdown({
     suggestions = [],
     isHistory = false,
     onSelect,
+    onRemove,
 }) {
-    if (!suggestions.length) {
+    if (!suggestions || suggestions.length === 0) {
         return null;
     }
 
@@ -30,44 +32,83 @@ function SearchDropdown({
             "
         >
             {suggestions.map((suggestion, index) => (
-                <button
+                <div
                     key={`${suggestion}-${index}`}
-                    type="button"
-                    onClick={() => onSelect?.(suggestion)}
                     className="
+                        group
                         flex
                         w-full
                         items-center
-                        gap-3
+                        justify-between
                         px-4
-                        py-3
-                        text-left
-                        text-sm
-                        text-text-primary
+                        py-2.5
                         transition-colors
                         duration-150
                         hover:bg-surface-elevated
-                        active:bg-surface-elevated
                     "
                 >
-                    {isHistory ? (
-                        <ClockCounterClockwiseIcon
-                            size={19}
-                            weight="regular"
-                            className="shrink-0 text-text-secondary"
-                        />
-                    ) : (
-                        <MagnifyingGlassIcon
-                            size={19}
-                            weight="regular"
-                            className="shrink-0 text-text-secondary"
-                        />
-                    )}
+                    <button
+                        type="button"
+                        onClick={() => onSelect?.(suggestion)}
+                        className="
+                            flex
+                            min-w-0
+                            flex-1
+                            items-center
+                            gap-3
+                            text-left
+                            text-sm
+                            text-text-primary
+                        "
+                    >
+                        {isHistory ? (
+                            <ClockCounterClockwiseIcon
+                                size={19}
+                                weight="regular"
+                                className="shrink-0 text-text-secondary"
+                            />
+                        ) : (
+                            <MagnifyingGlassIcon
+                                size={19}
+                                weight="regular"
+                                className="shrink-0 text-text-secondary"
+                            />
+                        )}
 
-                    <span className="min-w-0 truncate">
-                        {suggestion}
-                    </span>
-                </button>
+                        <span className="min-w-0 truncate font-medium">
+                            {suggestion}
+                        </span>
+                    </button>
+
+                    {isHistory && onRemove && (
+                        <button
+                            type="button"
+                            title="Remove from search history"
+                            aria-label={`Remove ${suggestion} from search history`}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onRemove(suggestion);
+                            }}
+                            className="
+                                ml-2
+                                flex
+                                h-7
+                                w-7
+                                shrink-0
+                                items-center
+                                justify-center
+                                rounded-full
+                                text-text-muted
+                                transition-all
+                                hover:bg-surface
+                                hover:text-text-primary
+                                active:scale-90
+                            "
+                        >
+                            <XIcon size={16} weight="bold" />
+                        </button>
+                    )}
+                </div>
             ))}
         </div>
     );

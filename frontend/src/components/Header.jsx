@@ -11,36 +11,40 @@ import {
     UploadButton
 } from "../components";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import SearchDropdown from "./SearchDropDown";
+import { useSearchHistory } from "../hooks/useSearchHistory";
 
 function Header({ onMenuClick }) {
+
+    const navigate = useNavigate();
+    const { searchHistory, removeFromHistory, fetchHistory } = useSearchHistory();
 
     const [searchQuery, setSearchQuery] = useState("");
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const boxRef = useRef(null);
     const inputRef = useRef(null);
 
-    const searchSuggestions = [
-        "React tutorial",
-        "Node.js tutorial",
-        "MongoDB aggregation",
-        "MERN project",
-        "JavaScript tutorial",
-    ];
+    const filteredSuggestions = searchQuery.trim()
+        ? searchHistory.filter((item) =>
+              item.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        : searchHistory;
 
-    const searchHistory = [
-        "React tutorial",
-        "MongoDB aggregation",
-        "MERN project",
-        "Node.js authentication",
-    ];
+    function handleSearch(term) {
+        const q = (term !== undefined ? term : searchQuery).trim();
+        if (!q) return;
+        setIsSearchFocused(false);
+        navigate(`/search?query=${encodeURIComponent(q)}`);
+    }
 
-
-    const filteredSuggestions = searchSuggestions.filter((item) =>
-        item.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    function handleKeyDown(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            handleSearch();
+        }
+    }
 
     useEffect(() => {
         function handleClickOutside(e) {
@@ -212,7 +216,11 @@ function Header({ onMenuClick }) {
                                 onChange={(e) => {
                                     setSearchQuery(e.target.value);
                                 }}
-                                onFocus={() => setIsSearchFocused(true)}
+                                onFocus={() => {
+                                    setIsSearchFocused(true);
+                                    fetchHistory();
+                                }}
+                                onKeyDown={handleKeyDown}
                                 placeholder="Search"
                                 className="
                                     h-14
@@ -262,25 +270,22 @@ function Header({ onMenuClick }) {
                             }
 
 
-                            <SearchButton classes="mt-1" />
+                            <SearchButton onClick={() => handleSearch()} classes="mt-1" />
 
                         </div>
 
                         {/* Search dropdown */}
-                        {isSearchFocused && <SearchDropdown
-                            suggestions={
-                                isSearchFocused
-                                    ? searchQuery
-                                        ? filteredSuggestions
-                                        : searchHistory
-                                    : []
-                            }
-                            isHistory={!searchQuery}
-                            onSelect={(item) => {
-                                setSearchQuery(item);                                
-                                setIsSearchFocused(false);
-                            }}
-                        />}
+                        {isSearchFocused && (
+                            <SearchDropdown
+                                suggestions={filteredSuggestions}
+                                isHistory={true}
+                                onSelect={(item) => {
+                                    setSearchQuery(item);
+                                    handleSearch(item);
+                                }}
+                                onRemove={(item) => removeFromHistory(item)}
+                            />
+                        )}
 
                     </div>
 
