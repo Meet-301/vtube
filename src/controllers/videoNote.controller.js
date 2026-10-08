@@ -24,7 +24,6 @@ const addNote = asyncHandler(async (req, res) => {
    }
 
    const documentCount = VideoNote.countDocuments({
-      timestamp,
       videoId,
       owner
    });
