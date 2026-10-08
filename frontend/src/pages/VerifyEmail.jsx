@@ -37,7 +37,7 @@ function VerifyEmail() {
 
     function showError(error) {
         notifications.show({
-            title: error || "Invalid or expired verification link",
+            title: error || "Something went wrong",
             color: "red",
             icon: <WarningCircleIcon/>
         });
@@ -69,7 +69,7 @@ function VerifyEmail() {
             navigate("/login");
 
         } catch (error) {
-            showError(error.response?.data?.message || "Invalid or expired verification link");
+            showError(error.response?.data?.message || "Something went wrong");
         } finally {
             setIsLoading(false);
         }

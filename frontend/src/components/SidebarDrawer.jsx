@@ -7,16 +7,17 @@ import {
     ThumbsUpIcon,
     XIcon,
 } from "@phosphor-icons/react";
+import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 
 function DrawerItem({ icon: Icon, label, url }) {
 
     const location = useLocation();
     
-        const isActive =
-        url === "/"
-            ? location.pathname === "/"
-            : location.pathname.startsWith(url);
+    const isActive =
+    url === "/"
+        ? location.pathname === "/"
+        : location.pathname.startsWith(url);
 
     return (
         <Link
@@ -45,6 +46,8 @@ function DrawerItem({ icon: Icon, label, url }) {
 
 function SidebarDrawer({ isOpen, onClose }) {
     if (!isOpen) return null;
+
+    const currentUser = useSelector(state => state.auth.user);
 
     return (
         <>
@@ -119,7 +122,7 @@ function SidebarDrawer({ isOpen, onClose }) {
                     <DrawerItem
                         icon={UserIcon}
                         label="Your channel"
-                        url="/channel"
+                        url={`/channel/${currentUser.username}`}
                     />
 
                     <DrawerItem

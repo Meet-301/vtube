@@ -9,6 +9,7 @@ import {
 import {
     MoreButton,
     Sidebar,
+    VideoCardButton,
 } from "../components";
 
 import { useNavigate } from "react-router-dom";
@@ -238,6 +239,7 @@ function Playlists() {
                                                 z-10
                                             "
                                         >
+                                            
                                             <MoreButton 
                                                 isEditable={true}
                                                 saveButton={false}

@@ -64,6 +64,7 @@ function Home() {
                         z-40
                         bg-background/75
                         backdrop-blur-xl
+                        -ml-5
                     "
                 >
                     <CategoryBar selected={sortBy} onSelect={setSortBy} />

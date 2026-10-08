@@ -7,16 +7,21 @@ import {
   CheckCircleIcon,
   ThumbsUpIcon
 } from "@phosphor-icons/react";
-import api from "../api/axios";
+import api from "../api/axios.js";
+import { useShare } from "../hooks/useShare.jsx";
+import { useSaveToPlaylist } from "../context/SaveToPlaylistContext.jsx";
 
 function LikedVideos() {
 
     const [likedVideos, setLikedVideos] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    const { openSave } = useSaveToPlaylist();
+    const { share } = useShare();
+
     function showError(error) {
         notifications.show({
-            title: error || "Invalid or expired verification link",
+            title: error || "Something went wrong",
             color: "red",
             icon: <WarningCircleIcon/>
         });
@@ -92,17 +97,12 @@ function LikedVideos() {
 
                     <section className="mt-8">
 
-                        {isLoading 
-                        ? 
-                            <LoadingOverlay
-                                visible={isLoading}
-                                zIndex={1000}
-                                overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
-                                loaderProps={{ color: "blue", type: "oval" }}
-                            /> 
-                        : 
-                            ""
-                        }
+                        <LoadingOverlay
+                            visible={isLoading}
+                            zIndex={1000}
+                            overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+                            loaderProps={{ color: "blue", type: "oval" }}
+                        />
 
                         {likedVideos.length > 0 ? (
 
@@ -125,6 +125,11 @@ function LikedVideos() {
                                         avatar={video.owner.avatar}
                                         editButton={false}
                                         onDeleteClick={() => handleDelete(video._id)}
+                                        onSaveClick={() => openSave(video._id)}
+                                        onShareClick={() => share({
+                                            path: `/watch/${video._id}`,
+                                            title: `${video.title}`
+                                        })}
                                         deleteText="Remove"
                                         {...video}
                                     />

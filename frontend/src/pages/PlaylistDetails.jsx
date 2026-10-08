@@ -292,7 +292,22 @@ function PlaylistDetails() {
                                             aria-label="Delete playlist"
                                             title="Delete playlist"
                                             onClick={handleDeletePlaylist}
-                                            className={classes}
+                                            className={`
+                                                flex 
+                                                h-11 
+                                                w-11 
+                                                shrink-0 
+                                                items-center 
+                                                justify-center 
+                                                rounded-full 
+                                                bg-red-500/10
+                                                text-text-primary 
+                                                transition-all 
+                                                duration-200
+                                                hover:bg-red-500/20 
+                                                active:bg-red-500/20  
+                                                active:scale-95
+                                            `}
                                         >
                                             <TrashIcon size={21} color="red" weight="regular" />
                                         </button>

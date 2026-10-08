@@ -73,15 +73,15 @@ const router = createBrowserRouter(
         <Route element={<Home />} path='' />
         <Route element={<Watch />} path='watch/:videoId' />
         <Route element={<History />} path='history' />
-        <Route element={<Channel />} path='channel' />
+        <Route element={<Channel />} path='channel/:username' />
         <Route element={<Subscriptions />} path='subscriptions' />
         <Route element={<Playlists />} path='playlists' />
         <Route element={<PlaylistDetails />} path='playlists/:id' />
         <Route element={<LikedVideos />} path='liked-videos' />
         <Route element={<ManageAccount />} path='manage-account' />
         <Route element={<UploadVideo />} path='upload-video' />
-        <Route element={<EditVideo />} path='edit-video' />
-        <Route element={<EditChannel />} path='edit-channel' />
+        <Route element={<EditVideo />} path='edit-video/:id' />
+        <Route element={<EditChannel />} path='edit-channel/:id' />
         <Route element={<Search />} path='search' />
       </Route>
 

@@ -31,7 +31,7 @@ function ManageAccount() {
 
     function showError(error) {
         notifications.show({
-            title: error || "Invalid or expired verification link",
+            title: error || "Something went wrong",
             color: "red",
             icon: <WarningCircleIcon />
         });

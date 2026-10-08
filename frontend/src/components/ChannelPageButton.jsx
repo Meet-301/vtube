@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom"
 
-function ChannelPageButton({icon: Icon, text, linkTo = "/"}) {
+function ChannelPageButton({icon: Icon, text, linkTo = "/", onClick}) {
     return (
         <Link
             to={linkTo}
+            onClick={onClick}
             className="
                 flex
                 items-center

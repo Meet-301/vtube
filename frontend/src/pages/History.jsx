@@ -5,7 +5,6 @@ import {
     ClockCounterClockwiseIcon 
 } from "@phosphor-icons/react";
 import {
-    SearchButton,
     VideoCard,
 } from "../components";
 import { useEffect, useState } from "react";
@@ -14,15 +13,20 @@ import { LoadingOverlay } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { Link } from "react-router-dom";
 import { Loader } from "@mantine/core";
+import { useSaveToPlaylist } from "../context/SaveToPlaylistContext.jsx";
+import { useShare } from "../hooks/useShare.jsx";
 
 function History() {
 
     const [isLoading, setIsLoading] = useState(true);
     const [historyVideos, setHistoryVideos] = useState([]);
 
+    const { openSave } = useSaveToPlaylist();
+    const { share } = useShare();
+
     function showError(error) {
         notifications.show({
-            title: error || "Invalid or expired verification link",
+            title: error || "Something went wrong",
             color: "red",
             icon: <WarningCircleIcon/>
         });
@@ -222,6 +226,11 @@ function History() {
                                             variant="horizontal"
                                             editButton={false}
                                             onDeleteClick={() => handleDelete(video._id)}
+                                            onSaveClick={() => openSave(video._id)}
+                                            onShareClick={() => share({
+                                                path: `/watch/${video._id}`,
+                                                title: `${video.title}`
+                                            })}
                                             deleteText="Remove"
                                             {...video}
                                         />

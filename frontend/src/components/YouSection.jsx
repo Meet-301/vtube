@@ -9,6 +9,7 @@ import {
 
 import {SidebarItem} from "./index.js";
 import {Link} from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function YouMenuItem({ icon: Icon, label, url }) {
     return (
@@ -33,6 +34,9 @@ function YouMenuItem({ icon: Icon, label, url }) {
 }
 
 function YouSection() {
+
+    const currentUser = useSelector((state) => state.auth.user);
+
     return (
         <div className="group relative">
 
@@ -62,7 +66,7 @@ function YouSection() {
 
                 <YouMenuItem
                     icon={UserIcon}
-                    url="/channel"
+                    url={`/channel/${currentUser.username}`}
                     label="Your channel"
                 />
 
