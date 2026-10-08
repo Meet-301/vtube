@@ -14,10 +14,15 @@ const addNote = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Invalid video id");
    }
 
-   const video = await Video.findById(videoId)
+   const video = await Video.findById(videoId);
+
+   const isTimestampExists = await VideoNote.exists({
+      timestamp,
+      videoId
+   });
 
    if(!video) {
-      throw new ApiError(400, "Video not found")
+      throw new ApiError(400, "Video not found");
    }
 
    if (!timestamp) {
@@ -26,7 +31,11 @@ const addNote = asyncHandler(async (req, res) => {
    timestamp = Number(timestamp);
 
    if(timestamp <= 0 || timestamp >= video.duration) {
-      throw new ApiError(400, "Invalid timestamp")
+      throw new ApiError(400, "Invalid timestamp");
+   }
+
+   if(isTimestampExists) {
+      throw new ApiError(400, "You can't add the note at the same time again");
    }
 
    if (!title || !description) {
