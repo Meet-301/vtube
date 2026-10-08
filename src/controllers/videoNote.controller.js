@@ -40,21 +40,21 @@ const addNote = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Timestamp cannot exceed video duration");
    }
 
-   //! 3. 5-second gap restriction for this user on this video
-   //! Math.abs(existing.timestamp - timestamp) < 5
+   //! 3. 10-second gap restriction for this user on this video
+   //! Math.abs(existing.timestamp - timestamp) < 10
    const nearbyNote = await VideoNote.exists({
       videoId,
       owner,
       timestamp: {
-         $gt: timestamp - 5,
-         $lt: timestamp + 5,
+         $gt: timestamp - 10,
+         $lt: timestamp + 10,
       },
    });
 
    if (nearbyNote) {
       throw new ApiError(
          400,
-         "You can only add notes with a minimum gap of 5 seconds"
+         "You can only add notes with a minimum gap of 10 seconds"
       );
    }
 
