@@ -6,7 +6,8 @@ import {
     DotsThreeIcon,
     ChatTextIcon,
     PencilSimpleIcon,
-    TrashIcon
+    TrashIcon,
+    PlayIcon
 } from "@phosphor-icons/react";
 import { useParams } from "react-router-dom";
 import api from "../api/axios";
@@ -42,7 +43,6 @@ function Watch() {
     const [editingId, setEditingId] = useState(null);
     const [editText, setEditText] = useState("");
 
-    const [likeLoading, setLikeLoading] = useState(false);
     const [isLiked, setIsLiked] = useState(null);
     const [likeCount, setLikeCount] = useState(null);
 
@@ -56,7 +56,11 @@ function Watch() {
     const [editNoteTitle, setEditNoteTitle] = useState("");
     const [editNoteDescription, setEditNoteDescription] = useState("");
 
+    const [currentSecond, setCurrentSecond] = useState(null);
+    const noteRefs = useRef({});
+
     const videoRef = useRef(null);
+    const isTogglingLike = useRef(false);
 
     const { register, handleSubmit, reset } = useForm();
 
@@ -136,16 +140,37 @@ function Watch() {
     }
 
     async function toggleLike() {
+        if (isTogglingLike.current) return;
+        isTogglingLike.current = true;
+
+        const previousIsLiked = isLiked;
+        const previousLikeCount = likeCount;
+
+        const nextIsLiked = !previousIsLiked;
+        const nextLikeCount = nextIsLiked
+            ? (previousLikeCount || 0) + 1
+            : Math.max(0, (previousLikeCount || 0) - 1);
+
+        // Optimistic instant UI update
+        setIsLiked(nextIsLiked);
+        setLikeCount(nextLikeCount);
+
         try {
-            setLikeLoading(true);
             const res = await api.patch(`/likes/toggle/${params.videoId}`);
 
-            showSuccess(res.data?.message);
-            fetchLikeDetails();
+            if (res.data?.data?.videoResponse?.likes !== undefined) {
+                setLikeCount(res.data.data.videoResponse.likes);
+            }
+            if (res.data?.data?.isLiked !== undefined) {
+                setIsLiked(res.data.data.isLiked);
+            }
         } catch (error) {
-            showError(error?.response?.data?.message || "Something went wrong");
+            // Rollback on failure
+            setIsLiked(previousIsLiked);
+            setLikeCount(previousLikeCount);
+            showError(error?.response?.data?.message || "Failed to update like");
         } finally {
-            setLikeLoading(false);
+            isTogglingLike.current = false;
         }
     }
 
@@ -281,12 +306,28 @@ function Watch() {
         }
     }
 
-    //! jump to the specific timestamp of the video by cliking the note
-    function seekTo(seconds) {
+    function handleTimeUpdate(e) {
+        const sec = Math.floor(e.currentTarget.currentTime);
+        setCurrentSecond((prev) => (prev === sec ? prev : sec));
+    }
+
+    //! jump to the specific timestamp of the video by clicking the note
+    function seekTo(seconds, noteId) {
         if (!videoRef.current) return;
 
+        const targetSec = Math.floor(seconds);
+        setCurrentSecond(targetSec);
+
         videoRef.current.currentTime = seconds;
-        videoRef.current.play();
+        videoRef.current.play().catch(() => {});
+
+        if (noteId) {
+            // Smooth scroll into view
+            noteRefs.current[noteId]?.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+            });
+        }
     }
 
     useEffect(() => {
@@ -391,6 +432,7 @@ function Watch() {
                                 videoRef={videoRef}
                                 src={videoData.videoFile}
                                 poster={videoData.thumbnail}
+                                onTimeUpdate={handleTimeUpdate}
                                 autoPlay
                             />
                         </div>
@@ -459,45 +501,38 @@ function Watch() {
                             {/* ================= ACTIONS ================= */}
                             <div className="flex shrink-0 items-center gap-2">
 
-                                {/* Like + Count */}
-                                {likeLoading ?
-                                    <Loader
-                                        color="blue"
+                                <button
+                                    type="button"
+                                    onClick={() => toggleLike()}
+                                    aria-label="Like video"
+                                    className="
+                                        flex
+                                        items-center
+                                        gap-2
+                                        rounded-full
+                                        bg-surface
+                                        px-4
+                                        py-2.5
+                                        text-sm
+                                        font-medium
+                                        text-text-primary
+                                        transition-all
+                                        duration-200
+                                        hover:bg-surface-elevated
+                                        active:bg-surface-elevated
+                                        active:scale-95
+                                    "
+                                >
+                                    <ThumbsUpIcon
                                         size={21}
+                                        weight={isLiked ? "fill" : "regular"}
+                                        className={isLiked ? "text-primary" : ""}
                                     />
-                                    :
-                                    <button
-                                        type="button"
-                                        onClick={() => toggleLike()}
-                                        aria-label="Like video"
-                                        className="
-                                            flex
-                                            items-center
-                                            gap-2
-                                            rounded-full
-                                            bg-surface
-                                            px-4
-                                            py-2.5
-                                            text-sm
-                                            font-medium
-                                            text-text-primary
-                                            transition-all
-                                            duration-200
-                                            hover:bg-surface-elevated
-                                            active:bg-surface-elevated
-                                            active:scale-95
-                                        "
-                                    >
-                                        <ThumbsUpIcon
-                                            size={21}
-                                            weight={isLiked ? "fill" : "regular"}
-                                        />
 
-                                        <span>
-                                            {likeCount || 0}
-                                        </span>
-                                    </button>
-                                }
+                                    <span>
+                                        {likeCount || 0}
+                                    </span>
+                                </button>
 
                                 {/* More */}
                                 <div
@@ -747,95 +782,123 @@ function Watch() {
                                         No notes yet. Pause the video and add one.
                                     </p>
                                 ) : (
-                                    notes.map((note) => (
-                                        <div
-                                            key={note._id}
-                                            className="rounded-xl p-3 transition-colors hover:bg-surface-elevated"
-                                        >
+                                    notes.map((note) => {
+                                        const isHighlighted =
+                                            currentSecond !== null &&
+                                            Math.floor(Number(note.timestamp)) === currentSecond;
 
-                                            <div className="flex items-center justify-between gap-2">
+                                        return (
+                                            <div
+                                                key={note._id}
+                                                ref={(el) => (noteRefs.current[note._id] = el)}
+                                                className={`
+                                                    rounded-xl p-3 transition-all duration-300 border
+                                                    ${
+                                                        isHighlighted
+                                                            ? "bg-primary/15 border-primary shadow-md shadow-primary/10 ring-2 ring-primary/40 scale-[1.01]"
+                                                            : "border-transparent bg-transparent hover:bg-surface-elevated/70"
+                                                    }
+                                                `}
+                                            >
 
-                                                <button
-                                                    type="button"
-                                                    onClick={() => seekTo(note.timestamp)}
-                                                    className="text-sm font-semibold text-primary active:scale-95"
-                                                >
-                                                    {formatDuration(note.timestamp)}
-                                                </button>
+                                                {editingNoteId === note._id ? (
+                                                    <div className="w-full">
+                                                        <span className="text-xs sm:text-sm font-semibold text-primary">
+                                                            {formatDuration(note.timestamp)}
+                                                        </span>
 
-                                                {editingNoteId !== note._id && (
-                                                    <div className="flex items-center gap-1">
-                                                        <button
-                                                            type="button"
-                                                            aria-label="Edit note"
-                                                            onClick={() => startEditNote(note)}
-                                                            className="rounded-full p-2 text-text-secondary transition-all hover:bg-surface active:scale-95"
+                                                        <input
+                                                            type="text"
+                                                            value={editNoteTitle}
+                                                            onChange={(e) => setEditNoteTitle(e.target.value)}
+                                                            placeholder="Note title"
+                                                            autoFocus
+                                                            className="mt-1 w-full border-b border-primary bg-transparent px-1 py-2 text-sm text-text-primary outline-none"
+                                                        />
+
+                                                        <textarea
+                                                            rows={3}
+                                                            value={editNoteDescription}
+                                                            onChange={(e) => setEditNoteDescription(e.target.value)}
+                                                            placeholder="Description"
+                                                            className="mt-2 w-full resize-none border-b border-border bg-transparent px-1 py-2 text-sm text-text-primary outline-none focus:border-primary"
+                                                        />
+
+                                                        <div className="mt-3 flex justify-end gap-2">
+                                                            <button
+                                                                type="button"
+                                                                onClick={cancelEditNote}
+                                                                className="rounded-full bg-surface px-4 py-2 text-sm font-semibold text-text-primary transition-all active:scale-95"
+                                                            >
+                                                                Cancel
+                                                            </button>
+
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleUpdateNote(note._id)}
+                                                                className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary-hover active:scale-95"
+                                                            >
+                                                                Save
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div
+                                                            onClick={() => seekTo(note.timestamp, note._id)}
+                                                            className="min-w-0 flex-1 cursor-pointer"
                                                         >
-                                                            <PencilSimpleIcon size={16} />
-                                                        </button>
+                                                            {/* Duration exact upar title */}
+                                                            <div className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-primary">
+                                                                {isHighlighted && (
+                                                                    <PlayIcon
+                                                                        size={12}
+                                                                        weight="fill"
+                                                                        className="shrink-0"
+                                                                    />
+                                                                )}
+                                                                <span>{formatDuration(note.timestamp)}</span>
+                                                            </div>
 
-                                                        <button
-                                                            type="button"
-                                                            aria-label="Delete note"
-                                                            onClick={() => handleDeleteNote(note._id)}
-                                                            className="rounded-full p-2 text-text-secondary transition-all hover:bg-surface active:scale-95"
-                                                        >
-                                                            <TrashIcon size={16} />
-                                                        </button>
+                                                            {/* Title */}
+                                                            <p className={`mt-1 text-sm font-semibold transition-colors ${isHighlighted ? "text-primary" : "text-text-primary"}`}>
+                                                                {note.title}
+                                                            </p>
+
+                                                            {/* Description */}
+                                                            {note.description && (
+                                                                <p className="mt-1 whitespace-pre-line text-sm leading-5 text-text-secondary">
+                                                                    {note.description}
+                                                                </p>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Edit & Delete actions */}
+                                                        <div className="flex shrink-0 items-center gap-1">
+                                                            <button
+                                                                type="button"
+                                                                aria-label="Edit note"
+                                                                onClick={() => startEditNote(note)}
+                                                                className="rounded-full p-2 text-text-secondary transition-all hover:bg-surface active:scale-95"
+                                                            >
+                                                                <PencilSimpleIcon size={16} />
+                                                            </button>
+
+                                                            <button
+                                                                type="button"
+                                                                aria-label="Delete note"
+                                                                onClick={() => handleDeleteNote(note._id)}
+                                                                className="rounded-full p-2 text-text-secondary transition-all hover:bg-surface active:scale-95"
+                                                            >
+                                                                <TrashIcon size={16} />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 )}
 
                                             </div>
-
-                                            {editingNoteId === note._id ? (
-                                                <div className="mt-1">
-                                                    <input
-                                                        type="text"
-                                                        value={editNoteTitle}
-                                                        onChange={(e) => setEditNoteTitle(e.target.value)}
-                                                        autoFocus
-                                                        className="w-full border-b border-primary bg-transparent px-1 py-2 text-sm text-text-primary outline-none"
-                                                    />
-
-                                                    <textarea
-                                                        rows={3}
-                                                        value={editNoteDescription}
-                                                        onChange={(e) => setEditNoteDescription(e.target.value)}
-                                                        className="mt-2 w-full resize-none border-b border-border bg-transparent px-1 py-2 text-sm text-text-primary outline-none focus:border-primary"
-                                                    />
-
-                                                    <div className="mt-3 flex justify-end gap-2">
-                                                        <button
-                                                            type="button"
-                                                            onClick={cancelEditNote}
-                                                            className="rounded-full bg-surface px-4 py-2 text-sm font-semibold text-text-primary transition-all active:scale-95"
-                                                        >
-                                                            Cancel
-                                                        </button>
-
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleUpdateNote(note._id)}
-                                                            className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary-hover active:scale-95"
-                                                        >
-                                                            Save
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <p className="mt-1 text-sm font-semibold text-text-primary">
-                                                        {note.title}
-                                                    </p>
-
-                                                    <p className="mt-1 whitespace-pre-line text-sm leading-5 text-text-secondary">
-                                                        {note.description}
-                                                    </p>
-                                                </>
-                                            )}
-
-                                        </div>
-                                    ))
+                                        );
+                                    })
                                 )}
 
                             </div>

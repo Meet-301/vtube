@@ -11,7 +11,7 @@ import {
 import { Loader } from "@mantine/core";
 import { formatDuration } from "../utils/formatters";
 
-function VideoPlayer({ src, poster, autoPlay = false, videoRef }) {
+function VideoPlayer({ src, poster, autoPlay = false, videoRef, onTimeUpdate }) {
 
     const innerRef = useRef(null);
     const ref = videoRef ?? innerRef;
@@ -121,8 +121,9 @@ function VideoPlayer({ src, poster, autoPlay = false, videoRef }) {
 
     /* ================= VIDEO EVENTS ================= */
 
-    function handleTimeUpdate() {
+    function handleTimeUpdate(e) {
         if (!isDragging.current) setCurrentTime(ref.current.currentTime);
+        onTimeUpdate?.(e);
     }
 
     function handleProgress() {

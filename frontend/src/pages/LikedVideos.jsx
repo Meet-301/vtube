@@ -10,6 +10,7 @@ import {
 import api from "../api/axios.js";
 import { useShare } from "../hooks/useShare.jsx";
 import { useSaveToPlaylist } from "../context/SaveToPlaylistContext.jsx";
+import { Link } from "react-router-dom";
 
 function LikedVideos() {
 
@@ -119,20 +120,22 @@ function LikedVideos() {
                             >
 
                                 {likedVideos.map((video) => (
-                                    <VideoCard
-                                        key={video._id}
-                                        channelName={video.owner.fullName}
-                                        avatar={video.owner.avatar}
-                                        editButton={false}
-                                        onDeleteClick={() => handleDelete(video._id)}
-                                        onSaveClick={() => openSave(video._id)}
-                                        onShareClick={() => share({
-                                            path: `/watch/${video._id}`,
-                                            title: `${video.title}`
-                                        })}
-                                        deleteText="Remove"
-                                        {...video}
-                                    />
+                                    <Link to={`/watch/${video._id}`}>
+                                        <VideoCard
+                                            key={video._id}
+                                            channelName={video.owner.fullName}
+                                            avatar={video.owner.avatar}
+                                            editButton={false}
+                                            onDeleteClick={() => handleDelete(video._id)}
+                                            onSaveClick={() => openSave(video._id)}
+                                            onShareClick={() => share({
+                                                path: `/watch/${video._id}`,
+                                                title: `${video.title}`
+                                            })}
+                                            deleteText="Remove"
+                                            {...video}
+                                        />
+                                    </Link>
                                 ))}
 
                             </div>
