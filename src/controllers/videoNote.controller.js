@@ -10,60 +10,65 @@ const addNote = asyncHandler(async (req, res) => {
    const { videoId } = req.params;
    let { title, description, timestamp } = req.body;
 
+   //! 1. Basic validation
    if (!mongoose.Types.ObjectId.isValid(videoId)) {
       throw new ApiError(400, "Invalid video id");
    }
 
-   const video = await Video.findById(videoId);
-
-   const isTimestampExists = await VideoNote.exists({
-      timestamp,
-      videoId
-   });
-
-   if(!video) {
-      throw new ApiError(400, "Video not found");
+   if (!title?.trim() || !description?.trim()) {
+      throw new ApiError(400, "Title and Description both are required");
    }
 
-   if (!timestamp) {
+   if (timestamp === undefined || timestamp === null || timestamp === "") {
       throw new ApiError(400, "Timestamp is required");
    }
+
    timestamp = Number(timestamp);
 
-   if(timestamp <= 0 || timestamp >= video.duration) {
+   if (isNaN(timestamp) || timestamp < 0) {
       throw new ApiError(400, "Invalid timestamp");
    }
 
-   const t5 = timestamp + 5
+   //! 2. Video existence and duration check
+   const video = await Video.findById(videoId);
 
-   const isFrequentTimestamp = VideoNote.exists({
-      timestamp: t5,
-      videoId
-   })
-
-   if(isFrequentTimestamp) {
-      throw new ApiError(400, "You can add notes in the gap of 5 seconds only");
+   if (!video) {
+      throw new ApiError(404, "Video not found");
    }
 
-   if(isTimestampExists) {
-      throw new ApiError(400, "You can't add the note at the same time again");
+   if (timestamp > video.duration) {
+      throw new ApiError(400, "Timestamp cannot exceed video duration");
    }
 
-   if (!title || !description) {
-      throw new ApiError(400, "Title and Description both are required");
+   //! 3. 5-second gap restriction for this user on this video
+   //! Math.abs(existing.timestamp - timestamp) < 5
+   const nearbyNote = await VideoNote.exists({
+      videoId,
+      owner,
+      timestamp: {
+         $gt: timestamp - 5,
+         $lt: timestamp + 5,
+      },
+   });
+
+   if (nearbyNote) {
+      throw new ApiError(
+         400,
+         "You can only add notes with a minimum gap of 5 seconds"
+      );
    }
 
    const videoNote = await VideoNote.create({
       owner,
       videoId,
       timestamp,
-      title,
-      description,
+      title: title.trim(),
+      description: description.trim(),
    });
 
    return res
       .status(201)
-      .json(new ApiResponse(200, videoNote, "Video note added successfully"));
+      .json(new ApiResponse(201, videoNote, "Video note added successfully"));
 });
 
 const getNotes = asyncHandler(async (req, res) => {
