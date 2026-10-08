@@ -23,6 +23,16 @@ const addNote = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Timestamp is required");
    }
 
+   const documentCount = VideoNote.countDocuments({
+      timestamp,
+      videoId,
+      owner
+   });
+
+   if(documentCount >= 10) {
+      throw new ApiError(400, "You can add only 10 notes per video");
+   }
+
    timestamp = Number(timestamp);
 
    if (isNaN(timestamp) || timestamp < 0) {
