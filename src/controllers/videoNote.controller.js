@@ -34,6 +34,17 @@ const addNote = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Invalid timestamp");
    }
 
+   const t5 = timestamp + 5
+
+   const isFrequentTimestamp = VideoNote.exists({
+      timestamp: t5,
+      videoId
+   })
+
+   if(isFrequentTimestamp) {
+      throw new ApiError(400, "You can add notes in the gap of 5 seconds only");
+   }
+
    if(isTimestampExists) {
       throw new ApiError(400, "You can't add the note at the same time again");
    }
