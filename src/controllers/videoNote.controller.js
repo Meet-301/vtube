@@ -23,7 +23,7 @@ const addNote = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Timestamp is required");
    }
 
-   const documentCount = VideoNote.countDocuments({
+   const documentCount = await VideoNote.countDocuments({
       videoId,
       owner
    });
