@@ -83,20 +83,21 @@ function NotificationMenu() {
                 title="Notifications"
                 className="
                     flex
-                    h-10 w-10 items-center justify-center
+                    h-10 w-10 shrink-0 items-center justify-center
                     rounded-full
                     text-text-primary
                     transition-all duration-200
                     hover:bg-surface-elevated
+                    active:bg-surface-elevated
                     active:scale-95
                     relative
                 "
             >
-                <BellIcon size={35} weight="regular" />
+                <BellIcon size={24} weight="regular" />
 
                 {/* Badge Counter */}
                 {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white shadow-md animate-pulse">
+                    <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white shadow-md animate-pulse">
                         {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
                 )}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
     ThumbsUpIcon,
     ShareNetworkIcon,
@@ -7,9 +7,11 @@ import {
     ChatTextIcon,
     PencilSimpleIcon,
     TrashIcon,
-    PlayIcon
+    PlayIcon,
+    XIcon,
 } from "@phosphor-icons/react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 import api from "../api/axios";
 import { Loader, LoadingOverlay } from "@mantine/core";
 import { formatViews, timeAgo, formatDuration } from "../utils/formatters";
@@ -19,13 +21,17 @@ import {
     WarningCircleIcon
 } from "@phosphor-icons/react";
 import { notifications } from "@mantine/notifications";
-import { SaveToPlaylistModal, VideoPlayer } from "../components";
+import { SaveToPlaylistModal, VideoPlayer, VideoCardButton } from "../components";
 import { useShare } from "../hooks/useShare.jsx";
 import { getWatchProgress, saveWatchProgress } from "../utils/watchProgress.js";
 
 function Watch() {
+    const navigate = useNavigate();
     const [isMoreOpen, setIsMoreOpen] = useState(false);
-    const [openUpward, setOpenUpward] = useState(false);
+    const [coords, setCoords] = useState(null);
+    const [isMobile, setIsMobile] = useState(
+        () => typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches
+    );
 
     const [isLoading, setIsLoading] = useState(true);
 
@@ -67,8 +73,9 @@ function Watch() {
 
     const params = useParams();
 
-    const moreRef = useRef(null);
     const buttonRef = useRef(null);
+    const morePopupRef = useRef(null);
+    const dropdownRef = useRef(null);
 
     const { share } = useShare();
 
@@ -373,25 +380,96 @@ function Watch() {
         }
     }
 
+    // Responsive check for mobile viewport (< 640px)
     useEffect(() => {
-        function handleClickOutside(event) {
+        const mq = window.matchMedia("(max-width: 639px)");
+        const onChange = (event) => setIsMobile(event.matches);
+        setIsMobile(mq.matches);
+        mq.addEventListener("change", onChange);
+        return () => mq.removeEventListener("change", onChange);
+    }, []);
+
+    // Outside click / Escape / (desktop) scroll + resize => close more menu
+    useEffect(() => {
+        if (!isMoreOpen) return;
+
+        function handleClickCapture(event) {
+            const target = event.target;
             if (
-                moreRef.current &&
-                !moreRef.current.contains(event.target)
+                buttonRef.current?.contains(target) ||
+                morePopupRef.current?.contains(target)
             ) {
-                setIsMoreOpen(false);
+                return;
             }
+
+            event.preventDefault();
+            event.stopPropagation();
+            setIsMoreOpen(false);
         }
 
-        document.addEventListener("mousedown", handleClickOutside);
+        function handleEscape(event) {
+            if (event.key === "Escape") setIsMoreOpen(false);
+        }
+
+        function handleResize() {
+            setIsMoreOpen(false);
+        }
+
+        function handleScroll(event) {
+            if (morePopupRef.current?.contains(event.target)) return;
+            setIsMoreOpen(false);
+        }
+
+        document.addEventListener("click", handleClickCapture, true);
+        document.addEventListener("keydown", handleEscape);
+
+        if (!isMobile) {
+            window.addEventListener("resize", handleResize);
+            window.addEventListener("scroll", handleScroll, true);
+        }
 
         return () => {
-            document.removeEventListener(
-                "mousedown",
-                handleClickOutside
-            );
+            document.removeEventListener("click", handleClickCapture, true);
+            document.removeEventListener("keydown", handleEscape);
+            window.removeEventListener("resize", handleResize);
+            window.removeEventListener("scroll", handleScroll, true);
         };
-    }, []);
+    }, [isMoreOpen, isMobile]);
+
+    // Lock background scroll when mobile bottom sheet is open
+    useEffect(() => {
+        if (!isMoreOpen || !isMobile) return;
+
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow = previousOverflow;
+        };
+    }, [isMoreOpen, isMobile]);
+
+    // Position of desktop dropdown
+    useLayoutEffect(() => {
+        if (!isMoreOpen || isMobile) {
+            setCoords(null);
+            return;
+        }
+
+        if (!buttonRef.current || !dropdownRef.current) return;
+
+        const rect = buttonRef.current.getBoundingClientRect();
+        const height = dropdownRef.current.offsetHeight;
+        const gap = 8;
+
+        const fitsBelow = rect.bottom + gap + height <= window.innerHeight - gap;
+
+        setCoords({
+            top: fitsBelow
+                ? rect.bottom + gap
+                : Math.max(gap, rect.top - gap - height),
+            right: Math.max(gap, window.innerWidth - rect.right),
+        });
+    }, [isMoreOpen, isMobile]);
 
     //! fetch channel and video data 
     useEffect(() => {
@@ -440,15 +518,9 @@ function Watch() {
     }, []);
 
     //! Handling code of more button's pop-up
-    function handleToggleMenu() {
-        if (!isMoreOpen && buttonRef.current) {
-            const rect = buttonRef.current.getBoundingClientRect();
-            const spaceBelow = window.innerHeight - rect.bottom;
-            const estimatedMenuHeight = 100; //! approx height of 2 items
-
-            setOpenUpward(spaceBelow < estimatedMenuHeight);
-        }
-
+    function handleToggleMenu(event) {
+        event?.preventDefault?.();
+        event?.stopPropagation?.();
         setIsMoreOpen((prev) => !prev);
     }
 
@@ -642,14 +714,12 @@ function Watch() {
                                 </button>
 
                                 {/* More */}
-                                <div
-                                    ref={moreRef}
-                                    className="relative"
-                                >
+                                <div className="relative">
                                     <button
                                         ref={buttonRef}
                                         type="button"
                                         aria-label="More actions"
+                                        aria-haspopup="menu"
                                         aria-expanded={isMoreOpen}
                                         onClick={handleToggleMenu}
                                         className="
@@ -674,103 +744,174 @@ function Watch() {
                                         />
                                     </button>
 
-                                    {/* More Popup */}
-                                    {isMoreOpen && (
-                                        <div
-                                            className={`
-                                                absolute
-                                                right-0
-                                                ${openUpward ? "bottom-full" : "top-full"}
-                                                z-30
-                                                mt-2
-                                                w-48
-                                                overflow-hidden
-                                                rounded-2xl
-                                                border
-                                                border-border
-                                                bg-surface
-                                                p-1.5
-                                                shadow-2xl
-                                            `}
-                                        >
-
-                                            {/* Share */}
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setIsMoreOpen(false);
-                                                    share({
-                                                        path: `/watch/${params.videoId}`,
-                                                        title: videoData.title
-                                                    })
-                                                }}
-                                                className="
-                                                    flex
-                                                    w-full
-                                                    items-center
-                                                    gap-3
-                                                    rounded-xl
-                                                    px-3
-                                                    py-3
-                                                    text-left
-                                                    text-sm
-                                                    font-medium
-                                                    text-text-primary
-                                                    transition-transform
-                                                    duration-150
-                                                    hover:bg-surface-elevated
-                                                    active:bg-surface-elevated
-                                                    active:scale-95
-                                                "
+                                    {/* More Popup (portal to document.body) */}
+                                    {isMoreOpen &&
+                                        createPortal(
+                                            <div
+                                                ref={morePopupRef}
+                                                onClick={(e) => e.stopPropagation()}
+                                                onPointerDown={(e) => e.stopPropagation()}
+                                                onMouseDown={(e) => e.stopPropagation()}
                                             >
-                                                <ShareNetworkIcon
-                                                    size={21}
-                                                    weight="regular"
-                                                />
+                                                {isMobile ? (
+                                                    <>
+                                                        {/* Backdrop */}
+                                                        <div
+                                                            aria-hidden="true"
+                                                            onClick={() => setIsMoreOpen(false)}
+                                                            className="fixed inset-0 z-90 bg-black/60 backdrop-blur-xs"
+                                                        />
 
-                                                <span>
-                                                    Share
-                                                </span>
-                                            </button>
+                                                        {/* Bottom sheet */}
+                                                        <div
+                                                            role="dialog"
+                                                            aria-modal="true"
+                                                            aria-label="More options"
+                                                            className="
+                                                                fixed
+                                                                inset-x-0
+                                                                bottom-0
+                                                                z-100
+                                                                max-h-[80dvh]
+                                                                overflow-y-auto
+                                                                overscroll-contain
+                                                                rounded-t-3xl
+                                                                bg-surface-elevated
+                                                                p-3
+                                                                pb-[calc(0.75rem+env(safe-area-inset-bottom))]
+                                                                shadow-2xl
+                                                            "
+                                                        >
+                                                            {/* Drag Pill */}
+                                                            <div className="mb-3 flex justify-center">
+                                                                <div className="h-1 w-10 rounded-full bg-text-muted/40" />
+                                                            </div>
 
-                                            {/* Save */}
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setIsMoreOpen(false);
-                                                    setIsSaveOpen(true);
-                                                }}
-                                                className="
-                                                    flex
-                                                    w-full
-                                                    items-center
-                                                    gap-3
-                                                    rounded-xl
-                                                    px-3
-                                                    py-3
-                                                    text-left
-                                                    text-sm
-                                                    font-medium
-                                                    text-text-primary
-                                                    transition-transform
-                                                    duration-150
-                                                    hover:bg-surface-elevated
-                                                    active:bg-surface-elevated
-                                                    active:scale-95
-                                                "
-                                            >
-                                                <BookmarkSimpleIcon
-                                                    size={21}
-                                                    weight="regular"
-                                                />
+                                                            {/* Sheet Header */}
+                                                            <div className="flex items-center justify-between px-2 pb-2">
+                                                                <span className="text-sm font-semibold text-text-primary">
+                                                                    More options
+                                                                </span>
 
-                                                <span>
-                                                    Save
-                                                </span>
-                                            </button>
+                                                                <button
+                                                                    type="button"
+                                                                    aria-label="Close"
+                                                                    onClick={() => setIsMoreOpen(false)}
+                                                                    className="
+                                                                        flex
+                                                                        h-9
+                                                                        w-9
+                                                                        touch-manipulation
+                                                                        items-center
+                                                                        justify-center
+                                                                        rounded-full
+                                                                        text-text-secondary
+                                                                        transition-colors
+                                                                        duration-150
+                                                                        active:scale-95
+                                                                        active:bg-surface
+                                                                    "
+                                                                >
+                                                                    <XIcon size={20} weight="bold" />
+                                                                </button>
+                                                            </div>
 
-                                        </div>
-                                    )}
+                                                            {/* Actions */}
+                                                            <div className="space-y-1">
+                                                                <VideoCardButton
+                                                                    icon={ShareNetworkIcon}
+                                                                    text="Share"
+                                                                    onClick={() => {
+                                                                        setIsMoreOpen(false);
+                                                                        share({
+                                                                            path: `/watch/${params.videoId}`,
+                                                                            title: videoData.title,
+                                                                        });
+                                                                    }}
+                                                                />
+
+                                                                <VideoCardButton
+                                                                    icon={BookmarkSimpleIcon}
+                                                                    text="Save"
+                                                                    onClick={() => {
+                                                                        setIsMoreOpen(false);
+                                                                        setIsSaveOpen(true);
+                                                                    }}
+                                                                />
+
+                                                                {isOwner && (
+                                                                    <VideoCardButton
+                                                                        icon={PencilSimpleIcon}
+                                                                        text="Edit Video"
+                                                                        onClick={() => {
+                                                                            setIsMoreOpen(false);
+                                                                            navigate(`/edit-video/${params.videoId}`);
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    /* Desktop / tablet dropdown */
+                                                    <div
+                                                        ref={dropdownRef}
+                                                        role="menu"
+                                                        style={
+                                                            coords ?? {
+                                                                top: 0,
+                                                                right: 0,
+                                                                visibility: "hidden",
+                                                            }
+                                                        }
+                                                        className="
+                                                            fixed
+                                                            z-100
+                                                            w-56
+                                                            rounded-2xl
+                                                            border
+                                                            border-border
+                                                            bg-surface-elevated
+                                                            p-2
+                                                            shadow-2xl
+                                                        "
+                                                    >
+                                                        <VideoCardButton
+                                                            icon={ShareNetworkIcon}
+                                                            text="Share"
+                                                            onClick={() => {
+                                                                setIsMoreOpen(false);
+                                                                share({
+                                                                    path: `/watch/${params.videoId}`,
+                                                                    title: videoData.title,
+                                                                });
+                                                            }}
+                                                        />
+
+                                                        <VideoCardButton
+                                                            icon={BookmarkSimpleIcon}
+                                                            text="Save"
+                                                            onClick={() => {
+                                                                setIsMoreOpen(false);
+                                                                setIsSaveOpen(true);
+                                                            }}
+                                                        />
+
+                                                        {isOwner && (
+                                                            <VideoCardButton
+                                                                icon={PencilSimpleIcon}
+                                                                text="Edit Video"
+                                                                onClick={() => {
+                                                                    setIsMoreOpen(false);
+                                                                    navigate(`/edit-video/${params.videoId}`);
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>,
+                                            document.body
+                                        )}
                                 </div>
 
                             </div>

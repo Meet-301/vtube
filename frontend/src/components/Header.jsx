@@ -66,42 +66,29 @@ function Header({ onMenuClick }) {
             <div className="flex h-full w-full items-center px-2 sm:px-3 md:px-4">
 
                 {/* ================= LEFT SECTION ================= */}
-                <div className="flex shrink-0 items-center lg:ml-1.5 gap-3">
+                <div className="flex shrink-0 items-center lg:ml-1.5 gap-2 sm:gap-3">
 
                     {/* Menu - Mobile & Tablet */}
                     <button
                         type="button"
                         aria-label="Open menu"
-                        title="More"
+                        title="Menu"
                         onClick={onMenuClick}
                         className="
-                            group relative
                             flex
-                            h-10 w-10
+                            h-10 w-10 shrink-0
                             items-center justify-center
                             rounded-full
                             text-text-primary
-                            active:bg-surface
+                            transition-all duration-200
+                            hover:bg-surface-elevated
+                            active:bg-surface-elevated
                             active:scale-95
                         "
                     >
-                        <span
-                            className="
-                                pointer-events-none
-                                absolute
-                                -inset-1
-                                rounded-full
-                                bg-surface-elevated
-                                opacity-0
-                                transition-opacity duration-200
-                                group-hover:opacity-100
-                            "
-                        />
-
                         <ListIcon
-                            size={32}
+                            size={24}
                             weight="regular"
-                            className="relative z-10"
                         />
                     </button>
 
@@ -115,17 +102,19 @@ function Header({ onMenuClick }) {
                             src="/Vtube logo.png"
                             alt="VTube"
                             className="
-                                h-12 w-12
-                                sm:h-12 sm:w-12
-                                md:h-14 md:w-14
-                                object-contain
+                                h-9 w-9
+                                sm:h-11 sm:w-11
+                                md:h-12 md:w-12
+                                object-contain shrink-0
                             "
                         />
 
                         <span
                             className="
                                 brand-font
-                                -ml-2
+                                -ml-1
+                                hidden
+                                sm:inline-block
                                 text-xl
                                 sm:text-2xl
                                 md:text-3xl
@@ -291,14 +280,13 @@ function Header({ onMenuClick }) {
 
                     {/* Upload */}
                     <UploadButton
-                        size={25}
+                        size={24}
                         classes="
                             hidden
                             lg:flex
                             h-10
                             w-10
                             shrink-0
-                            mt-1
                             items-center
                             justify-center
                             rounded-full
@@ -314,18 +302,23 @@ function Header({ onMenuClick }) {
                 </div>
 
                 {/* ================= RIGHT SECTION ================= */}
-                <div className="ml-auto flex shrink-0 items-center gap-3">
+                <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 md:gap-3">
 
-                    <UploadButton size={32} classes="lg:hidden flex
+                    <UploadButton
+                        size={24}
+                        classes="
+                            lg:hidden flex
                             h-10 w-10
-                            shrink-0 mt-1
+                            shrink-0
                             items-center justify-center
                             rounded-full
                             text-text-primary
                             transition-all duration-200
-                            hover:bg-surface
-                            active:bg-surface
-                            active:scale-95" />
+                            hover:bg-surface-elevated
+                            active:bg-surface-elevated
+                            active:scale-95
+                        "
+                    />
 
                     {/* Mobile Search */}
                     <Link
@@ -334,6 +327,7 @@ function Header({ onMenuClick }) {
                         className="
                             flex md:hidden
                             h-10 w-10
+                            shrink-0
                             items-center justify-center
                             rounded-full
                             text-text-primary
@@ -344,7 +338,7 @@ function Header({ onMenuClick }) {
                         "
                     >
                         <MagnifyingGlassIcon
-                            size={32}
+                            size={24}
                             weight="regular"
                         />
                     </Link>

@@ -83,13 +83,16 @@ function ProfileMenu() {
             <button
                 type="button"
                 onClick={() => setIsopen(!isOpen)}
+                aria-label="Account menu"
                 className="
                     flex
-                    h-11 w-11 mt-1
+                    h-10 w-10 shrink-0
                     items-center justify-center
                     rounded-full
                     transition-all duration-200
                     text-text-primary
+                    border border-border/80
+                    hover:ring-2 hover:ring-primary/40
                     active:scale-95
                     overflow-hidden
                 "
