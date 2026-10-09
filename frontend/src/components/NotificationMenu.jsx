@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { NotificationItem } from ".";
 import { markAllAsRead, markAsRead, clearAllNotifications } from "../features/notificationSlice.js";
 import { timeAgo } from "../utils/formatters.js";
+import api from "../api/axios.js";
 
 function NotificationMenu() {
     const [isOpen, setIsOpen] = useState(false);
@@ -34,12 +35,41 @@ function NotificationMenu() {
         };
     }, []);
 
-    function handleItemClick(item) {
-        dispatch(markAsRead(item.id));
+    async function handleItemClick(item) {
+        const notifId = item.id || item._id;
+        if (notifId) {
+            dispatch(markAsRead(notifId));
+            try {
+                await api.patch(`/notifications/${notifId}/read`);
+            } catch (err) {
+                console.log("Failed to mark notification read on backend:", err);
+            }
+        }
+
         setIsOpen(false);
 
         if (item.videoId) {
             navigate(`/watch/${item.videoId}`);
+        } else if (item.subscriberUsername) {
+            navigate(`/channel/${item.subscriberUsername}`);
+        }
+    }
+
+    async function handleMarkAllAsRead() {
+        dispatch(markAllAsRead());
+        try {
+            await api.patch("/notifications/read-all");
+        } catch (err) {
+            console.log("Failed to mark all notifications read on backend:", err);
+        }
+    }
+
+    async function handleClearAll() {
+        dispatch(clearAllNotifications());
+        try {
+            await api.delete("/notifications/clear");
+        } catch (err) {
+            console.log("Failed to clear notifications on backend:", err);
         }
     }
 
@@ -52,7 +82,7 @@ function NotificationMenu() {
                 aria-label="Notifications"
                 title="Notifications"
                 className="
-                    hidden lg:flex
+                    flex
                     h-10 w-10 items-center justify-center
                     rounded-full
                     text-text-primary
@@ -62,11 +92,11 @@ function NotificationMenu() {
                     relative
                 "
             >
-                <BellIcon size={26} weight="regular" />
+                <BellIcon size={28} weight="regular" />
 
                 {/* Badge Counter */}
                 {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-bold text-white shadow-md animate-pulse">
+                    <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white shadow-md animate-pulse">
                         {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
                 )}
@@ -93,17 +123,17 @@ function NotificationMenu() {
                                     {unreadCount > 0 && (
                                         <button
                                             type="button"
-                                            onClick={() => dispatch(markAllAsRead())}
-                                            className="text-xs font-medium text-primary hover:underline"
+                                            onClick={handleMarkAllAsRead}
+                                            className="text-xs font-medium text-primary hover:underline cursor-pointer"
                                         >
                                             Mark all read
                                         </button>
                                     )}
                                     <button
                                         type="button"
-                                        onClick={() => dispatch(clearAllNotifications())}
+                                        onClick={handleClearAll}
                                         title="Clear all"
-                                        className="text-xs text-text-muted hover:text-red-400 transition-colors"
+                                        className="text-xs text-text-muted hover:text-red-400 transition-colors cursor-pointer"
                                     >
                                         Clear
                                     </button>
@@ -121,8 +151,9 @@ function NotificationMenu() {
                             ) : (
                                 notificationsList.map((item) => (
                                     <NotificationItem
-                                        key={item.id}
-                                        avatar={item.avatar || "https://i.pravatar.cc/150?img=12"}
+                                        key={item.id || item._id}
+                                        avatar={item.avatar}
+                                        thumbnail={item.thumbnail}
                                         message={item.message}
                                         time={timeAgo(item.createdAt) || "just now"}
                                         unread={item.unread}

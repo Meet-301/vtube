@@ -1,4 +1,4 @@
-import { CheckIcon, UserPlusIcon } from "@phosphor-icons/react";
+import { CheckIcon } from "@phosphor-icons/react";
 import {
     CategoryBar,
     Sidebar,
@@ -9,29 +9,67 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { LoadingOverlay } from "@mantine/core";
 import api from "../api/axios.js";
+import { useSaveToPlaylist } from "../context/SaveToPlaylistContext.jsx";
+import { useShare } from "../hooks/useShare.jsx";
 
 function Subscriptions() {
     const currentUser = useSelector((state) => state.auth.user);
     const [channels, setChannels] = useState([]);
+    const [feedVideos, setFeedVideos] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [sortBy, setSortBy] = useState("latest");
+
+    const { openSave } = useSaveToPlaylist();
+    const { share } = useShare();
 
     async function fetchSubscribedChannels() {
         if (!currentUser?._id) return;
         try {
-            setIsLoading(true);
             const res = await api.get(`/subscriptions/subscribed-channels/${currentUser._id}`);
             const data = res.data?.data || [];
             setChannels(data.map((item) => item.channel).filter(Boolean));
         } catch (error) {
             console.log("Failed to fetch subscribed channels:", error);
-        } finally {
-            setIsLoading(false);
+        }
+    }
+
+    async function fetchFeedVideos(sort = sortBy) {
+        if (!currentUser?._id) return;
+        try {
+            const res = await api.get("/videos/feed/subscription", {
+                params: { sortBy: sort },
+            });
+            const data = res.data?.data || [];
+            setFeedVideos(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.log("Failed to fetch subscription feed videos:", error);
         }
     }
 
     useEffect(() => {
-        fetchSubscribedChannels();
-    }, [currentUser?._id]);
+        if (!currentUser?._id) return;
+        let isMounted = true;
+
+        async function loadData() {
+            try {
+                setIsLoading(true);
+                await Promise.all([
+                    fetchSubscribedChannels(),
+                    fetchFeedVideos(sortBy),
+                ]);
+            } catch (error) {
+                console.log("Failed to load subscriptions data:", error);
+            } finally {
+                if (isMounted) setIsLoading(false);
+            }
+        }
+
+        loadData();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [currentUser?._id, sortBy]);
 
     async function handleToggleSubscribe(e, channelId) {
         e.preventDefault();
@@ -39,77 +77,14 @@ function Subscriptions() {
         try {
             await api.post(`/subscriptions/toggle/${channelId}`);
             setChannels((prev) => prev.filter((ch) => ch._id !== channelId));
+            setFeedVideos((prev) => prev.filter((v) => {
+                const ownerId = v.owner?._id || v.owner;
+                return ownerId?.toString() !== channelId?.toString();
+            }));
         } catch (error) {
             console.log("Failed to toggle subscription:", error);
         }
     }
-
-    const videos = [
-        {
-            thumbnail:
-                "https://picsum.photos/seed/sub3/640/360",
-            title:
-                "MongoDB Aggregation Pipeline Tutorial",
-            avatar:
-                "https://i.pravatar.cc/150?img=45",
-            channelName:
-                "Backend Lab",
-            views:
-                "21K views",
-            uploadedAt:
-                "1 week ago",
-            duration:
-                "22:16",
-        },
-        {
-            thumbnail:
-                "https://picsum.photos/seed/sub4/640/360",
-            title:
-                "How I Built My First Production Web App",
-            avatar:
-                "https://i.pravatar.cc/150?img=56",
-            channelName:
-                "Code Stories",
-            views:
-                "34K views",
-            uploadedAt:
-                "2 weeks ago",
-            duration:
-                "16:51",
-        },
-        {
-            thumbnail:
-                "https://picsum.photos/seed/sub5/640/360",
-            title:
-                "JavaScript Async Await Finally Explained",
-            avatar:
-                "https://i.pravatar.cc/150?img=68",
-            channelName:
-                "JS Simplified",
-            views:
-                "17K views",
-            uploadedAt:
-                "3 weeks ago",
-            duration:
-                "11:38",
-        },
-        {
-            thumbnail:
-                "https://picsum.photos/seed/sub6/640/360",
-            title:
-                "What Actually Happens When You Call an API?",
-            avatar:
-                "https://i.pravatar.cc/150?img=11",
-            channelName:
-                "Web Dev Daily",
-            views:
-                "9.7K views",
-            uploadedAt:
-                "1 month ago",
-            duration:
-                "13:04",
-        },
-    ];
 
     return (
         <main className="flex min-w-0">
@@ -120,6 +95,9 @@ function Subscriptions() {
                 overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
                 loaderProps={{ color: "blue", type: "oval" }}
             />
+
+            {/* ================= SIDEBAR ================= */}
+            <Sidebar />
 
             {/* ================= MAIN CONTENT ================= */}
 
@@ -134,13 +112,11 @@ function Subscriptions() {
                         z-40
                         bg-background/75
                         backdrop-blur-xl
+                        -ml-5
                         md:top-16
                     "
                 >
-                    <div className="xl:ml-14">
-                        <CategoryBar />
-                    </div>
-                    
+                    <CategoryBar selected={sortBy} onSelect={setSortBy} />
                 </div>
 
 
@@ -310,29 +286,41 @@ function Subscriptions() {
 
                         {/* ================= VIDEO GRID ================= */}
 
-                        <div
-                            className="
-                                grid
-                                grid-cols-1
-                                gap-x-4
-                                gap-y-8
-                                sm:grid-cols-2
-                                lg:grid-cols-3
-                            "
-                        >
-
-                            {videos.map((video, index) => (
-
-                                <VideoCard
-                                    key={index}
-                                    editButton={false}
-                                    deleteButton={false}
-                                    {...video}
-                                />
-
-                            ))}
-
-                        </div>
+                        {feedVideos.length === 0 && !isLoading ? (
+                            <div className="py-16 text-center">
+                                <p className="text-base text-text-secondary">
+                                    No videos from your subscribed channels yet.
+                                </p>
+                            </div>
+                        ) : (
+                            <div
+                                className="
+                                    grid
+                                    grid-cols-1
+                                    gap-x-4
+                                    gap-y-8
+                                    sm:grid-cols-2
+                                    lg:grid-cols-3
+                                "
+                            >
+                                {feedVideos.map((video) => (
+                                    <Link key={video._id} to={`/watch/${video._id}`}>
+                                        <VideoCard
+                                            channelName={video.owner?.fullName || video.owner?.username}
+                                            avatar={video.owner?.avatar}
+                                            editButton={false}
+                                            deleteButton={false}
+                                            onSaveClick={() => openSave(video._id)}
+                                            onShareClick={() => share({
+                                                path: `/watch/${video._id}`,
+                                                title: `${video.title}`
+                                            })}
+                                            {...video}
+                                        />
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
 
                     </section>
 

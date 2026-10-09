@@ -13,6 +13,7 @@ import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
 import { Like } from "../models/like.model.js";
 import { Subscription } from "../models/subscription.model.js";
+import { Notification } from "../models/notification.model.js";
 
 const createVideo = asyncHandler(async (req, res) => {
    if (!req.body) {
@@ -78,29 +79,44 @@ const createVideo = asyncHandler(async (req, res) => {
    delete safeVideo.videoFile;
    delete safeVideo.videoPublicId;
 
-   // Real-time socket notification to all channel subscribers
+   // Real-time socket & DB notification to all channel subscribers
    try {
-      const io = req.app.get("io");
-      if (io) {
-         Subscription.find({ channel: userId })
-            .select("subscriber")
-            .lean()
-            .then((subscribers) => {
-               subscribers.forEach((sub) => {
-                  io.to(sub.subscriber.toString()).emit("new_notification", {
-                     type: "NEW_VIDEO",
-                     message: `${req.user.fullName || req.user.username} uploaded a new video: "${createdVideo.title}"`,
-                     avatar: req.user.avatar,
-                     thumbnail: createdVideo.thumbnail,
-                     videoId: createdVideo._id,
-                     createdAt: new Date().toISOString(),
-                  });
+      const subscribers = await Subscription.find({ channel: userId })
+         .select("subscriber")
+         .lean();
+
+      if (subscribers.length > 0) {
+         const notifDocs = subscribers.map((sub) => ({
+            recipient: sub.subscriber,
+            sender: userId,
+            type: "NEW_VIDEO",
+            message: `${req.user.fullName || req.user.username} uploaded a new video: "${createdVideo.title}"`,
+            avatar: req.user.avatar,
+            thumbnail: createdVideo.thumbnail,
+            videoId: createdVideo._id,
+         }));
+
+         const savedNotifs = await Notification.insertMany(notifDocs);
+
+         const io = req.app.get("io");
+         if (io) {
+            savedNotifs.forEach((notif) => {
+               io.to(notif.recipient.toString()).emit("new_notification", {
+                  _id: notif._id,
+                  id: notif._id.toString(),
+                  type: "NEW_VIDEO",
+                  message: notif.message,
+                  avatar: notif.avatar,
+                  thumbnail: notif.thumbnail,
+                  videoId: notif.videoId,
+                  unread: true,
+                  createdAt: notif.createdAt,
                });
-            })
-            .catch((err) => console.log("Socket notification error (subscribers):", err));
+            });
+         }
       }
    } catch (err) {
-      console.log("Socket notification error (video upload):", err);
+      console.log("Notification error (video upload):", err);
    }
 
    return res
@@ -333,10 +349,28 @@ const getVideoById = asyncHandler(async (req, res) => {
 const getSubscriptionFeed = asyncHandler(async (req, res) => {
    const page = Number(req.query.page) || 1;
    const limit = Number(req.query.limit) || 10;
+   const { sortBy = "latest" } = req.query;
+
+   const sortMap = {
+      latest: { createdAt: -1 },
+      oldest: { createdAt: 1 },
+      mostliked: { likes: -1, createdAt: -1 },
+      mostviewed: { views: -1, createdAt: -1 },
+   };
+
+   const sort = sortMap[sortBy] || sortMap.latest;
 
    const subscriptions = await Subscription.find({ subscriber: req.user._id });
 
    const channelIds = subscriptions.map((sub) => sub.channel);
+
+   if (!channelIds.length) {
+      return res
+         .status(200)
+         .json(
+            new ApiResponse(200, [], "Subscriptions fetched successfully")
+         );
+   }
 
    const feedVideos = await Video.aggregate([
       {
@@ -358,6 +392,7 @@ const getSubscriptionFeed = asyncHandler(async (req, res) => {
                   $project: {
                      avatar: 1,
                      fullName: 1,
+                     username: 1,
                   },
                },
             ],
@@ -371,9 +406,7 @@ const getSubscriptionFeed = asyncHandler(async (req, res) => {
          },
       },
       {
-         $sort: {
-            createdAt: -1,
-         },
+         $sort: sort,
       },
       {
          $skip: (page - 1) * limit,

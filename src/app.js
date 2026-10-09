@@ -33,6 +33,7 @@ import playlistRouter from "./routes/playlist.route.js";
 import subscriptionRouter from "./routes/subscription.route.js";
 import searchRouter from "./routes/search.route.js";
 import videoNoteRouter from "./routes/videoNote.route.js";
+import notificationRouter from "./routes/notification.route.js";
 import ApiResponse from "./utils/ApiResponse.js";
 
 //! routes declaration
@@ -43,6 +44,7 @@ app.use("/api/v1/comments", commentRouter);
 app.use("/api/v1/playlists", playlistRouter);
 app.use("/api/v1/subscriptions", subscriptionRouter);
 app.use("/api/v1/video-notes", videoNoteRouter);
+app.use("/api/v1/notifications", notificationRouter);
 app.use("/api/v1", searchRouter);
 app.get("/", (req, res) => {
    res.json(new ApiResponse(200, [], "Hey, Welcome to VTube"))

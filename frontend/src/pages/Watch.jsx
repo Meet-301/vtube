@@ -9,7 +9,7 @@ import {
     TrashIcon,
     PlayIcon
 } from "@phosphor-icons/react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import api from "../api/axios";
 import { Loader, LoadingOverlay } from "@mantine/core";
 import { formatViews, timeAgo, formatDuration } from "../utils/formatters";
@@ -409,6 +409,33 @@ function Watch() {
         setIsMoreOpen((prev) => !prev);
     }
 
+    const isOwner = Boolean(
+        currentUserData?._id &&
+        (String(currentUserData._id) === String(userData?._id) ||
+         String(currentUserData._id) === String(channelData?._id) ||
+         String(currentUserData._id) === String(videoData?.owner))
+    );
+
+    async function handleToggleSubscribe() {
+        const channelId = channelData?._id || userData?._id;
+        if (!channelId) return;
+
+        try {
+            const res = await api.post(`/subscriptions/toggle/${channelId}`);
+            const isSub = res.data?.data?.isSubscribed;
+            setChannelData((prev) => ({
+                ...prev,
+                isSubscribed: isSub,
+                subscribersCount: isSub
+                    ? (prev.subscribersCount || 0) + 1
+                    : Math.max(0, (prev.subscribersCount || 1) - 1),
+            }));
+            showSuccess(isSub ? "Subscribed to channel" : "Unsubscribed from channel");
+        } catch (error) {
+            showError(error?.response?.data?.message || "Failed to toggle subscription");
+        }
+    }
+
     return (
         <main className="px-4 py-6">
             <LoadingOverlay
@@ -453,48 +480,81 @@ function Watch() {
                             {/* Channel */}
                             <div className="flex min-w-0 items-center gap-3">
 
-                                <img
-                                    src={userData.avatar}
-                                    alt="Backend Lab"
-                                    className="
-                                        h-12
-                                        w-12
-                                        shrink-0
-                                        rounded-full
-                                        object-cover
-                                    "
-                                />
-
-                                <div className="min-w-0">
-                                    <p className="truncate font-semibold text-text-primary">
-                                        {userData.fullName}
-                                    </p>
-
-                                    <p className="text-sm text-text-secondary">
-                                        {channelData.subscribersCount > 0 ? channelData.subscribersCount : "No "} subscribers
-                                    </p>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    className="
-                                        ml-2
-                                        shrink-0
-                                        rounded-full
-                                        bg-primary
-                                        px-5
-                                        py-2.5
-                                        text-sm
-                                        font-semibold
-                                        text-white
-                                        transition-all
-                                        hover:bg-primary-hover
-                                        active:bg-primary-hover
-                                        active:scale-95
-                                    "
+                                <Link
+                                    to={`/channel/${userData.username || channelData.username}`}
+                                    className="flex min-w-0 items-center gap-3 group/channel"
                                 >
-                                    Subscribe
-                                </button>
+                                    <img
+                                        src={userData.avatar}
+                                        alt={userData.fullName || "Channel Avatar"}
+                                        className="
+                                            h-12
+                                            w-12
+                                            shrink-0
+                                            rounded-full
+                                            object-cover
+                                            transition-transform
+                                            group-hover/channel:scale-105
+                                        "
+                                    />
+
+                                    <div className="min-w-0">
+                                        <p className="truncate font-semibold text-text-primary group-hover/channel:text-primary transition-colors">
+                                            {userData.fullName}
+                                        </p>
+
+                                        <p className="text-sm text-text-secondary">
+                                            {channelData.subscribersCount > 0 ? channelData.subscribersCount : "No "} subscribers
+                                        </p>
+                                    </div>
+                                </Link>
+
+                                {isOwner ? (
+                                    <Link
+                                        to={`/channel/${userData.username || channelData.username}`}
+                                        className="
+                                            ml-2
+                                            shrink-0
+                                            rounded-full
+                                            bg-surface-elevated
+                                            hover:bg-surface
+                                            border border-border
+                                            px-4
+                                            py-2
+                                            text-xs
+                                            sm:text-sm
+                                            font-medium
+                                            text-text-primary
+                                            transition-all
+                                            hover:text-white
+                                            active:scale-95
+                                        "
+                                    >
+                                        View channel
+                                    </Link>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={handleToggleSubscribe}
+                                        className={`
+                                            ml-2
+                                            shrink-0
+                                            rounded-full
+                                            px-5
+                                            py-2.5
+                                            text-sm
+                                            font-semibold
+                                            transition-all
+                                            active:scale-95
+                                            ${channelData.isSubscribed
+                                                ? "bg-surface-elevated text-text-primary hover:bg-surface border border-border"
+                                                : "bg-primary text-white hover:bg-primary-hover"
+                                            }
+                                        `}
+                                    >
+                                        {channelData.isSubscribed ? "Subscribed" : "Subscribe"}
+                                    </button>
+                                )}
 
                             </div>
 

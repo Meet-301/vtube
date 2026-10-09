@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import api from "./api/axios.js";
 import { useDispatch, useSelector } from "react-redux";
 import { login, setAccessToken, setInitializing } from "./features/authSlice.js";
-import { addNotification } from "./features/notificationSlice.js";
+import { addNotification, setNotifications } from "./features/notificationSlice.js";
 import { LoadingOverlay } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { SaveToPlaylistProvider } from "./context/SaveToPlaylistContext.jsx";
@@ -89,6 +89,24 @@ function App() {
     };
   }, []);
 
+  //! Fetch user notifications from database on auth
+  useEffect(() => {
+    if (!currentUser?._id) return;
+
+    async function fetchUserNotifications() {
+      try {
+        const res = await api.get("/notifications");
+        if (res.data?.data) {
+          dispatch(setNotifications(res.data.data));
+        }
+      } catch (err) {
+        console.log("Failed to fetch notifications from backend:", err);
+      }
+    }
+
+    fetchUserNotifications();
+  }, [currentUser?._id, dispatch]);
+
   //! Real-time Socket.IO notification listener
   useEffect(() => {
     if (!currentUser?._id) {
@@ -96,11 +114,19 @@ function App() {
       return;
     }
 
-    if (!socket.connected) {
-      socket.connect();
+    function joinRoom() {
+      if (currentUser?._id) {
+        socket.emit("join", currentUser._id.toString());
+      }
     }
 
-    socket.emit("join", currentUser._id);
+    socket.on("connect", joinRoom);
+
+    if (socket.connected) {
+      joinRoom();
+    } else {
+      socket.connect();
+    }
 
     function handleNotification(data) {
       dispatch(addNotification(data));
@@ -116,6 +142,7 @@ function App() {
     socket.on("new_notification", handleNotification);
 
     return () => {
+      socket.off("connect", joinRoom);
       socket.off("new_notification", handleNotification);
     };
   }, [currentUser?._id, dispatch]);

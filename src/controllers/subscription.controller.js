@@ -3,6 +3,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { Subscription } from "../models/subscription.model.js";
+import { Notification } from "../models/notification.model.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 const toggleSubscription = asyncHandler(async (req, res) => {
@@ -42,16 +43,35 @@ const toggleSubscription = asyncHandler(async (req, res) => {
       });
       isSubscribed = true;
 
-      // Real-time socket notification to creator
+      // 1. Save notification to database
+      let savedNotif = null;
+      try {
+         savedNotif = await Notification.create({
+            recipient: channelId,
+            sender: req.user._id,
+            type: "SUBSCRIBER",
+            message: `${req.user.fullName || req.user.username} subscribed to your channel!`,
+            avatar: req.user.avatar,
+            subscriberUsername: req.user.username,
+         });
+      } catch (err) {
+         console.log("DB notification error (subscription):", err);
+      }
+
+      // 2. Real-time socket notification to creator
       try {
          const io = req.app.get("io");
          if (io) {
             io.to(channelId.toString()).emit("new_notification", {
+               _id: savedNotif?._id,
+               id: savedNotif?._id?.toString() || Date.now().toString(),
                type: "SUBSCRIBER",
                message: `${req.user.fullName || req.user.username} subscribed to your channel!`,
                avatar: req.user.avatar,
+               subscriberUsername: req.user.username,
                subscriberId: req.user._id,
-               createdAt: new Date().toISOString(),
+               unread: true,
+               createdAt: savedNotif?.createdAt || new Date().toISOString(),
             });
          }
       } catch (err) {

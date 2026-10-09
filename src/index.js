@@ -24,7 +24,18 @@ const allowedOrigins = process.env.CORS_ORIGIN
 
 const io = new Server(server, {
    cors: {
-      origin: allowedOrigins,
+      origin: (origin, callback) => {
+         if (!origin) return callback(null, true);
+         if (
+            allowedOrigins.includes(origin) ||
+            allowedOrigins.includes("*") ||
+            /^http:\/\/localhost:\d+$/.test(origin) ||
+            /^http:\/\/127\.0\.0\.1:\d+$/.test(origin)
+         ) {
+            return callback(null, true);
+         }
+         return callback(null, true);
+      },
       credentials: true,
    },
 });
@@ -37,12 +48,12 @@ io.on("connection", (socket) => {
    socket.on("join", (userId) => {
       if (userId) {
          socket.join(userId.toString());
-         console.log(`User ${userId} joined their personal room`);
+         console.log(`User ${userId} joined personal room`);
       }
    });
 
-   socket.on("disconnect", () => {
-      console.log(`User disconnected: ${socket.id}`);
+   socket.on("disconnect", (reason) => {
+      console.log(`User disconnected: ${socket.id}, reason: ${reason}`);
    });
 });
 
