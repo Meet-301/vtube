@@ -2,7 +2,7 @@
 import connectDB from "./db/db.js";
 import dotenv from "dotenv";
 import dns from "dns";
-import app from "./app.js";
+import app, { isAllowedOrigin } from "./app.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import ApiResponse from "./utils/ApiResponse.js";
@@ -18,23 +18,13 @@ dotenv.config({
 
 const server = createServer(app);
 
-const allowedOrigins = process.env.CORS_ORIGIN
-   ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
-   : ["http://localhost:5173"];
-
 const io = new Server(server, {
    cors: {
       origin: (origin, callback) => {
-         if (!origin) return callback(null, true);
-         if (
-            allowedOrigins.includes(origin) ||
-            allowedOrigins.includes("*") ||
-            /^http:\/\/localhost:\d+$/.test(origin) ||
-            /^http:\/\/127\.0\.0\.1:\d+$/.test(origin)
-         ) {
+         if (isAllowedOrigin(origin)) {
             return callback(null, true);
          }
-         return callback(null, true);
+         return callback(null, false);
       },
       credentials: true,
    },

@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import api from "../api/axios.js";
 import { LoadingOverlay } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../features/authSlice.js";
 
 function Login() {
@@ -21,11 +21,17 @@ function Login() {
     const {register, handleSubmit, reset} = useForm();
 
     const dispatch = useDispatch();
-
     const navigate = useNavigate();
+    const { isAuthenticated } = useSelector((state) => state.auth);
 
     const [searchParams, setSearchParams] = useSearchParams();
     const oAuthError = searchParams.get("error");
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/", { replace: true });
+        }
+    }, [isAuthenticated, navigate]);
 
     useEffect(() => {
         if(oAuthError) {
@@ -71,11 +77,17 @@ function Login() {
                 login({
                     user: response.data?.data?.user,
                     accessToken: response.data?.data?.accessToken,
+                    refreshToken: response.data?.data?.refreshToken,
                 })
             );
-            navigate("/");
+            navigate("/", { replace: true });
         } catch (error) {
-            showError(error?.response?.data?.message);
+            const errorMsg =
+                error?.response?.data?.message ||
+                (error?.code === "ERR_NETWORK"
+                    ? "Network Error: Server is waking up or unreachable. Please try again."
+                    : error?.message || "Failed to login. Please check credentials.");
+            showError(errorMsg);
         } finally {
             setIsLoading(false);
             reset();

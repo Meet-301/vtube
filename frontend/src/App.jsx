@@ -6,7 +6,7 @@ import {
 import { useState, useEffect } from "react";
 import api from "./api/axios.js";
 import { useDispatch, useSelector } from "react-redux";
-import { login, setAccessToken, setInitializing } from "./features/authSlice.js";
+import { login, setAccessToken, setInitializing, logout } from "./features/authSlice.js";
 import { addNotification, setNotifications } from "./features/notificationSlice.js";
 import { LoadingOverlay } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
@@ -23,6 +23,7 @@ function App() {
 
   const isInitializing = useSelector(state => state.auth.isInitializing);
   const currentUser = useSelector(state => state.auth.user);
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
 
   const pages = [
     "/search",
@@ -38,18 +39,22 @@ function App() {
   useEffect(() => {
     async function restoreAuth() {
       try {
+        const storedRefreshToken = localStorage.getItem("vtube_refreshToken");
+        const storedAccessToken = localStorage.getItem("vtube_accessToken");
+
         const refreshResponse = await api.post(
-          "/users/refresh-token"
+          "/users/refresh-token",
+          storedRefreshToken ? { refreshToken: storedRefreshToken } : {}
         );
 
         const accessToken =
           refreshResponse.data?.data?.accessToken;
+        const refreshToken =
+          refreshResponse.data?.data?.refreshToken;
 
-        if (!accessToken) {
-          return;
+        if (accessToken) {
+          dispatch(setAccessToken(accessToken));
         }
-
-        dispatch(setAccessToken(accessToken));
 
         const userResponse = await api.get(
           "/users/current-user"
@@ -57,18 +62,24 @@ function App() {
 
         const user = userResponse.data?.data;
 
-        dispatch(
-          login({
-            user,
-            accessToken
-          })
-        );
+        if (user) {
+          dispatch(
+            login({
+              user,
+              accessToken: accessToken || storedAccessToken,
+              refreshToken: refreshToken || storedRefreshToken,
+            })
+          );
+        }
 
       } catch (error) {
         console.log(
           "Auth restore failed:",
           error.response?.data || error
         );
+        if (error.response?.status === 401) {
+          dispatch(logout());
+        }
       } finally {
         dispatch(setInitializing(false));
       }
@@ -147,7 +158,9 @@ function App() {
     };
   }, [currentUser?._id, dispatch]);
 
-  if (isInitializing) {
+  const shouldBlockScreen = isInitializing && !isAuthenticated && !isCheckPage;
+
+  if (shouldBlockScreen) {
     return (
       <div className="
             flex
@@ -157,7 +170,7 @@ function App() {
             bg-background
         ">
         <LoadingOverlay
-          visible={isInitializing}
+          visible={true}
           zIndex={1000}
           pos="fixed"
           inset={0}

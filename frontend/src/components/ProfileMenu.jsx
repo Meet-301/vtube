@@ -21,7 +21,24 @@ function ProfileMenu() {
     const navigate = useNavigate();
     const user = useSelector(state => state?.auth?.user);
 
-    if(!user) return null;
+    useEffect(() => {
+        function handleClick(event) {
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(event.target)
+            ) {
+                setIsopen(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClick);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClick);
+        };
+    }, []);
+
+    if (!user) return null;
 
     function showError(error) {
         notifications.show({
@@ -38,23 +55,6 @@ function ProfileMenu() {
             color: "vtube",
         });
     }
-
-    useEffect(() => {
-        function handleClick(event) {
-            if (
-                menuRef.current &&
-                !menuRef.current.contains(event.target)
-            ) {
-                setIsopen(false);
-            }
-        }
-
-        document.addEventListener("mousedown", handleClick);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClick);
-        }
-    }, []);
 
     async function handleLogout() {
         try {

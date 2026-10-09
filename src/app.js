@@ -6,13 +6,45 @@ import passport from "./config/passport.js";
 
 const app = express(); //! new server instance of express application
 
-const allowedOrigins = process.env.CORS_ORIGIN
-   ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
-   : ["http://localhost:5173"];
+export const isAllowedOrigin = (origin) => {
+   if (!origin) return true;
+   const cleanOrigin = origin.replace(/\/$/, "");
+
+   const configuredOrigins = process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim().replace(/\/$/, ""))
+      : ["http://localhost:5173"];
+
+   if (configuredOrigins.includes(cleanOrigin) || configuredOrigins.includes("*")) {
+      return true;
+   }
+
+   // Localhost with any port (5173, 3000, etc.)
+   if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(cleanOrigin)) {
+      return true;
+   }
+
+   // Local network IP addresses for tablet/mobile Wi-Fi testing
+   if (/^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(cleanOrigin)) {
+      return true;
+   }
+
+   // Any Vercel deployment domain (*.vercel.app)
+   if (/^https:\/\/[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.vercel\.app$/.test(cleanOrigin)) {
+      return true;
+   }
+
+   return false;
+};
 
 app.use(
    cors({
-      origin: allowedOrigins,
+      origin: (origin, callback) => {
+         if (isAllowedOrigin(origin)) {
+            callback(null, true);
+         } else {
+            callback(new Error(`Origin ${origin} not allowed by CORS`));
+         }
+      },
       credentials: true,
    })
 );

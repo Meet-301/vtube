@@ -45,9 +45,9 @@ function DrawerItem({ icon: Icon, label, url }) {
 }
 
 function SidebarDrawer({ isOpen, onClose }) {
-    if (!isOpen) return null;
-
     const currentUser = useSelector(state => state.auth.user);
+
+    if (!isOpen) return null;
 
     return (
         <>
@@ -122,7 +122,7 @@ function SidebarDrawer({ isOpen, onClose }) {
                     <DrawerItem
                         icon={UserIcon}
                         label="Your channel"
-                        url={`/channel/${currentUser.username}`}
+                        url={`/channel/${currentUser?.username || ""}`}
                     />
 
                     <DrawerItem
