@@ -12,6 +12,10 @@ const toggleSubscription = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Invalid channel id");
    }
 
+   if (String(channelId) === String(req.user._id)) {
+      throw new ApiError(400, "You cannot subscribe to your own channel");
+   }
+
    const channel = await User.findById(channelId);
 
    if (!channel) {
@@ -24,20 +28,35 @@ const toggleSubscription = asyncHandler(async (req, res) => {
    });
 
    let isSubscribed;
-   let data;
 
    if (isSubscriptionExists) {
-      data = await Subscription.deleteOne({
+      await Subscription.deleteOne({
          subscriber: req.user._id,
          channel: channelId,
       });
       isSubscribed = false;
    } else {
-      data = await Subscription.create({
+      await Subscription.create({
          subscriber: req.user._id,
          channel: channelId,
       });
       isSubscribed = true;
+
+      // Real-time socket notification to creator
+      try {
+         const io = req.app.get("io");
+         if (io) {
+            io.to(channelId.toString()).emit("new_notification", {
+               type: "SUBSCRIBER",
+               message: `${req.user.fullName || req.user.username} subscribed to your channel!`,
+               avatar: req.user.avatar,
+               subscriberId: req.user._id,
+               createdAt: new Date().toISOString(),
+            });
+         }
+      } catch (err) {
+         console.log("Socket notification error (subscription):", err);
+      }
    }
 
    return res
@@ -45,7 +64,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
       .json(
          new ApiResponse(
             200,
-            data,
+            { isSubscribed },
             isSubscribed
                ? "Channel subscribed successfully"
                : "Channel unsubscribed successfully"
@@ -74,9 +93,62 @@ const getChannelSubscribers = asyncHandler(async (req, res) => {
 });
 
 const getMySubscribedChannels = asyncHandler(async (req, res) => {
-   const subscribedChannels = await Subscription.find({
-      subscriber: req.user._id,
-   });
+   const subscriberId = req.params.userId || req.user._id;
+
+   if (!mongoose.Types.ObjectId.isValid(subscriberId)) {
+      throw new ApiError(400, "Invalid user id");
+   }
+
+   const subscribedChannels = await Subscription.aggregate([
+      {
+         $match: {
+            subscriber: new mongoose.Types.ObjectId(subscriberId),
+         },
+      },
+      {
+         $lookup: {
+            from: "users",
+            localField: "channel",
+            foreignField: "_id",
+            as: "channel",
+            pipeline: [
+               {
+                  $project: {
+                     fullName: 1,
+                     username: 1,
+                     avatar: 1,
+                  },
+               },
+            ],
+         },
+      },
+      {
+         $unwind: "$channel",
+      },
+      {
+         $lookup: {
+            from: "subscriptions",
+            localField: "channel._id",
+            foreignField: "channel",
+            as: "subscribers",
+         },
+      },
+      {
+         $addFields: {
+            "channel.subscribersCount": { $size: "$subscribers" },
+         },
+      },
+      {
+         $project: {
+            _id: 1,
+            channel: 1,
+            createdAt: 1,
+         },
+      },
+      {
+         $sort: { createdAt: -1 },
+      },
+   ]);
 
    return res
       .status(200)

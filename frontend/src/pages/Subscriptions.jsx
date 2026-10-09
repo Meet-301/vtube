@@ -1,69 +1,50 @@
-import { BellIcon, CheckIcon } from "@phosphor-icons/react";
-
+import { CheckIcon, UserPlusIcon } from "@phosphor-icons/react";
 import {
-    Sidebar,
     CategoryBar,
+    Sidebar,
     VideoCard,
 } from "../components";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { LoadingOverlay } from "@mantine/core";
+import api from "../api/axios.js";
 
 function Subscriptions() {
+    const currentUser = useSelector((state) => state.auth.user);
+    const [channels, setChannels] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const channels = [
-        {
-            avatar: "https://i.pravatar.cc/150?img=12",
-            name: "Code With Meet",
-            subscribers: "12.4K subscribers",
-        },
-        {
-            avatar: "https://i.pravatar.cc/150?img=32",
-            name: "Dev Academy",
-            subscribers: "84.7K subscribers",
-        },
-        {
-            avatar: "https://i.pravatar.cc/150?img=45",
-            name: "Backend Lab",
-            subscribers: "31.2K subscribers",
-        },
-        {
-            avatar: "https://i.pravatar.cc/150?img=56",
-            name: "Code Stories",
-            subscribers: "52.8K subscribers",
-        },
-    ];
+    async function fetchSubscribedChannels() {
+        if (!currentUser?._id) return;
+        try {
+            setIsLoading(true);
+            const res = await api.get(`/subscriptions/subscribed-channels/${currentUser._id}`);
+            const data = res.data?.data || [];
+            setChannels(data.map((item) => item.channel).filter(Boolean));
+        } catch (error) {
+            console.log("Failed to fetch subscribed channels:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchSubscribedChannels();
+    }, [currentUser?._id]);
+
+    async function handleToggleSubscribe(e, channelId) {
+        e.preventDefault();
+        e.stopPropagation();
+        try {
+            await api.post(`/subscriptions/toggle/${channelId}`);
+            setChannels((prev) => prev.filter((ch) => ch._id !== channelId));
+        } catch (error) {
+            console.log("Failed to toggle subscription:", error);
+        }
+    }
 
     const videos = [
-        {
-            thumbnail:
-                "https://picsum.photos/seed/sub1/640/360",
-            title:
-                "Building a Full Stack Video Platform with MERN",
-            avatar:
-                "https://i.pravatar.cc/150?img=12",
-            channelName:
-                "Code With Meet",
-            views:
-                "12K views",
-            uploadedAt:
-                "2 days ago",
-            duration:
-                "18:42",
-        },
-        {
-            thumbnail:
-                "https://picsum.photos/seed/sub2/640/360",
-            title:
-                "React Hooks Explained in Simple Terms",
-            avatar:
-                "https://i.pravatar.cc/150?img=32",
-            channelName:
-                "Dev Academy",
-            views:
-                "8.4K views",
-            uploadedAt:
-                "5 days ago",
-            duration:
-                "14:27",
-        },
         {
             thumbnail:
                 "https://picsum.photos/seed/sub3/640/360",
@@ -133,6 +114,13 @@ function Subscriptions() {
     return (
         <main className="flex min-w-0">
 
+            <LoadingOverlay
+                visible={isLoading}
+                zIndex={1000}
+                overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
+                loaderProps={{ color: "blue", type: "oval" }}
+            />
+
             {/* ================= MAIN CONTENT ================= */}
 
             <div className="min-w-0 flex-1 p-4">
@@ -195,108 +183,87 @@ function Subscriptions() {
                             "
                         >
 
-                            {channels.map((channel) => (
-
-                                <div
-                                    key={channel.name}
-                                    className="
-                                        flex
-                                        min-w-64
-                                        shrink-0
-                                        items-center
-                                        gap-3
-                                        rounded-2xl
-                                        bg-surface
-                                        hover:bg-surface-elevated
-                                        cursor-pointer
-                                        transition-transform
-                                        duration-150
-                                        active:scale-95
-                                        p-3
-                                    "
-                                >
-
-                                    {/* Avatar */}
-
-                                    <img
-                                        src={channel.avatar}
-                                        alt={channel.name}
-                                        className="
-                                            h-12
-                                            w-12
-                                            shrink-0
-                                            rounded-full
-                                            object-cover
-                                        "
-                                    />
-
-
-                                    {/* Channel information */}
-
-                                    <div className="min-w-0 flex-1">
-
-                                        <h2
-                                            className="
-                                                truncate
-                                                text-sm
-                                                font-semibold
-                                                text-text-primary
-                                            "
-                                        >
-                                            {channel.name}
-                                        </h2>
-
-                                        <p
-                                            className="
-                                                mt-0.5
-                                                truncate
-                                                text-xs
-                                                text-text-muted
-                                            "
-                                        >
-                                            {channel.subscribers}
-                                        </p>
-
-                                    </div>
-
-
-                                    {/* Subscribed button */}
-
-                                    <button
-                                        type="button"
+                            {channels.length === 0 && !isLoading ? (
+                                <p className="py-6 text-sm text-text-secondary">
+                                    You haven't subscribed to any channels yet.
+                                </p>
+                            ) : (
+                                channels.map((channel) => (
+                                    <Link
+                                        key={channel._id}
+                                        to={`/channel/${channel.username}`}
                                         className="
                                             flex
-                                            h-9
+                                            min-w-64
                                             shrink-0
                                             items-center
-                                            gap-1.5
-                                            rounded-full
-                                            bg-surface-elevated
-                                            px-3
-                                            text-xs
-                                            font-medium
-                                            text-text-primary
-                                            transition-all
+                                            gap-3
+                                            rounded-2xl
+                                            bg-surface
+                                            hover:bg-surface-elevated
+                                            cursor-pointer
+                                            transition-transform
                                             duration-150
-                                            hover:bg-primary-hover
-                                            active:bg-primary-hover
-                                            hover:text-white
                                             active:scale-95
+                                            p-3
                                         "
                                     >
-                                        <CheckIcon
-                                            size={16}
-                                            weight="bold"
+                                        {/* Avatar */}
+                                        <img
+                                            src={channel.avatar}
+                                            alt={channel.fullName || channel.username}
+                                            className="
+                                                h-12
+                                                w-12
+                                                shrink-0
+                                                rounded-full
+                                                object-cover
+                                            "
                                         />
 
-                                        <span>
-                                            Subscribed
-                                        </span>
-                                    </button>
+                                        {/* Channel information */}
+                                        <div className="min-w-0 flex-1">
+                                            <h2 className="truncate text-sm font-semibold text-text-primary">
+                                                {channel.fullName || channel.username}
+                                            </h2>
 
-                                </div>
+                                            <p className="mt-0.5 truncate text-xs text-text-muted">
+                                                {channel.subscribersCount ?? 0} subscribers
+                                            </p>
+                                        </div>
 
-                            ))}
+                                        {/* Subscribed button */}
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleToggleSubscribe(e, channel._id)}
+                                            className="
+                                                flex
+                                                h-9
+                                                shrink-0
+                                                items-center
+                                                gap-1.5
+                                                rounded-full
+                                                bg-surface-elevated
+                                                px-3
+                                                text-xs
+                                                font-medium
+                                                text-text-primary
+                                                transition-all
+                                                duration-150
+                                                hover:bg-red-500/20
+                                                hover:text-red-400
+                                                active:scale-95
+                                            "
+                                        >
+                                            <CheckIcon
+                                                size={16}
+                                                weight="bold"
+                                            />
+                                            <span>Subscribed</span>
+                                        </button>
+                                    </Link>
+                                ))
+                            )}
 
                         </div>
 

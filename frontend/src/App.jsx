@@ -7,8 +7,11 @@ import { useState, useEffect } from "react";
 import api from "./api/axios.js";
 import { useDispatch, useSelector } from "react-redux";
 import { login, setAccessToken, setInitializing } from "./features/authSlice.js";
+import { addNotification } from "./features/notificationSlice.js";
 import { LoadingOverlay } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { SaveToPlaylistProvider } from "./context/SaveToPlaylistContext.jsx";
+import socket from "./api/socket.js";
 
 function App() {
 
@@ -19,6 +22,7 @@ function App() {
   const dispatch = useDispatch();
 
   const isInitializing = useSelector(state => state.auth.isInitializing);
+  const currentUser = useSelector(state => state.auth.user);
 
   const pages = [
     "/search",
@@ -84,6 +88,37 @@ function App() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  //! Real-time Socket.IO notification listener
+  useEffect(() => {
+    if (!currentUser?._id) {
+      if (socket.connected) socket.disconnect();
+      return;
+    }
+
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    socket.emit("join", currentUser._id);
+
+    function handleNotification(data) {
+      dispatch(addNotification(data));
+
+      notifications.show({
+        title: data.type === "SUBSCRIBER" ? "New Subscriber! 🎉" : "New Video Upload! 🎥",
+        message: data.message,
+        color: "blue",
+        autoClose: 5000,
+      });
+    }
+
+    socket.on("new_notification", handleNotification);
+
+    return () => {
+      socket.off("new_notification", handleNotification);
+    };
+  }, [currentUser?._id, dispatch]);
 
   if (isInitializing) {
     return (

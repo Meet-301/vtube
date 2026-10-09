@@ -83,7 +83,9 @@ function History() {
         }
     }
 
-    useEffect(() => {loadHistory()}, [historyVideos]);
+    useEffect(() => {
+        loadHistory();
+    }, []);
 
     return (
         <main className="min-w-0">

@@ -3,9 +3,11 @@ function NotificationItem({
     message,
     time,
     unread = false,
+    onClick,
 }) {
     return (
         <div
+            onClick={onClick}
             className="
                 flex items-start gap-3
                 rounded-xl px-3 py-3

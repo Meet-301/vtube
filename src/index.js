@@ -16,17 +16,35 @@ dotenv.config({
    path: "./.env",
 });
 
-const server = createServer(app)
+const server = createServer(app);
 
-const io = new Server(server)
+const allowedOrigins = process.env.CORS_ORIGIN
+   ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
+   : ["http://localhost:5173"];
+
+const io = new Server(server, {
+   cors: {
+      origin: allowedOrigins,
+      credentials: true,
+   },
+});
+
+app.set("io", io);
 
 io.on("connection", (socket) => {
    console.log(`User connected: ${socket.id}`);
-   
+
+   socket.on("join", (userId) => {
+      if (userId) {
+         socket.join(userId.toString());
+         console.log(`User ${userId} joined their personal room`);
+      }
+   });
+
    socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.id}`);
-   })
-})
+   });
+});
 
 connectDB().then(() => {
    app.on("error", (error) => {

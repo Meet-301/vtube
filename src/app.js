@@ -6,9 +6,13 @@ import passport from "./config/passport.js";
 
 const app = express(); //! new server instance of express application
 
+const allowedOrigins = process.env.CORS_ORIGIN
+   ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
+   : ["http://localhost:5173"];
+
 app.use(
    cors({
-      origin: process.env.CORS_ORIGIN,
+      origin: allowedOrigins,
       credentials: true,
    })
 );

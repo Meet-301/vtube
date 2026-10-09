@@ -78,6 +78,31 @@ const createVideo = asyncHandler(async (req, res) => {
    delete safeVideo.videoFile;
    delete safeVideo.videoPublicId;
 
+   // Real-time socket notification to all channel subscribers
+   try {
+      const io = req.app.get("io");
+      if (io) {
+         Subscription.find({ channel: userId })
+            .select("subscriber")
+            .lean()
+            .then((subscribers) => {
+               subscribers.forEach((sub) => {
+                  io.to(sub.subscriber.toString()).emit("new_notification", {
+                     type: "NEW_VIDEO",
+                     message: `${req.user.fullName || req.user.username} uploaded a new video: "${createdVideo.title}"`,
+                     avatar: req.user.avatar,
+                     thumbnail: createdVideo.thumbnail,
+                     videoId: createdVideo._id,
+                     createdAt: new Date().toISOString(),
+                  });
+               });
+            })
+            .catch((err) => console.log("Socket notification error (subscribers):", err));
+      }
+   } catch (err) {
+      console.log("Socket notification error (video upload):", err);
+   }
+
    return res
       .status(201)
       .json(new ApiResponse(201, safeVideo, "Video created successfully"));
@@ -201,13 +226,32 @@ const getAllVideos = asyncHandler(async (req, res) => {
          },
       },
       {
-         $sort: sort
-      }
+         $sort: sort,
+      },
+      {
+         $skip: skip,
+      },
+      {
+         $limit: limitNumber,
+      },
    ]);
 
-   return res
-      .status(200)
-      .json(new ApiResponse(200, videos, "Videos fetched successfully"));
+   const totalCount = await Video.countDocuments({ isPublished: true });
+   const hasMore = skip + videos.length < totalCount;
+
+   return res.status(200).json(
+      new ApiResponse(
+         200,
+         {
+            videos,
+            hasMore,
+            totalCount,
+            currentPage: pageNumber,
+            totalPages: Math.ceil(totalCount / limitNumber) || 1,
+         },
+         "Videos fetched successfully"
+      )
+   );
 });
 
 const getVideoById = asyncHandler(async (req, res) => {
