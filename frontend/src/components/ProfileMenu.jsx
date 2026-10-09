@@ -31,10 +31,18 @@ function ProfileMenu() {
             }
         }
 
+        function handleEscape(event) {
+            if (event.key === "Escape") {
+                setIsopen(false);
+            }
+        }
+
         document.addEventListener("mousedown", handleClick);
+        document.addEventListener("keydown", handleEscape);
 
         return () => {
             document.removeEventListener("mousedown", handleClick);
+            document.removeEventListener("keydown", handleEscape);
         };
     }, []);
 
@@ -82,31 +90,36 @@ function ProfileMenu() {
             {/* Profile button */}
             <button
                 type="button"
-                onClick={() => setIsopen(!isOpen)}
+                onClick={() => setIsopen((prev) => !prev)}
                 aria-label="Account menu"
+                aria-expanded={isOpen}
+                title={user.fullName || user.username || "Account"}
                 className="
                     flex
                     h-10 w-10 shrink-0
                     items-center justify-center
                     rounded-full
-                    transition-all duration-200
                     text-text-primary
-                    border border-border/80
-                    hover:ring-2 hover:ring-primary/40
+                    transition-all duration-200
+                    hover:bg-surface-elevated
+                    active:bg-surface-elevated
                     active:scale-95
-                    overflow-hidden
                 "
             >
-                <img
-                    src={user.avatar}
-                    alt="Profile"
-                    className="h-full w-full object-cover"
-                />
+                {user.avatar ? (
+                    <img
+                        src={user.avatar}
+                        alt="Profile"
+                        className="h-8 w-8 rounded-full object-cover"
+                    />
+                ) : (
+                    <UserCircleIcon size={24} weight="regular" />
+                )}
             </button>
 
             {/* Profile menu */}
             {isOpen &&
-                <div className="absolute right-0 top-full z-50 w-64">
+                <div className="absolute right-0 top-full z-50 w-64 max-w-[calc(100vw-1rem)]">
                     <LoadingOverlay
                         visible={isLoading}
                         zIndex={1000}
