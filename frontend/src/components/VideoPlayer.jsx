@@ -12,7 +12,15 @@ import {
 import { Loader } from "@mantine/core";
 import { formatDuration } from "../utils/formatters";
 
-function VideoPlayer({ src, poster, autoPlay = false, videoRef, onTimeUpdate }) {
+function VideoPlayer({
+    src,
+    poster,
+    autoPlay = false,
+    videoRef,
+    onTimeUpdate,
+    initialTime = 0,
+    onProgressSave,
+}) {
 
     const innerRef = useRef(null);
     const ref = videoRef ?? innerRef;
@@ -21,6 +29,8 @@ function VideoPlayer({ src, poster, autoPlay = false, videoRef, onTimeUpdate }) 
     const barRef = useRef(null);
     const hideTimer = useRef(null);
     const isDragging = useRef(false);
+    const lastSavedTime = useRef(0);
+    const hasResumed = useRef(false);
 
     const [isPaused, setIsPaused] = useState(!autoPlay);
     const [isBuffering, setIsBuffering] = useState(false);
@@ -249,11 +259,34 @@ function VideoPlayer({ src, poster, autoPlay = false, videoRef, onTimeUpdate }) 
         setHoverRatio(0);
     }
 
+    useEffect(() => {
+        hasResumed.current = false;
+        lastSavedTime.current = 0;
+    }, [src]);
+
     /* ================= VIDEO EVENTS ================= */
 
+    function handleLoadedMetadata(e) {
+        const d = e.currentTarget.duration;
+        setDuration(d);
+        if (initialTime > 0 && !hasResumed.current) {
+            hasResumed.current = true;
+            e.currentTarget.currentTime = initialTime;
+            setCurrentTime(initialTime);
+        }
+    }
+
     function handleTimeUpdate(e) {
-        if (!isDragging.current) setCurrentTime(ref.current.currentTime);
+        const video = ref.current;
+        if (!video) return;
+
+        if (!isDragging.current) setCurrentTime(video.currentTime);
         onTimeUpdate?.(e);
+
+        if (Math.abs(video.currentTime - lastSavedTime.current) >= 2.5) {
+            lastSavedTime.current = video.currentTime;
+            onProgressSave?.(video.currentTime, video.duration);
+        }
     }
 
     function handleProgress() {
@@ -395,10 +428,22 @@ function VideoPlayer({ src, poster, autoPlay = false, videoRef, onTimeUpdate }) 
                 onClick={togglePlay}
                 onDoubleClick={toggleFullscreen}
                 onPlay={() => { setIsPaused(false); wakeControls(); }}
-                onPause={() => { setIsPaused(true); setShowControls(true); }}
+                onPause={() => {
+                    setIsPaused(true);
+                    setShowControls(true);
+                    if (ref.current) {
+                        onProgressSave?.(ref.current.currentTime, ref.current.duration);
+                    }
+                }}
+                onEnded={() => {
+                    setIsPaused(true);
+                    if (ref.current) {
+                        onProgressSave?.(ref.current.duration, ref.current.duration);
+                    }
+                }}
                 onTimeUpdate={handleTimeUpdate}
                 onProgress={handleProgress}
-                onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+                onLoadedMetadata={handleLoadedMetadata}
                 onDurationChange={(e) => setDuration(e.currentTarget.duration)}
                 onWaiting={() => setIsBuffering(true)}
                 onPlaying={() => setIsBuffering(false)}

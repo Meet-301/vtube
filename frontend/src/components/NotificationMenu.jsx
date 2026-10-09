@@ -92,7 +92,7 @@ function NotificationMenu() {
                     relative
                 "
             >
-                <BellIcon size={28} weight="regular" />
+                <BellIcon size={35} weight="regular" />
 
                 {/* Badge Counter */}
                 {unreadCount > 0 && (
@@ -146,7 +146,7 @@ function NotificationMenu() {
                         <div className="max-h-[70vh] overflow-y-auto space-y-1 scrollbar-none">
                             {notificationsList.length === 0 ? (
                                 <div className="py-8 text-center text-xs text-text-muted">
-                                    No notifications yet ✨
+                                    No notifications yet
                                 </div>
                             ) : (
                                 notificationsList.map((item) => (

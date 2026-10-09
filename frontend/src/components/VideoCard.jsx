@@ -4,8 +4,10 @@ import {
 
 import { MoreButton } from "./index.js";
 import { formatDuration, formatViews, timeAgo } from "../utils/formatters.js";
+import { getWatchProgress } from "../utils/watchProgress.js";
 
 function VideoCard({
+    _id,
     thumbnail,
     title,
     avatar,
@@ -14,6 +16,7 @@ function VideoCard({
     createdAt,
     duration,
     description,
+    progress,
     variant = "grid",
     deleteText = "Delete",
     saveButton = true,
@@ -27,6 +30,7 @@ function VideoCard({
 }) {
 
     const isHorizontal = variant === "horizontal";
+    const watchProgressPercent = progress ?? (_id ? getWatchProgress(_id)?.progress : 0);
 
     return (
         <article
@@ -160,6 +164,16 @@ function VideoCard({
                         >
                             {formatDuration(duration)}
                         </span>
+                    )}
+
+                    {/* Blue Watch Progress Bar */}
+                    {watchProgressPercent > 0 && (
+                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 overflow-hidden rounded-b-2xl">
+                            <div
+                                className="h-full bg-primary transition-all duration-200"
+                                style={{ width: `${Math.min(100, Math.max(0, watchProgressPercent))}%` }}
+                            />
+                        </div>
                     )}
 
                 </div>

@@ -21,6 +21,7 @@ import {
 import { notifications } from "@mantine/notifications";
 import { SaveToPlaylistModal, VideoPlayer } from "../components";
 import { useShare } from "../hooks/useShare.jsx";
+import { getWatchProgress, saveWatchProgress } from "../utils/watchProgress.js";
 
 function Watch() {
     const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -70,6 +71,48 @@ function Watch() {
     const buttonRef = useRef(null);
 
     const { share } = useShare();
+
+    const savedProgress = getWatchProgress(params.videoId);
+    const initialResumeTime = savedProgress?.currentTime > 3 ? savedProgress.currentTime : 0;
+
+    useEffect(() => {
+        if (!params.videoId) return;
+        const saved = getWatchProgress(params.videoId);
+        if (saved && saved.currentTime > 3) {
+            notifications.show({
+                id: `resume-${params.videoId}`,
+                title: "Resumed Playback ⏱️",
+                message: `Continuing from ${formatDuration(saved.currentTime)}`,
+                color: "blue",
+                autoClose: 3500,
+            });
+        }
+    }, [params.videoId]);
+
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            if (videoRef.current && params.videoId) {
+                saveWatchProgress(
+                    params.videoId,
+                    videoRef.current.currentTime,
+                    videoRef.current.duration
+                );
+            }
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+            if (videoRef.current && params.videoId) {
+                saveWatchProgress(
+                    params.videoId,
+                    videoRef.current.currentTime,
+                    videoRef.current.duration
+                );
+            }
+        };
+    }, [params.videoId]);
 
     function showError(error) {
         notifications.show({
@@ -441,6 +484,8 @@ function Watch() {
             <LoadingOverlay
                 visible={isLoading}
                 zIndex={1000}
+                pos="fixed"
+                inset={0}
                 overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
                 loaderProps={{ color: "blue", type: "oval" }}
             />
@@ -459,6 +504,8 @@ function Watch() {
                                 videoRef={videoRef}
                                 src={videoData.videoFile}
                                 poster={videoData.thumbnail}
+                                initialTime={initialResumeTime}
+                                onProgressSave={(time, dur) => saveWatchProgress(params.videoId, time, dur)}
                                 onTimeUpdate={handleTimeUpdate}
                                 autoPlay
                             />

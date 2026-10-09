@@ -29,7 +29,8 @@ import {
   ForgotPassword,
   VerifyEmail,
   ResetPassword,
-  PlaylistDetails
+  PlaylistDetails,
+  NotFound,
 } from './pages'
 import classes from './Notifications.module.css'
 import { Provider } from "react-redux";
@@ -68,29 +69,33 @@ const theme = createTheme({
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route element={<App />} path='/'>
-      <Route element={<ProtectedRoute/>}>
-        <Route element={<Home />} path='' />
-        <Route element={<Watch />} path='watch/:videoId' />
-        <Route element={<History />} path='history' />
-        <Route element={<Channel />} path='channel/:username' />
-        <Route element={<Subscriptions />} path='subscriptions' />
-        <Route element={<Playlists />} path='playlists' />
-        <Route element={<PlaylistDetails />} path='playlists/:id' />
-        <Route element={<LikedVideos />} path='liked-videos' />
-        <Route element={<ManageAccount />} path='manage-account' />
-        <Route element={<UploadVideo />} path='upload-video' />
-        <Route element={<EditVideo />} path='edit-video/:id' />
-        <Route element={<EditChannel />} path='edit-channel/:id' />
-        <Route element={<Search />} path='search' />
+    <>
+      <Route element={<App />} path='/'>
+        <Route element={<ProtectedRoute/>}>
+          <Route element={<Home />} path='' />
+          <Route element={<Watch />} path='watch/:videoId' />
+          <Route element={<History />} path='history' />
+          <Route element={<Channel />} path='channel/:username' />
+          <Route element={<Subscriptions />} path='subscriptions' />
+          <Route element={<Playlists />} path='playlists' />
+          <Route element={<PlaylistDetails />} path='playlists/:id' />
+          <Route element={<LikedVideos />} path='liked-videos' />
+          <Route element={<ManageAccount />} path='manage-account' />
+          <Route element={<UploadVideo />} path='upload-video' />
+          <Route element={<EditVideo />} path='edit-video/:id' />
+          <Route element={<EditChannel />} path='edit-channel/:id' />
+          <Route element={<Search />} path='search' />
+        </Route>
+
+        <Route element={<Login />} path='login' />
+        <Route element={<Register />} path='register' />
+        <Route element={<ForgotPassword/>} path='forgot-password' />
+        <Route element={<VerifyEmail />} path='verify-email' />
+        <Route element={<ResetPassword />} path='reset-password' />
       </Route>
 
-      <Route element={<Login />} path='login' />
-      <Route element={<Register />} path='register' />
-      <Route element={<ForgotPassword/>} path='forgot-password' />
-      <Route element={<VerifyEmail />} path='verify-email' />
-      <Route element={<ResetPassword />} path='reset-password' />
-    </Route>
+      <Route element={<NotFound />} path='*' />
+    </>
   )
 )
 

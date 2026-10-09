@@ -5,7 +5,7 @@ import {setAccessToken} from "../features/authSlice.js";
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true //! to allow browser to send cookies to server
-})
+});
 
 //! request interceptor
 api.interceptors.request.use(

@@ -93,6 +93,8 @@ function History() {
             <LoadingOverlay
                 visible={isLoading}
                 zIndex={1000}
+                pos="fixed"
+                inset={0}
                 overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
                 loaderProps={{ color: "blue", type: "oval" }}
             />
@@ -221,9 +223,9 @@ function History() {
                                     />
                                 :
                                historyVideos.map((video) => (
-                                    <Link to={`/watch/${video._id}`}>
+                                    <Link key={video._id} to={`/watch/${video._id}`}>
                                         <VideoCard
-                                            key={video._id}
+                                            _id={video._id}
                                             channelName={video.owner?.fullName}
                                             variant="horizontal"
                                             editButton={false}

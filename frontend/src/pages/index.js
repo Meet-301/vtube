@@ -16,6 +16,7 @@ import ForgotPassword from "./ForgotPassword.jsx";
 import VerifyEmail from "./VerifyEmail.jsx";
 import ResetPassword from "./ResetPassword.jsx";
 import PlaylistDetails from "./PlaylistDetails.jsx";
+import NotFound from "./NotFound.jsx";
 
 export {
     Home,
@@ -35,5 +36,6 @@ export {
     ForgotPassword,
     VerifyEmail,
     ResetPassword,
-    PlaylistDetails
+    PlaylistDetails,
+    NotFound,
 }

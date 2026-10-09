@@ -110,6 +110,8 @@ function Channel() {
             <LoadingOverlay 
                 visible={isLoading}
                 zIndex={1000}
+                pos="fixed"
+                inset={0}
                 overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
                 loaderProps={{ color: "blue", type: "oval" }}
             />

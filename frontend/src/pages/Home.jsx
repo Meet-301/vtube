@@ -119,6 +119,8 @@ function Home() {
             <LoadingOverlay
                 visible={isLoading}
                 zIndex={1000}
+                pos="fixed"
+                inset={0}
                 overlayProps={{ radius: "sm", blur: 2, backgroundOpacity: 0.45, color: "black" }}
                 loaderProps={{ color: "blue", type: "oval" }}
             />
@@ -178,7 +180,7 @@ function Home() {
                     )}
                     {!hasMore && videos.length > 0 && !isLoading && (
                         <p className="text-xs text-text-muted">
-                            You're all caught up ✨
+                            You're all caught up
                         </p>
                     )}
                 </div>
