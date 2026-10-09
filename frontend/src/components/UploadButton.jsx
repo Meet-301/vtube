@@ -1,7 +1,7 @@
 import { UploadSimpleIcon } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 
-function UploadButton({ size, classes }) {
+function UploadButton({ size, classes, iconClasses = "" }) {
     return (
         <Link
             to="/upload-video"
@@ -12,9 +12,10 @@ function UploadButton({ size, classes }) {
             <UploadSimpleIcon
                 size={size}
                 weight="regular"
+                className={iconClasses}
             />
         </Link>
-    )
+    );
 }
 
 export default UploadButton;

@@ -76,7 +76,8 @@ function Header({ onMenuClick }) {
                         onClick={onMenuClick}
                         className="
                             flex
-                            h-10 w-10 shrink-0
+                            h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12
+                            shrink-0
                             items-center justify-center
                             rounded-full
                             text-text-primary
@@ -89,6 +90,7 @@ function Header({ onMenuClick }) {
                         <ListIcon
                             size={24}
                             weight="regular"
+                            className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8"
                         />
                     </button>
 
@@ -104,7 +106,7 @@ function Header({ onMenuClick }) {
                             className="
                                 h-9 w-9
                                 sm:h-11 sm:w-11
-                                md:h-12 md:w-12
+                                md:h-13 md:w-13
                                 object-contain shrink-0
                             "
                         />
@@ -281,11 +283,11 @@ function Header({ onMenuClick }) {
                     {/* Upload */}
                     <UploadButton
                         size={24}
+                        iconClasses="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8"
                         classes="
                             hidden
                             lg:flex
-                            h-10
-                            w-10
+                            h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12
                             shrink-0
                             items-center
                             justify-center
@@ -306,9 +308,10 @@ function Header({ onMenuClick }) {
 
                     <UploadButton
                         size={24}
+                        iconClasses="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8"
                         classes="
                             lg:hidden flex
-                            h-10 w-10
+                            h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12
                             shrink-0
                             items-center justify-center
                             rounded-full
@@ -326,7 +329,7 @@ function Header({ onMenuClick }) {
                         aria-label="Search"
                         className="
                             flex md:hidden
-                            h-10 w-10
+                            h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12
                             shrink-0
                             items-center justify-center
                             rounded-full
@@ -340,6 +343,7 @@ function Header({ onMenuClick }) {
                         <MagnifyingGlassIcon
                             size={24}
                             weight="regular"
+                            className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8"
                         />
                     </Link>
 

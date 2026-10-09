@@ -96,7 +96,8 @@ function ProfileMenu() {
                 title={user.fullName || user.username || "Account"}
                 className="
                     flex
-                    h-10 w-10 shrink-0
+                    h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12
+                    shrink-0
                     items-center justify-center
                     rounded-full
                     text-text-primary
@@ -110,10 +111,19 @@ function ProfileMenu() {
                     <img
                         src={user.avatar}
                         alt="Profile"
-                        className="h-8 w-8 rounded-full object-cover"
+                        className="
+                            h-8 w-8
+                            sm:h-9 sm:w-9
+                            md:h-10 md:w-10
+                            rounded-full object-cover
+                        "
                     />
                 ) : (
-                    <UserCircleIcon size={24} weight="regular" />
+                    <UserCircleIcon
+                        size={24}
+                        weight="regular"
+                        className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8"
+                    />
                 )}
             </button>
 

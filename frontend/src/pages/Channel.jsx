@@ -105,7 +105,7 @@ function Channel() {
     }
 
     return (
-        <main className="px-4 py-6">
+        <main className="px-3 sm:px-4 py-4 sm:py-6">
 
             <LoadingOverlay 
                 visible={isLoading}
@@ -118,30 +118,30 @@ function Channel() {
 
             <div className="mx-auto w-full max-w-350">
 
-                {/* ================= COVER ================= */}
+                {/* ================= COVER / BANNER ================= */}
 
-                {
-                    channel.coverImage &&
-                    <div className="overflow-hidden rounded-2xl bg-surface">
+                {channel.coverImage && (
+                    <div className="overflow-hidden rounded-xl sm:rounded-2xl bg-surface shadow-xs">
                         <div
                             className="
-                                h-40
+                                aspect-3/1
+                                sm:aspect-[3.5/1]
+                                md:aspect-[4/1]
+                                lg:aspect-[4.5/1]
+                                min-h-[105px]
+                                max-h-72
                                 w-full
                                 bg-surface-elevated
-                                sm:h-48
-                                md:h-56
-                                lg:h-64
-                                xl:h-72
                             "
                         >
                             <img
                                 src={channel.coverImage}
-                                alt=""
-                                className="h-full w-full object-cover"
+                                alt={channel.fullName || "Channel banner"}
+                                className="h-full w-full object-cover object-center"
                             />
                         </div>
                     </div>
-                }
+                )}
 
                 {/* ================= CHANNEL INFO ================= */}
 
@@ -152,11 +152,13 @@ function Channel() {
                         {/* Avatar */}
 
                         <img
-                            src={channel.avatar}
+                            src={channel.avatar || "https://i.pravatar.cc/150?img=12"}
                             alt={channel.fullName}
                             className="
-                                h-24
-                                w-24
+                                h-20
+                                w-20
+                                sm:h-24
+                                sm:w-24
                                 shrink-0
                                 rounded-full
                                 object-cover
@@ -372,7 +374,8 @@ function Channel() {
                                         grid
                                         grid-cols-1
                                         gap-x-4
-                                        gap-y-8
+                                        gap-y-6
+                                        sm:gap-y-8
                                         sm:grid-cols-2
                                         lg:grid-cols-3
                                         xl:grid-cols-4
@@ -382,10 +385,16 @@ function Channel() {
                                         videos
                                             .filter((video) => Boolean(video && video._id))
                                             .map((video) => (
-                                            <Link key={video._id} to={`/watch/${video._id}`}>
+                                            <Link
+                                                key={video._id}
+                                                to={`/watch/${video._id}`}
+                                                className="block w-full min-w-0"
+                                            >
                                                 <VideoCard
                                                     key={video._id}
                                                     uploadedAt={video.createdAt}
+                                                    channelName={channel.fullName}
+                                                    avatar={channel.avatar}
                                                     editButton={isOwner}
                                                     deleteButton={isOwner}
                                                     onEditClick={() => navigate(`/edit-video/${video._id}`)}
@@ -433,7 +442,8 @@ function Channel() {
                                         grid
                                         grid-cols-1
                                         gap-x-5
-                                        gap-y-8
+                                        gap-y-6
+                                        sm:gap-y-8
                                         sm:grid-cols-2
                                         lg:grid-cols-3
                                         xl:grid-cols-4
@@ -442,11 +452,16 @@ function Channel() {
                                     {playlists
                                         .filter((playlist) => Boolean(playlist && playlist._id))
                                         .map((playlist) => (
-                                        <Link key={playlist._id} to={`/playlists/${playlist._id}`}>
+                                        <Link
+                                            key={playlist._id}
+                                            to={`/playlists/${playlist._id}`}
+                                            className="block w-full min-w-0"
+                                        >
                                             <article
-                                                key={playlist.id}
+                                                key={playlist.id || playlist._id}
                                                 className="
                                                     group
+                                                    w-full
                                                     min-w-0
                                                     cursor-pointer
                                                     transition-transform
@@ -460,6 +475,7 @@ function Channel() {
                                                     className="
                                                         relative
                                                         aspect-video
+                                                        w-full
                                                         overflow-hidden
                                                         rounded-2xl
                                                         bg-surface
@@ -472,6 +488,8 @@ function Channel() {
                                                             h-full
                                                             w-full
                                                             object-cover
+                                                            transition-transform
+                                                            duration-200
                                                             group-hover:scale-[1.02]
                                                         "
                                                     />

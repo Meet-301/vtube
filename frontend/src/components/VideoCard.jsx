@@ -41,7 +41,7 @@ function VideoCard({
                 min-w-0
                 transition-transform
                 duration-150
-                has-[button:active:not(.more-btn)]:scale-[0.99]
+                active:scale-[0.99]
 
                 ${isHorizontal
                     ? "flex flex-col gap-3 sm:flex-row sm:gap-4"
@@ -52,8 +52,7 @@ function VideoCard({
 
             {/* ================= THUMBNAIL ================= */}
 
-            <button
-                type="button"
+            <div
                 className={`
                     group
                     block
@@ -178,7 +177,7 @@ function VideoCard({
 
                 </div>
 
-            </button>
+            </div>
 
 
             {/* ================= VIDEO INFORMATION ================= */}
@@ -197,8 +196,7 @@ function VideoCard({
 
                 {/* Main information */}
 
-                <button
-                    type="button"
+                <div
                     className={`
                         group
                         flex
@@ -299,7 +297,7 @@ function VideoCard({
                         </p>
                     </div>
 
-                </button>
+                </div>
 
 
                 {/* More */}
