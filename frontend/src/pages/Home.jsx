@@ -38,8 +38,9 @@ function Home() {
                 if (!isMounted) return;
 
                 const data = response.data?.data;
-                const fetchedVideos = Array.isArray(data) ? data : (data?.videos || []);
-                const more = Array.isArray(data) ? (fetchedVideos.length >= LIMIT) : (data?.hasMore ?? false);
+                const rawList = Array.isArray(data) ? data : (data?.videos || []);
+                const fetchedVideos = rawList.filter((v) => Boolean(v && v._id));
+                const more = Array.isArray(data) ? (rawList.length >= LIMIT) : (data?.hasMore ?? false);
 
                 setVideos(fetchedVideos);
                 setHasMore(more);
@@ -73,8 +74,9 @@ function Home() {
             });
 
             const data = response.data?.data;
-            const newVideos = Array.isArray(data) ? data : (data?.videos || []);
-            const more = Array.isArray(data) ? (newVideos.length >= LIMIT) : (data?.hasMore ?? false);
+            const rawList = Array.isArray(data) ? data : (data?.videos || []);
+            const newVideos = rawList.filter((v) => Boolean(v && v._id));
+            const more = Array.isArray(data) ? (rawList.length >= LIMIT) : (data?.hasMore ?? false);
 
             setVideos((prev) => [...prev, ...newVideos]);
             setPage(nextPage);
@@ -151,7 +153,9 @@ function Home() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-                        {videos.map((video) => (
+                        {videos
+                            .filter((video) => Boolean(video && video._id))
+                            .map((video) => (
                             <Link key={video._id} to={`/watch/${video._id}`}>
                                 <VideoCard
                                     channelName={video.owner?.fullName}

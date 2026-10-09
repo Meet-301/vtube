@@ -36,6 +36,7 @@ import classes from './Notifications.module.css'
 import { Provider } from "react-redux";
 import store from './app/store.js';
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import { ErrorBoundary } from './components'
 
 const theme = createTheme({
   primaryColor: "vtube",
@@ -70,7 +71,7 @@ const theme = createTheme({
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      <Route element={<App />} path='/'>
+      <Route element={<App />} path='/' errorElement={<ErrorBoundary />}>
         <Route element={<ProtectedRoute/>}>
           <Route element={<Home />} path='' />
           <Route element={<Watch />} path='watch/:videoId' />

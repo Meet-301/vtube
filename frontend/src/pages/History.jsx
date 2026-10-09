@@ -43,8 +43,8 @@ function History() {
     async function loadHistory() {
         try {
             const res = await api.get("/users/history/watch-history");
-
-            setHistoryVideos(res.data?.data ?? []);
+            const raw = Array.isArray(res.data?.data) ? res.data.data : [];
+            setHistoryVideos(raw.filter((v) => Boolean(v && v._id)));
         } catch (error) {
             showError(error?.response?.data?.message || "Something went wrong");
         } finally {
@@ -222,7 +222,9 @@ function History() {
                                         size={21}
                                     />
                                 :
-                               historyVideos.map((video) => (
+                               historyVideos
+                                    .filter((video) => Boolean(video && video._id))
+                                    .map((video) => (
                                     <Link key={video._id} to={`/watch/${video._id}`}>
                                         <VideoCard
                                             _id={video._id}

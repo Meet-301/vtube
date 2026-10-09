@@ -41,7 +41,8 @@ function Playlists() {
             try {
                 const res = await api.get("/playlists/get/user");
 
-                setPlaylists(res.data?.data ?? []);
+                const raw = Array.isArray(res.data?.data) ? res.data.data : [];
+                setPlaylists(raw.filter((p) => Boolean(p && p._id)));
             } catch (error) {
                 showError(error?.response?.data?.message || "Something went wrong");
             } finally {
@@ -137,7 +138,9 @@ function Playlists() {
                                 "
                             >
 
-                                {playlists.map((playlist) => (
+                                {playlists
+                                    .filter((p) => Boolean(p && p._id))
+                                    .map((playlist) => (
 
                                     <div
                                         key={playlist._id}

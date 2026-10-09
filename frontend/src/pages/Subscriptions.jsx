@@ -27,7 +27,7 @@ function Subscriptions() {
         try {
             const res = await api.get(`/subscriptions/subscribed-channels/${currentUser._id}`);
             const data = res.data?.data || [];
-            setChannels(data.map((item) => item.channel).filter(Boolean));
+            setChannels(data.map((item) => item?.channel).filter((c) => Boolean(c && c._id)));
         } catch (error) {
             console.log("Failed to fetch subscribed channels:", error);
         }
@@ -40,7 +40,7 @@ function Subscriptions() {
                 params: { sortBy: sort },
             });
             const data = res.data?.data || [];
-            setFeedVideos(Array.isArray(data) ? data : []);
+            setFeedVideos(Array.isArray(data) ? data.filter((v) => Boolean(v && v._id)) : []);
         } catch (error) {
             console.log("Failed to fetch subscription feed videos:", error);
         }
@@ -166,7 +166,9 @@ function Subscriptions() {
                                     You haven't subscribed to any channels yet.
                                 </p>
                             ) : (
-                                channels.map((channel) => (
+                                channels
+                                    .filter((channel) => Boolean(channel && channel._id))
+                                    .map((channel) => (
                                     <Link
                                         key={channel._id}
                                         to={`/channel/${channel.username}`}
@@ -305,7 +307,9 @@ function Subscriptions() {
                                     lg:grid-cols-3
                                 "
                             >
-                                {feedVideos.map((video) => (
+                                {feedVideos
+                                    .filter((video) => Boolean(video && video._id))
+                                    .map((video) => (
                                     <Link key={video._id} to={`/watch/${video._id}`}>
                                         <VideoCard
                                             channelName={video.owner?.fullName || video.owner?.username}

@@ -39,8 +39,12 @@ function LikedVideos() {
     async function fetchLikedVideos() {
         try {
             const res = await api.get("/likes/all");
+            const rawData = Array.isArray(res.data?.data) ? res.data.data : [];
+            const validVideos = rawData
+                .map((item) => item?.video || item)
+                .filter((v) => Boolean(v && v._id));
 
-            setLikedVideos(res.data?.data.map((item) => item.video) ?? []);
+            setLikedVideos(validVideos);
         } catch (error) {
             showError(error?.response?.data?.message || "Something went wrong");
         } finally {
@@ -121,18 +125,19 @@ function LikedVideos() {
                                 "
                             >
 
-                                {likedVideos.map((video) => (
-                                    <Link to={`/watch/${video._id}`}>
+                                {likedVideos
+                                    .filter((video) => Boolean(video && video._id))
+                                    .map((video) => (
+                                    <Link key={video._id} to={`/watch/${video._id}`}>
                                         <VideoCard
-                                            key={video._id}
-                                            channelName={video.owner.fullName}
-                                            avatar={video.owner.avatar}
+                                            channelName={video.owner?.fullName || video.owner?.username}
+                                            avatar={video.owner?.avatar}
                                             editButton={false}
                                             onDeleteClick={() => handleDelete(video._id)}
                                             onSaveClick={() => openSave(video._id)}
                                             onShareClick={() => share({
                                                 path: `/watch/${video._id}`,
-                                                title: `${video.title}`
+                                                title: `${video.title || "Video"}`
                                             })}
                                             deleteText="Remove"
                                             {...video}

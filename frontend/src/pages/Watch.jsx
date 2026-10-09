@@ -889,7 +889,9 @@ function Watch() {
                                         No notes yet. Pause the video and add one.
                                     </p>
                                 ) : (
-                                    notes.map((note) => {
+                                    notes
+                                        .filter((note) => Boolean(note && note._id))
+                                        .map((note) => {
                                         const isHighlighted =
                                             currentSecond !== null &&
                                             Math.floor(Number(note.timestamp)) === currentSecond;
@@ -1109,7 +1111,9 @@ function Watch() {
                                     loaderProps={{ color: "blue", type: "oval" }}
                                 />
                             ) : (
-                                commentData.map((comment) => (
+                                commentData
+                                    .filter((comment) => Boolean(comment && comment._id))
+                                    .map((comment) => (
                                     <div className="flex gap-3" key={comment._id}>
 
                                         <img

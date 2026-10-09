@@ -149,7 +149,9 @@ function NotificationMenu() {
                                     No notifications yet
                                 </div>
                             ) : (
-                                notificationsList.map((item) => (
+                                notificationsList
+                                    .filter((item) => Boolean(item && (item._id || item.id)))
+                                    .map((item) => (
                                     <NotificationItem
                                         key={item.id || item._id}
                                         avatar={item.avatar}

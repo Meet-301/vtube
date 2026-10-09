@@ -187,7 +187,7 @@ function PlaylistDetails() {
 
     const { share } = useShare();
 
-    const videos = playlist?.videos ?? [];
+    const videos = (playlist?.videos ?? []).filter((v) => Boolean(v && v._id));
 
     console.log(playlist);
 

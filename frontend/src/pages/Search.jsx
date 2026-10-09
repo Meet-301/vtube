@@ -517,7 +517,9 @@ function Search() {
                         {/* --- VIDEOS LIST --- */}
                         {typeParam === "video" && (
                             <div className="flex flex-col gap-6">
-                                {results.map((video) => (
+                                {results
+                                    .filter((video) => Boolean(video && video._id))
+                                    .map((video) => (
                                     <Link key={video._id} to={`/watch/${video._id}`} className="block w-full">
                                         <VideoCard
                                             thumbnail={video.thumbnail}
@@ -546,7 +548,9 @@ function Search() {
                         {/* --- CHANNELS LIST --- */}
                         {typeParam === "channel" && (
                             <div className="flex flex-col divide-y divide-border/60">
-                                {results.map((channel) => (
+                                {results
+                                    .filter((channel) => Boolean(channel && channel._id))
+                                    .map((channel) => (
                                     <div
                                         key={channel._id}
                                         className="flex items-center justify-between gap-4 py-5 transition-colors hover:bg-surface/40 px-3 rounded-2xl"
@@ -590,7 +594,9 @@ function Search() {
                         {/* --- PLAYLISTS LIST --- */}
                         {typeParam === "playlist" && (
                             <div className="flex flex-col gap-6">
-                                {results.map((playlist) => (
+                                {results
+                                    .filter((playlist) => Boolean(playlist && playlist._id))
+                                    .map((playlist) => (
                                     <Link
                                         key={playlist._id}
                                         to={`/playlists/${playlist._id}`}

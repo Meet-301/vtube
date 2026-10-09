@@ -16,6 +16,7 @@ import MoreButton from "./MoreButton.jsx";
 import SearchDropdown from "./SearchDropDown.jsx";
 import SaveToPlaylistModal from "./SaveToPlaylistModal.jsx";
 import VideoPlayer from "./VideoPlayer.jsx";
+import ErrorBoundary from "./ErrorBoundary.jsx";
 
 export {
    Header,
@@ -35,5 +36,6 @@ export {
    MoreButton,
    SearchDropdown,
    SaveToPlaylistModal,
-   VideoPlayer
+   VideoPlayer,
+   ErrorBoundary
 };

@@ -379,8 +379,10 @@ function Channel() {
                                     "
                                 >
                                     {
-                                        videos.map((video) => (
-                                            <Link to={`/watch/${video._id}`}>
+                                        videos
+                                            .filter((video) => Boolean(video && video._id))
+                                            .map((video) => (
+                                            <Link key={video._id} to={`/watch/${video._id}`}>
                                                 <VideoCard
                                                     key={video._id}
                                                     uploadedAt={video.createdAt}
@@ -437,8 +439,10 @@ function Channel() {
                                         xl:grid-cols-4
                                     "
                                 >
-                                    {playlists.map((playlist) => (
-                                        <Link to={`/playlists/${playlist._id}`}>
+                                    {playlists
+                                        .filter((playlist) => Boolean(playlist && playlist._id))
+                                        .map((playlist) => (
+                                        <Link key={playlist._id} to={`/playlists/${playlist._id}`}>
                                             <article
                                                 key={playlist.id}
                                                 className="
