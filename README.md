@@ -1,6 +1,6 @@
 # 🎬 VTube
 
-A video platform built from scratch with **Node.js, Express and MongoDB**. It ships a full REST API covering authentication, video uploads, likes, comments, playlists, subscriptions, search and timestamped video notes, with a **React** frontend currently in progress.
+A video platform built from scratch with **Node.js, Express and MongoDB**. It ships a full REST API covering authentication, video uploads, likes, comments, playlists, subscriptions, search and timestamped video notes, with a **React** frontend.
 
 ![Node.js](https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?logo=express&logoColor=white)
