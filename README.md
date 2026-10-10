@@ -211,7 +211,7 @@ Import [`docs/vtube.postman_collection.json`](./docs/vtube.postman_collection.js
 - [x] REST API with JWT authentication, email verification and Google OAuth
 - [x] Video upload pipeline with Cloudinary
 - [x] Likes, comments, subscriptions, playlists, search and video notes
-- [ ] React frontend (in progress)
+- [x] React frontend
 
 ## 👤 Author
 
