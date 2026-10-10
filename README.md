@@ -142,8 +142,6 @@ npm run dev
 
 ## 📡 API Overview
 
-Import [`docs/vtube.postman_collection.json`](./docs/vtube.postman_collection.json) into Postman and set the `server` variable to your API base URL (for example `http://localhost:8000/api/v1`). Routes below are relative to that base URL; protected routes need a logged-in user.
-
 ### Users — `/users`
 | Method | Endpoint | Description |
 | --- | --- | --- |
