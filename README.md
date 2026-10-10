@@ -1,4 +1,4 @@
-# 🎬 Vtube
+# 🎬 VTube
 
 A video platform built from scratch with **Node.js, Express and MongoDB**. It ships a full REST API covering authentication, video uploads, likes, comments, playlists, subscriptions, search and timestamped video notes, with a **React** frontend currently in progress.
 
@@ -9,13 +9,32 @@ A video platform built from scratch with **Node.js, Express and MongoDB**. It sh
 ![Socket.IO](https://img.shields.io/badge/Socket.IO-010101?logo=socketdotio&logoColor=white)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?logo=cloudinary&logoColor=white)
 
-**🔗 Live API:** http://vtube-mvnn.onrender.com &nbsp;|&nbsp;
-
-<!-- Add a screenshot or GIF here once the frontend is ready:
-![Vtube demo](./docs/demo.gif)
--->
+**🔗 Live Link:** http://vtube-stream.vercel.app
 
 ---
+
+## 📸 Screenshots
+
+<img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/2cdc0198-b32f-4a1f-a338-adeab04ace1b" />
+
+<img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/7962a114-2e31-449b-b2f8-c319ea787d9c" />
+
+<img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/9157ad6a-7ac5-42fc-9029-b90e1c328520" />
+
+<img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/1df43e60-e621-41e3-aac3-8f89483e1ee4" />
+
+<img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/dd31692d-1523-410c-b310-81df6aff462d" />
+
+<img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/bd1bd0a3-9497-4953-b238-6968cde322df" />
+
+<img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/429aaa88-cfdb-4703-881c-6576bf6a30a2" />
+
+<img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/8e045a3d-721e-4c7a-b151-ffbc31d532db" />
+
+<img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/d7c2a785-d70a-4b71-9cbc-60c5ac151068" />
+
+<img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/6690ab4b-bb00-4cce-83f5-c7fa4ceae609" />
+
 
 ## ✨ Features
 
@@ -43,11 +62,11 @@ A video platform built from scratch with **Node.js, Express and MongoDB**. It sh
 | Layer | Technologies |
 | --- | --- |
 | Backend | Node.js, Express 5 |
-| Database | MongoDB, Mongoose, mongoose-aggregate-paginate-v2 |
+| Database | MongoDB, Mongoose |
 | Auth | JWT, bcrypt, Passport (Google OAuth 2.0), cookie-parser |
 | Media | Multer, Cloudinary |
-| Real-time / Email | Socket.IO, Nodemailer |
-| Frontend | React (in progress) |
+| Real-time / Email | Socket.IO, Nylas |
+| Frontend | React |
 | Tooling | Nodemon, Prettier, Postman, Git & GitHub |
 
 ## 📁 Project Structure
@@ -55,8 +74,7 @@ A video platform built from scratch with **Node.js, Express and MongoDB**. It sh
 ```
 vtube/
 ├── src/         # Backend (Express API)
-├── frontend/    # React client (in progress)
-├── docs/        # Postman collection
+├── frontend/    # React
 ├── package.json
 └── README.md
 ```
