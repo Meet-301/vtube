@@ -39,22 +39,23 @@ A video platform built from scratch with **Node.js, Express and MongoDB**. It sh
 ## ✨ Features
 
 - **Authentication & account management**
-  - Register with avatar upload, login, logout and refresh-token flow (JWT)
-  - Email verification with resend, forgot / reset password (Nodemailer)
+  - Register with avatar and cover image upload, login, logout and refresh-token flow (JWT)
+  - Email verification with resend, forgot / reset password (Nylas)
   - Password hashing with bcrypt, Google sign-in via OAuth 2.0 (Passport.js)
   - Update account details, password, avatar and cover image
 - **Videos**
   - Upload video + thumbnail (Multer → Cloudinary), duration extracted automatically
   - Watch, browse all videos, fetch by channel, publish/unpublish, update details and thumbnail, delete
   - Personalised feed from subscribed channels
-  - Watch history with per-video removal
+  - Watch history with per-video removal and clear history
 - **Engagement**
-  - Like / unlike toggle, liked-videos list and like status per video
+  - Like / unlike toggle, liked-videos list, like status, and total video likes count
   - Comments: add, list, edit, delete
   - Subscriptions: toggle, list a channel's subscribers, list subscribed channels
 - **Playlists:** create, add / remove videos, custom cover image, delete
-- **Search:** search by query and type (e.g. channel), with saved search history
+- **Search:** search by query and type (video, playlist, channel), with saved search history
 - **Video notes:** timestamped notes on any video (create, list, edit, delete)
+- **Notifications:** real-time notifications with Socket.IO, mark as read, clear all notifications
 - **Efficient data access:** MongoDB aggregation pipelines with pagination
 
 ## 🛠️ Tech Stack
@@ -62,7 +63,7 @@ A video platform built from scratch with **Node.js, Express and MongoDB**. It sh
 | Layer | Technologies |
 | --- | --- |
 | Backend | Node.js, Express 5 |
-| Database | MongoDB, Mongoose |
+| Database | MongoDB, Mongoose, mongoose-aggregate-paginate-v2 |
 | Auth | JWT, bcrypt, Passport (Google OAuth 2.0), cookie-parser |
 | Media | Multer, Cloudinary |
 | Real-time / Email | Socket.IO, Nylas |
@@ -86,7 +87,7 @@ vtube/
 - A MongoDB database (local or Atlas)
 - A Cloudinary account
 - Google OAuth credentials (for Google sign-in)
-- An email account / SMTP app password (for verification and reset emails)
+- Nylas account / credentials (for verification and reset emails)
 
 ### Backend
 
@@ -124,9 +125,11 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_CALLBACK_URL=http://localhost:8000/api/v1/users/auth/google/callback
 
-EMAIL_USER=your_email
-EMAIL_PASS=your_app_password
+NYLAS_API_KEY=your_nylas_api_key
+NYLAS_DOMAIN=your_nylas_domain
+NYLAS_FROM_EMAIL=your_email
 ```
 
 ### Frontend
@@ -144,7 +147,7 @@ Import [`docs/vtube.postman_collection.json`](./docs/vtube.postman_collection.js
 ### Users — `/users`
 | Method | Endpoint | Description |
 | --- | --- | --- |
-| POST | `/users/register` | Register (multipart: email, password, fullName, username, avatar) |
+| POST | `/users/register` | Register (multipart: `email`, `password`, `fullName`, `username`, `avatar`, `coverImage`) |
 | POST | `/users/verify-email` | Verify email with token |
 | POST | `/users/resend-email` | Resend verification email |
 | POST | `/users/login` | Log in |
@@ -154,25 +157,30 @@ Import [`docs/vtube.postman_collection.json`](./docs/vtube.postman_collection.js
 | PATCH | `/users/reset-password` | Reset password with token |
 | PATCH | `/users/update-password` | Change password |
 | GET | `/users/current-user` | Get logged-in user |
+| GET | `/users/:userId` | Get user by ID |
 | GET | `/users/channel/:username` | Get channel profile |
-| GET | `/users/watch-history` | Get watch history |
+| GET | `/users/history/watch-history` | Get watch history |
 | DELETE | `/users/watch-history/remove?videoId=` | Remove a video from history |
+| DELETE | `/users/watch-history/clear` | Clear entire watch history |
 | PATCH | `/users/update-account` | Update account details |
-| PATCH | `/users/update-avatar` | Update avatar |
-| PATCH | `/users/update-cover` | Update cover image |
+| PATCH | `/users/update-avatar` | Update avatar (multipart: `avatar`) |
+| PATCH | `/users/update-cover` | Update cover image (multipart: `coverImage`) |
+| GET | `/users/auth/google` | Google OAuth 2.0 login |
+| GET | `/users/auth/google/callback` | Google OAuth callback |
 
 ### Videos — `/videos`
 | Method | Endpoint | Description |
 | --- | --- | --- |
-| POST | `/videos/create` | Upload a video (multipart: title, description, video, thumbnail) |
+| POST | `/videos/create` | Upload a video (multipart: `title`, `description`, `video`, `thumbnail`) |
 | GET | `/videos/all` | Get all videos |
 | GET | `/videos/watch/:videoId` | Watch a video |
 | GET | `/videos/id/:videoId` | Get video details |
 | GET | `/videos/username/:username` | Get a channel's videos |
 | GET | `/videos/feed/subscription` | Feed from subscribed channels |
 | PATCH | `/videos/update-details/:videoId` | Update details / publish status |
-| PATCH | `/videos/update-thumbnail/:videoId` | Update thumbnail |
+| PATCH | `/videos/update-thumbnail/:videoId` | Update thumbnail (multipart: `thumbnail`) |
 | DELETE | `/videos/videoid/:videoId` | Delete a video |
+| DELETE | `/videos/username/:username` | Delete all videos of a channel |
 
 ### Likes, Comments, Subscriptions
 | Method | Endpoint | Description |
@@ -180,6 +188,7 @@ Import [`docs/vtube.postman_collection.json`](./docs/vtube.postman_collection.js
 | PATCH | `/likes/toggle/:videoId` | Toggle like |
 | GET | `/likes/all` | Get liked videos |
 | GET | `/likes/status/:videoId` | Get like status |
+| GET | `/likes/current-video/:videoId` | Get likes count of current video |
 | POST | `/comments/add/:videoId` | Add a comment |
 | GET | `/comments/all/:videoId` | List comments |
 | PATCH | `/comments/:commentId` | Edit a comment |
@@ -188,17 +197,17 @@ Import [`docs/vtube.postman_collection.json`](./docs/vtube.postman_collection.js
 | GET | `/subscriptions/channel-subscribers/:channelId` | List subscribers |
 | GET | `/subscriptions/subscribed-channels/:userId` | List subscribed channels |
 
-### Playlists, Search, Video Notes
+### Playlists, Video Notes, Search
 | Method | Endpoint | Description |
 | --- | --- | --- |
-| POST | `/playlists/create` | Create a playlist |
+| POST | `/playlists/create` | Create a playlist (multipart: `playlistCover`) |
 | GET | `/playlists/:playlistId` | Get a playlist |
 | GET | `/playlists/get/user` | Get the user's playlists |
 | POST | `/playlists/:playlistId/add-video/:videoId` | Add a video |
 | DELETE | `/playlists/remove-video/:playlistId/:videoId` | Remove a video |
-| PATCH | `/playlists/:playlistId` | Update playlist cover |
-| DELETE | `/playlists/:playlistId` | Delete a playlist |
-| GET | `/search?query=&type=` | Search |
+| PATCH | `/playlists/:playlistId` | Update playlist cover & details (multipart: `playlistCover`) |
+| DELETE | `/playlists/remove-playlist/:playlistId` | Delete a playlist |
+| GET | `/search?query=&type=` | Search videos, playlists, or channels (`query`, `type`, `sortBy`, `page`, `limit`) |
 | GET | `/search-history` | Get search history |
 | DELETE | `/search-history/remove?query=` | Remove a search entry |
 | POST | `/video-notes/:videoId` | Add a timestamped note |
@@ -206,11 +215,20 @@ Import [`docs/vtube.postman_collection.json`](./docs/vtube.postman_collection.js
 | PATCH | `/video-notes/:noteId` | Edit a note |
 | DELETE | `/video-notes/:noteId` | Delete a note |
 
+### Notifications — `/notifications`
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/notifications` | Get all notifications for current user |
+| PATCH | `/notifications/read-all` | Mark all notifications as read |
+| PATCH | `/notifications/:id/read` | Mark a specific notification as read |
+| DELETE | `/notifications/clear` | Clear all notifications |
+
 ## 🗺️ Roadmap
 
 - [x] REST API with JWT authentication, email verification and Google OAuth
 - [x] Video upload pipeline with Cloudinary
 - [x] Likes, comments, subscriptions, playlists, search and video notes
+- [x] Notifications system with real-time Socket.IO
 - [x] React frontend
 
 ## 👤 Author
